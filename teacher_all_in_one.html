@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>教師甄試報名系統</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+<style>
+  *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+  :root{
+    --primary:#3D8B7E;--primary-light:#5DA99B;--primary-surface:#E6F3F0;
+    --accent:#E8B84B;--text:#2C3E3A;--text-dim:#7A8F8B;--text-muted:#A9BCB8;
+    --bg:#F5F8F7;--surface:#FFFFFF;--border:#D6E4E0;--border-light:#E8F0ED;
+    --error:#D9655B;--success:#3D8B7E;--warning:#F39C12;
+    --radius:16px;--radius-sm:10px;
+    --shadow:0 2px 8px rgba(61,139,126,0.06),0 8px 32px rgba(61,139,126,0.04)
+  }
+  body{
+    font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;
+    background-image:radial-gradient(ellipse 600px 400px at 10% 20%,rgba(61,139,126,0.04) 0%,transparent 100%);
+    background-attachment:fixed
+  }
+  .header{
+    background:linear-gradient(135deg,var(--primary) 0%,#2D6B60 100%);color:#fff;padding:0 24px;
+    position:sticky;top:0;z-index:100;box-shadow:0 4px 20px rgba(45,107,96,0.15)
+  }
+  .header-inner{
+    max-width:960px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:64px
+  }
+  .header .brand{display:flex;align-items:center;gap:10px}
+  .header .brand-icon{
+    width:32px;height:32px;background:rgba(255,255,255,0.15);border-radius:8px;
+    display:flex;align-items:center;justify-content:center;font-size:18px
+  }
+  .header h1{font-size:18px;font-weight:700;letter-spacing:.5px}
+  .header h1 small{font-weight:300;font-size:12px;opacity:.75;margin-left:6px}
+  .header .admin-link{
+    padding:6px 14px;border:1px solid rgba(255,255,255,0.25);background:transparent;
+    color:rgba(255,255,255,0.7);border-radius:8px;cursor:pointer;font-size:12px;
+    font-family:inherit;transition:all .25s;text-decoration:none
+  }
+  .header .admin-link:hover{background:rgba(255,255,255,0.1);color:#fff;border-color:rgba(255,255,255,0.4)}
+  .main{max-width:960px;margin:0 auto;padding:32px 24px 60px}
+  .page{display:none;animation:fadeUp .4s ease}
+  .page.active,.admin-page.active{display:block}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+  .card{
+    background:var(--surface);border-radius:var(--radius);box-shadow:var(--shadow);
+    padding:28px 32px;margin-bottom:20px;border:1px solid var(--border-light);position:relative;overflow:hidden
+  }
+  .card::before{
+    content:'';position:absolute;top:0;left:0;right:0;height:3px;
+    background:linear-gradient(90deg,var(--primary),var(--accent),var(--primary));
+    background-size:200% 100%;animation:shimmer 4s ease-in-out infinite
+  }
+  @keyframes shimmer{0%,100%{background-position:0% 0%}50%{background-position:100% 0%}}
+  .card-title{font-size:17px;font-weight:700;margin-bottom:4px;color:var(--primary);display:flex;align-items:center;gap:10px}
+  .card-title .badge{font-size:11px;font-weight:600;background:var(--primary-surface);color:var(--primary);padding:2px 12px;border-radius:20px}
+  .card-title .icon{font-size:20px}
+  .card-desc{font-size:13px;color:var(--text-dim);margin-bottom:20px;padding-left:30px}
+  .welcome-banner{
+    background:linear-gradient(135deg,var(--primary) 0%,#2D6B60 100%);border-radius:var(--radius);
+    padding:28px 32px;margin-bottom:20px;color:#fff;position:relative;overflow:hidden
+  }
+  .welcome-banner::after{content:'📄';position:absolute;right:24px;bottom:12px;font-size:56px;opacity:.12}
+  .welcome-banner h2{font-size:20px;font-weight:700;margin-bottom:4px}
+  .welcome-banner p{font-size:14px;opacity:.85}
+  .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px 24px}
+  .form-grid .full{grid-column:1/-1}
+  .form-group{display:flex;flex-direction:column;gap:5px}
+  .form-group label{font-size:13px;font-weight:600;color:var(--text)}
+  .form-group label .required{color:var(--error);margin-left:2px}
+  .form-group input,.form-group select,.form-group textarea{
+    padding:11px 14px;border:1.5px solid var(--border);border-radius:var(--radius-sm);
+    font-size:14px;font-family:inherit;outline:none;transition:all .25s ease;background:var(--bg);color:var(--text)
+  }
+  .form-group input:focus,.form-group select:focus,.form-group textarea:focus{
+    border-color:var(--primary);box-shadow:0 0 0 4px rgba(61,139,126,0.1);background:#fff
+  }
+  .form-group textarea{resize:vertical;min-height:80px}
+  .form-group .error-msg{font-size:12px;color:var(--error);display:none}
+  .form-group.invalid input,.form-group.invalid select{border-color:var(--error);box-shadow:0 0 0 4px rgba(217,101,91,0.08)}
+  .form-group.invalid .error-msg{display:block}
+  .file-upload-area{
+    border:2px dashed var(--border);border-radius:var(--radius-sm);padding:24px;
+    text-align:center;cursor:pointer;transition:all .25s;background:var(--bg);position:relative
+  }
+  .file-upload-area:hover{border-color:var(--primary);background:var(--primary-surface)}
+  .file-upload-area.dragover{border-color:var(--primary);background:var(--primary-surface);box-shadow:0 0 0 4px rgba(61,139,126,0.1)}
+  .file-upload-area .upload-icon{font-size:36px;margin-bottom:8px;opacity:.5}
+  .file-upload-area .upload-text{font-size:14px;color:var(--text-dim)}
+  .file-upload-area .upload-hint{font-size:12px;color:var(--text-muted);margin-top:4px}
+  .file-upload-area input[type="file"]{position:absolute;inset:0;opacity:0;cursor:pointer}
+  .file-list{display:flex;flex-direction:column;gap:8px;margin-top:12px}
+  .file-item{
+    display:flex;align-items:center;gap:10px;padding:8px 12px;
+    background:var(--primary-surface);border-radius:var(--radius-sm);font-size:13px
+  }
+  .file-item .file-icon{font-size:20px}
+  .file-item .file-info{flex:1}
+  .file-item .file-info .file-name{font-weight:500;color:var(--text)}
+  .file-item .file-info .file-size{font-size:11px;color:var(--text-dim)}
+  .file-item .file-status{font-size:11px;padding:2px 8px;border-radius:10px;font-weight:500}
+  .file-item .file-status.uploaded{background:rgba(61,139,126,0.1);color:var(--primary)}
+  .file-item .file-status.pending{background:#FEF9E7;color:#B8860B}
+  .file-item .file-status.error{background:rgba(217,101,91,0.1);color:var(--error)}
+  .file-item .file-remove{
+    width:24px;height:24px;border:none;background:transparent;color:var(--text-muted);
+    border-radius:4px;cursor:pointer;font-size:16px;transition:all .2s
+  }
+  .file-item .file-remove:hover{background:rgba(217,101,91,0.1);color:var(--error)}
+  .gdrive-setup{
+    background:#FEF9E7;border:1px solid #F9E79F;border-radius:var(--radius-sm);
+    padding:14px 18px;margin-bottom:16px;font-size:13px
+  }
+  .gdrive-setup .gdrive-title{font-weight:600;color:#7D6608;margin-bottom:6px}
+  .gdrive-setup .gdrive-step{color:#7D6608;margin:2px 0;font-size:12px}
+  .gdrive-setup input{
+    width:100%;padding:8px 12px;border:1.5px solid #F9E79F;border-radius:6px;
+    font-size:13px;font-family:monospace;outline:none;margin:6px 0;background:#fff
+  }
+  .gdrive-setup input:focus{border-color:#D4AC0D}
+  .gdrive-setup .btn-sm{
+    padding:6px 14px;border:none;border-radius:6px;font-size:12px;font-weight:600;
+    font-family:inherit;cursor:pointer;background:var(--primary);color:#fff;transition:background .2s
+  }
+  .gdrive-setup .btn-sm:hover{background:var(--primary-light)}
+  .gdrive-connected{
+    display:none;background:#E8F5E9;border:1px solid #A5D6A7;
+    border-radius:var(--radius-sm);padding:10px 16px;font-size:13px;margin-bottom:12px
+  }
+  .gdrive-connected.show{display:flex;align-items:center;gap:8px}
+  .gdrive-connected .check{color:var(--success);font-weight:600}
+  .checkbox-group{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px}
+  .checkbox-group label{
+    display:flex;align-items:center;gap:6px;font-size:13px;font-weight:400;padding:7px 14px;
+    border:1.5px solid var(--border);border-radius:8px;cursor:pointer;transition:all .25s;
+    background:var(--bg);color:var(--text-dim)
+  }
+  .checkbox-group label:hover{border-color:var(--primary-light);background:var(--primary-surface);color:var(--primary)}
+  .checkbox-group label.selected{border-color:var(--primary);background:var(--primary-surface);color:var(--primary);font-weight:600}
+  .checkbox-group input[type="checkbox"]{display:none}
+  .form-actions{display:flex;gap:12px;justify-content:flex-end;margin-top:8px;flex-wrap:wrap}
+  .btn{
+    padding:11px 32px;border:none;border-radius:var(--radius-sm);font-size:14px;
+    font-weight:600;font-family:inherit;cursor:pointer;transition:all .25s;letter-spacing:.3px
+  }
+  .btn:active{transform:scale(0.96)}
+  .btn-primary{
+    background:linear-gradient(135deg,var(--primary) 0%,var(--primary-light) 100%);
+    color:#fff;box-shadow:0 4px 16px rgba(61,139,126,0.3)
+  }
+  .btn-primary:hover{box-shadow:0 6px 24px rgba(61,139,126,0.4);transform:translateY(-1px)}
+  .btn-outline{background:transparent;color:var(--text-dim);border:1.5px solid var(--border)}
+  .btn-outline:hover{background:var(--bg);color:var(--text)}
+
+  /* ===== 管理後台樣式 ===== */
+  .admin-page{display:none}
+  .admin-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px}
+  .stat-card{
+    background:var(--surface);border-radius:var(--radius);padding:20px;
+    box-shadow:var(--shadow);border:1px solid var(--border-light)
+  }
+  .stat-card .stat-icon{font-size:28px;margin-bottom:8px}
+  .stat-card .stat-number{font-size:28px;font-weight:800;color:var(--primary);line-height:1.2}
+  .stat-card .stat-label{font-size:13px;color:var(--text-dim);margin-top:4px}
+  .admin-card{
+    background:var(--surface);border-radius:var(--radius);box-shadow:var(--shadow);
+    border:1px solid var(--border-light);margin-bottom:20px
+  }
+  .admin-card-header{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:18px 24px;border-bottom:1px solid var(--border-light);flex-wrap:wrap;gap:12px
+  }
+  .admin-card-header h2{font-size:16px;font-weight:700;color:var(--primary)}
+  .toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+  .toolbar input,.toolbar select{
+    padding:9px 12px;border:1.5px solid var(--border);border-radius:var(--radius-sm);
+    font-size:13px;font-family:inherit;outline:none;background:var(--bg);transition:border-color .2s
+  }
+  .toolbar input:focus,.toolbar select:focus{border-color:var(--primary)}
+  .toolbar input{flex:1;min-width:160px}
+  .table-wrap{overflow-x:auto}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  table th{
+    text-align:left;padding:12px 14px;background:var(--primary-surface);
+    color:var(--primary);font-weight:600;font-size:12px;white-space:nowrap
+  }
+  table td{padding:11px 14px;border-bottom:1px solid var(--border-light);vertical-align:middle}
+  table tr:hover td{background:rgba(44,62,80,0.02)}
+  table td .status-badge{
+    display:inline-block;padding:2px 10px;border-radius:20px;font-size:11px;font-weight:600
+  }
+  table td .status-badge.pending{background:#FEF9E7;color:var(--warning)}
+  table td .status-badge.approved{background:rgba(61,139,126,0.1);color:var(--success)}
+  table td .status-badge.rejected{background:rgba(217,101,91,0.1);color:var(--error)}
+  table td .subjects-cell{display:flex;flex-wrap:wrap;gap:3px}
+  table td .subjects-cell span{
+    background:var(--primary-surface);color:var(--primary);
+    padding:1px 8px;border-radius:4px;font-size:11px;font-weight:500
+  }
+  table td .action-btns{display:flex;gap:4px}
+  table td .action-btns button{
+    padding:4px 10px;border:none;border-radius:4px;font-size:11px;
+    font-weight:600;font-family:inherit;cursor:pointer;transition:all .2s
+  }
+  table td .action-btns .btn-approve{background:rgba(61,139,126,0.1);color:var(--primary)}
+  table td .action-btns .btn-approve:hover{background:var(--primary);color:#fff}
+  table td .action-btns .btn-reject{background:rgba(217,101,91,0.1);color:var(--error)}
+  table td .action-btns .btn-reject:hover{background:var(--error);color:#fff}
+  table td .action-btns .btn-delete{background:transparent;color:var(--text-muted);font-size:16px;padding:4px 6px}
+  table td .action-btns .btn-delete:hover{color:var(--error)}
+  .table-empty{text-align:center;padding:48px 0;color:var(--text-dim);font-size:14px}
+  .table-empty .icon{font-size:40px;margin-bottom:8px;opacity:.3}
+
+  /* ===== 登入 Modal ===== */
+  .modal-overlay{
+    display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);
+    z-index:300;align-items:center;justify-content:center;padding:24px
+  }
+  .modal-overlay.active{display:flex}
+  .modal{
+    background:var(--surface);border-radius:var(--radius);width:100%;max-width:400px;
+    padding:32px;box-shadow:0 20px 60px rgba(0,0,0,0.2);animation:fadeUp .3s ease
+  }
+  .modal h3{font-size:18px;font-weight:700;text-align:center;color:var(--primary);margin-bottom:4px}
+  .modal .modal-sub{text-align:center;font-size:13px;color:var(--text-dim);margin-bottom:20px}
+  .modal .form-group{margin-bottom:14px}
+  .modal .form-group label{display:block;font-size:13px;font-weight:600;margin-bottom:5px}
+  .modal .form-group input{
+    width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:var(--radius-sm);
+    font-size:14px;font-family:inherit;outline:none;transition:border-color .2s;background:var(--bg)
+  }
+  .modal .form-group input:focus{border-color:var(--primary);box-shadow:0 0 0 4px rgba(61,139,126,0.1)}
+  .modal .login-error{color:var(--error);font-size:13px;text-align:center;margin-bottom:12px;display:none}
+  .modal .btn{width:100%;text-align:center}
+  .modal .modal-close-top{
+    position:absolute;top:12px;right:16px;border:none;background:transparent;
+    font-size:22px;color:var(--text-muted);cursor:pointer
+  }
+  .modal{position:relative}
+
+  .toast{
+    position:fixed;top:84px;right:24px;padding:14px 24px;border-radius:var(--radius-sm);
+    font-size:14px;font-weight:500;box-shadow:0 8px 32px rgba(0,0,0,0.15);
+    transform:translateX(120%);transition:transform .5s cubic-bezier(0.34,1.56,0.64,1);
+    z-index:200;max-width:360px;color:#fff
+  }
+  .toast.show{transform:translateX(0)}
+  .toast.success{background:var(--success)}
+  .toast.error{background:var(--error)}
+
+  .file-preview-item{
+    display:inline-flex;align-items:center;gap:6px;padding:4px 10px;
+    background:var(--primary-surface);border-radius:6px;font-size:12px;margin:2px
+  }
+  .file-preview-item a{color:var(--primary);text-decoration:none}
+  .file-preview-item a:hover{text-decoration:underline}
+
+  @media(max-width:700px){
+    .form-grid{grid-template-columns:1fr}
+    .header-inner{flex-direction:column;height:auto;padding:12px 0;gap:10px}
+    .nav-tabs{width:100%}
+    .nav-tabs button{flex:1;text-align:center;padding:8px 12px;font-size:13px}
+    .card{padding:20px}
+    .card-desc{padding-left:0}
+    .form-actions{flex-direction:column}
+    .form-actions .btn{width:100%;text-align:center}
+    .welcome-banner{padding:20px}
+    .welcome-banner::after{display:none}
+    .admin-stats{grid-template-columns:repeat(2,1fr)}
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-inner">
+    <div class="brand">
+      <div class="brand-icon">📚</div>
+      <h1>教師甄試 <small>報名系統</small></h1>
+    </div>
+    <button class="admin-link" id="adminLoginBtn">🔐 管理後台</button>
+  </div>
+</div>
+
+<div class="main">
+  <!-- ===== 報名頁 ===== -->
+  <div class="page active" id="pageRegister">
+    <div class="welcome-banner">
+      <h2>教師甄試線上報名</h2>
+      <p>請填寫資料並上傳相關掃描文件</p>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="icon">☁️</span> Google Drive 雲端儲存設定</div>
+      <div class="card-desc">設定後上傳的檔案將自動存入你的 Google 雲端硬碟</div>
+      <div class="gdrive-connected" id="gdriveConnected"><span class="check">✅</span> 已連接 Google Drive</div>
+      <div class="gdrive-setup">
+        <div class="gdrive-title">🔑 設定步驟</div>
+        <div class="gdrive-step">1. 前往 <a href="https://console.cloud.google.com/apis/credentials" target="_blank">Google Cloud Console</a> 建立憑證</div>
+        <div class="gdrive-step">2. 建立 OAuth 2.0 用戶端 ID（網頁應用程式）</div>
+        <div class="gdrive-step">3. 授權來源：<code>https://htmlpreview.github.io</code></div>
+        <label style="font-size:12px;font-weight:600;margin-top:8px;display:block">Google API 用戶端 ID</label>
+        <input type="text" id="gdriveClientId" placeholder="貼上你的 Google OAuth Client ID">
+        <div style="display:flex;gap:8px;margin-top:6px">
+          <button class="btn-sm" id="gdriveConnectBtn">🔗 連接</button>
+          <button class="btn-sm" id="gdriveClearBtn" style="background:#ddd;color:#666">清除</button>
+        </div>
+      </div>
+    </div>
+
+    <form id="regForm" novalidate>
+      <div class="card">
+        <div class="card-title"><span class="icon">👤</span> 基本資料 <span class="badge">必填</span></div>
+        <div class="card-desc">請填寫個人基本資訊</div>
+        <div class="form-grid">
+          <div class="form-group"><label>姓名 <span class="required">*</span></label><input type="text" id="name" placeholder="請輸入姓名" required><div class="error-msg">請輸入姓名</div></div>
+          <div class="form-group"><label>身分證字號 <span class="required">*</span></label><input type="text" id="idNumber" placeholder="A123456789" required><div class="error-msg">請輸入正確的身分證字號</div></div>
+          <div class="form-group"><label>性別 <span class="required">*</span></label><select id="gender" required><option value="">請選擇性別</option><option value="男">男</option><option value="女">女</option></select><div class="error-msg">請選擇性別</div></div>
+          <div class="form-group"><label>出生日期 <span class="required">*</span></label><input type="date" id="birthDate" required><div class="error-msg">請選擇出生日期</div></div>
+          <div class="form-group"><label>聯絡電話 <span class="required">*</span></label><input type="tel" id="phone" placeholder="0912-345-678" required><div class="error-msg">請輸入聯絡電話</div></div>
+          <div class="form-group"><label>電子郵件 <span class="required">*</span></label><input type="email" id="email" placeholder="example@mail.com" required><div class="error-msg">請輸入有效的電子郵件</div></div>
+          <div class="form-group full"><label>通訊地址</label><input type="text" id="address" placeholder="縣市／鄉鎮市區／路街／號"></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title"><span class="icon">🎓</span> 學歷與證照 <span class="badge">必填</span></div>
+        <div class="card-desc">請填寫最高學歷及教師證資訊</div>
+        <div class="form-grid">
+          <div class="form-group"><label>最高學歷 <span class="required">*</span></label><select id="degree" required><option value="">請選擇學歷</option><option value="學士">學士</option><option value="碩士">碩士</option><option value="博士">博士</option></select><div class="error-msg">請選擇學歷</div></div>
+          <div class="form-group"><label>畢業學校 <span class="required">*</span></label><input type="text" id="school" placeholder="例如：國立臺灣師範大學" required><div class="error-msg">請輸入畢業學校</div></div>
+          <div class="form-group"><label>科系 <span class="required">*</span></label><input type="text" id="major" placeholder="例如：教育學系" required><div class="error-msg">請輸入科系</div></div>
+          <div class="form-group"><label>教師證字號</label><input type="text" id="certNo" placeholder="例如：教中字第XXXXXXX號"></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title"><span class="icon">📋</span> 應試資訊 <span class="badge">必填</span></div>
+        <div class="card-desc">選擇報考科目與志願地區</div>
+        <div class="form-grid">
+          <div class="form-group full">
+            <label>報考科目 <span class="required">*</span></label>
+            <div class="checkbox-group" id="subjectsGroup">
+              <label data-value="國文"><input type="checkbox" value="國文"> 📖 國文</label>
+              <label data-value="英文"><input type="checkbox" value="英文"> 🌎 英文</label>
+              <label data-value="數學"><input type="checkbox" value="數學"> 🔢 數學</label>
+              <label data-value="社會"><input type="checkbox" value="社會"> 🏛️ 社會</label>
+              <label data-value="自然"><input type="checkbox" value="自然"> 🔬 自然</label>
+              <label data-value="音樂"><input type="checkbox" value="音樂"> 🎵 音樂</label>
+              <label data-value="美術"><input type="checkbox" value="美術"> 🎨 美術</label>
+              <label data-value="體育"><input type="checkbox" value="體育"> ⚽ 體育</label>
+              <label data-value="資訊"><input type="checkbox" value="資訊"> 💻 資訊</label>
+              <label data-value="特教"><input type="checkbox" value="特教"> ❤️ 特教</label>
+            </div>
+            <div class="error-msg" id="subjectsError">請至少選擇一個報考科目</div>
+          </div>
+          <div class="form-group full">
+            <label>志願地區 <span class="required">*</span></label>
+            <select id="region" required>
+              <option value="">請選擇志願地區</option>
+              <option value="臺北市">📍 臺北市</option><option value="新北市">📍 新北市</option>
+              <option value="桃園市">📍 桃園市</option><option value="臺中市">📍 臺中市</option>
+              <option value="臺南市">📍 臺南市</option><option value="高雄市">📍 高雄市</option>
+              <option value="基隆市">📍 基隆市</option><option value="新竹縣市">📍 新竹縣市</option>
+              <option value="苗栗縣">📍 苗栗縣</option><option value="彰化縣">📍 彰化縣</option>
+              <option value="南投縣">📍 南投縣</option><option value="雲林縣">📍 雲林縣</option>
+              <option value="嘉義縣市">📍 嘉義縣市</option><option value="屏東縣">📍 屏東縣</option>
+              <option value="宜蘭縣">📍 宜蘭縣</option><option value="花蓮縣">📍 花蓮縣</option>
+              <option value="臺東縣">📍 臺東縣</option><option value="澎湖縣">📍 澎湖縣</option>
+            </select>
+            <div class="error-msg">請選擇志願地區</div>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title"><span class="icon">📎</span> 掃描文件上傳</div>
+        <div class="card-desc">請上傳相關證明文件的掃描檔或照片（支援圖片、PDF，單檔上限 10MB）</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+          <div class="form-group"><label>身分證正反面</label><div class="file-upload-area"><div class="upload-icon">📇</div><div class="upload-text">點選或拖曳</div><div class="upload-hint">JPG / PNG / PDF</div><input type="file" accept="image/*,application/pdf" data-target="idCard"></div><div class="file-list" id="fileIdCard"></div></div>
+          <div class="form-group"><label>教師證書</label><div class="file-upload-area"><div class="upload-icon">📜</div><div class="upload-text">點選或拖曳</div><div class="upload-hint">JPG / PNG / PDF</div><input type="file" accept="image/*,application/pdf" data-target="cert"></div><div class="file-list" id="fileCert"></div></div>
+          <div class="form-group"><label>畢業證書</label><div class="file-upload-area"><div class="upload-icon">🎓</div><div class="upload-text">點選或拖曳</div><div class="upload-hint">JPG / PNG / PDF</div><input type="file" accept="image/*,application/pdf" data-target="diploma"></div><div class="file-list" id="fileDiploma"></div></div>
+          <div class="form-group"><label>其他證明</label><div class="file-upload-area"><div class="upload-icon">📁</div><div class="upload-text">點選或拖曳</div><div class="upload-hint">JPG / PNG / PDF</div><input type="file" accept="image/*,application/pdf" data-target="other"></div><div class="file-list" id="fileOther"></div></div>
+        </div>
+      </div>
+      <div class="card"><div class="card-title"><span class="icon">✏️</span> 備註</div><div class="form-group" style="margin-top:12px"><textarea id="notes" placeholder="其他特殊需求或補充說明..." style="min-height:80px"></textarea></div></div>
+      <div class="form-actions">
+        <button type="reset" class="btn btn-outline">重新填寫</button>
+        <button type="submit" class="btn btn-primary">📤 送出報名</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- ===== 管理後台頁 ===== -->
+  <div class="admin-page" id="pageAdmin">
+    <div class="admin-stats">
+      <div class="stat-card"><div class="stat-icon">📝</div><div class="stat-number" id="statTotal">0</div><div class="stat-label">總報名人數</div></div>
+      <div class="stat-card" style="border-left:3px solid var(--success)"><div class="stat-icon">✅</div><div class="stat-number" id="statApproved">0</div><div class="stat-label">已審核通過</div></div>
+      <div class="stat-card" style="border-left:3px solid var(--warning)"><div class="stat-icon">⏳</div><div class="stat-number" id="statPending">0</div><div class="stat-label">待審核</div></div>
+      <div class="stat-card" style="border-left:3px solid var(--error)"><div class="stat-icon">❌</div><div class="stat-number" id="statRejected">0</div><div class="stat-label">未通過</div></div>
+    </div>
+    <div class="admin-card">
+      <div class="admin-card-header">
+        <h2>報名資料管理 <span id="listTotal" style="font-weight:400;color:var(--text-dim);font-size:13px"></span></h2>
+        <div class="toolbar">
+          <input type="text" id="searchInput" placeholder="搜尋姓名、身分證、學校...">
+          <select id="filterSubject"><option value="">全部科目</option><option value="國文">國文</option><option value="英文">英文</option><option value="數學">數學</option><option value="社會">社會</option><option value="自然">自然</option><option value="音樂">音樂</option><option value="美術">美術</option><option value="體育">體育</option><option value="資訊">資訊</option><option value="特教">特教</option></select>
+          <select id="filterStatus"><option value="">全部狀態</option><option value="pending">待審核</option><option value="approved">已通過</option><option value="rejected">未通過</option></select>
+          <button class="btn btn-primary" id="exportBtn" style="padding:9px 16px;font-size:13px">📥 CSV</button>
+          <button class="btn btn-outline" id="backToRegBtn" style="padding:9px 16px;font-size:13px">📝 報名表</button>
+        </div>
+      </div>
+      <div style="padding:0">
+        <div class="table-wrap">
+          <table><thead><tr><th>姓名</th><th>身分證</th><th>電話</th><th>學歷</th><th>學校</th><th>科目</th><th>地區</th><th>狀態</th><th>檔案</th><th style="width:130px">操作</th></tr></thead><tbody id="listBody"></tbody></table>
+        </div>
+        <div class="table-empty" id="listEmpty"><div class="icon">📋</div><div>尚無報名資料</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 登入 Modal ===== -->
+<div class="modal-overlay" id="loginModal">
+  <div class="modal">
+    <button class="modal-close-top" id="modalCloseTop">×</button>
+    <h3>🔐 管理者登入</h3>
+    <div class="modal-sub">請輸入管理帳號密碼</div>
+    <div class="login-error" id="loginError">帳號或密碼錯誤</div>
+    <div class="form-group"><label>帳號</label><input type="text" id="loginUser" placeholder="請輸入帳號"></div>
+    <div class="form-group"><label>密碼</label><input type="password" id="loginPass" placeholder="請輸入密碼"></div>
+    <button class="btn btn-primary" id="loginBtn">登入後台</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://apis.google.com/js/api.js"></script>
+<script>
+const STORAGE_KEY='teacher_registrations_all';
+const ADMIN_USER='admin',ADMIN_PASS='admin123';
+const FILE_TARGETS=['idCard','cert','diploma','other'];
+const FILE_LABELS={idCard:'身分證',cert:'教師證書',diploma:'畢業證書',other:'其他證明'};
+const FILE_ICONS={idCard:'📇',cert:'📜',diploma:'🎓',other:'📁'};
+
+let registrations=[];
+let gdriveAuthorized=false,gdriveToken=null;
+let pendingFiles={idCard:[],cert:[],diploma:[],other:[]};
+let uploadedFiles={idCard:[],cert:[],diploma:[],other:[]};
+
+const D=id=>document.getElementById(id);
+const DOM={
+  name:D('name'),idNumber:D('idNumber'),gender:D('gender'),birthDate:D('birthDate'),
+  phone:D('phone'),email:D('email'),address:D('address'),degree:D('degree'),
+  school:D('school'),major:D('major'),certNo:D('certNo'),
+  subjectsGroup:D('subjectsGroup'),region:D('region'),notes:D('notes'),
+  form:D('regForm'),gdriveClientId:D('gdriveClientId'),
+  gdriveConnectBtn:D('gdriveConnectBtn'),gdriveClearBtn:D('gdriveClearBtn'),
+  gdriveConnected:D('gdriveConnected'),
+  toast:D('toast'),
+  adminLoginBtn:D('adminLoginBtn'),loginModal:D('loginModal'),
+  loginUser:D('loginUser'),loginPass:D('loginPass'),loginBtn:D('loginBtn'),
+  loginError:D('loginError'),modalCloseTop:D('modalCloseTop'),
+  pageRegister:D('pageRegister'),pageAdmin:D('pageAdmin'),
+  statTotal:D('statTotal'),statApproved:D('statApproved'),
+  statPending:D('statPending'),statRejected:D('statRejected'),
+  listBody:D('listBody'),listEmpty:D('listEmpty'),listTotal:D('listTotal'),
+  searchInput:D('searchInput'),filterSubject:D('filterSubject'),
+  filterStatus:D('filterStatus'),exportBtn:D('exportBtn'),backToRegBtn:D('backToRegBtn')
+};
+
+/* ===== 檔案處理 ===== */
+FILE_TARGETS.forEach(target=>{
+  const input=document.querySelector(`input[data-target="${target}"]`);
+  input.addEventListener('change',()=>{Array.from(input.files).forEach(f=>addFile(target,f));input.value=''});
+  const area=input.closest('.file-upload-area');
+  area.addEventListener('dragover',e=>{e.preventDefault();area.classList.add('dragover')});
+  area.addEventListener('dragleave',()=>area.classList.remove('dragover'));
+  area.addEventListener('drop',e=>{e.preventDefault();area.classList.remove('dragover');Array.from(e.dataTransfer.files).forEach(f=>addFile(target,f))});
+});
+
+function addFile(target,file){
+  if(file.size>10*1024*1024){showToast('⚠️ '+file.name+' 超過 10MB','error');return}
+  const reader=new FileReader();
+  reader.onload=function(e){
+    const fd={id:Date.now().toString(36)+Math.random().toString(36).slice(2,4),name:file.name,size:file.size,type:file.type,data:e.target.result,status:gdriveAuthorized?'pending':'local',gdriveId:null,gdriveLink:null};
+    pendingFiles[target].push(fd);renderFiles(target);
+    if(gdriveAuthorized)uploadToDrive(target,fd)
+  };
+  reader.readAsDataURL(file)
+}
+
+function removeFile(target,id){
+  pendingFiles[target]=pendingFiles[target].filter(f=>f.id!==id);
+  uploadedFiles[target]=uploadedFiles[target].filter(f=>f.id!==id);renderFiles(target)
+}
+
+function renderFiles(target){
+  const list=D('file'+target.charAt(0).toUpperCase()+target.slice(1));
+  const all=[...uploadedFiles[target],...pendingFiles[target]];
+  if(!all.length){list.innerHTML='';return}
+  list.innerHTML=all.map(f=>{
+    const done=f.status==='uploaded'||f.gdriveId;
+    const st=done?'☁️ 已上傳':f.status==='error'?'❌ 失敗':'⏳ 排隊中';
+    const sc=done?'uploaded':f.status==='error'?'error':'pending';
+    const sz=f.size>1024*1024?(f.size/1024/1024).toFixed(1)+' MB':(f.size/1024).toFixed(0)+' KB';
+    const link=f.gdriveLink?` <a href="${f.gdriveLink}" target="_blank" style="font-size:14px;text-decoration:none" title="在雲端開啟">🔗</a>`:'';
+    return`<div class="file-item"><div class="file-icon">${FILE_ICONS[target]}</div><div class="file-info"><div class="file-name">${esc(f.name)}${link}</div><div class="file-size">${sz}</div></div><span class="file-status ${sc}">${st}</span><button class="file-remove" onclick="removeFile('${target}','${f.id}')">×</button></div>`
+  }).join('')
+}
+
+/* ===== Google Drive ===== */
+function loadGdrive(){
+  try{
+    const s=JSON.parse(localStorage.getItem('gdrive_settings')||'{}');
+    DOM.gdriveClientId.value=s.clientId||'';
+    if(s.authorized){gdriveAuthorized=true;gdriveToken=s.token;DOM.gdriveConnected.classList.add('show')}
+  }catch{}
+}
+function saveGdrive(){localStorage.setItem('gdrive_settings',JSON.stringify({clientId:DOM.gdriveClientId.value.trim(),authorized:gdriveAuthorized,token:gdriveToken}))}
+
+async function connectGdrive(){
+  const cid=DOM.gdriveClientId.value.trim();
+  if(!cid){showToast('請輸入用戶端 ID','error');return}
+  try{
+    await new Promise(r=>gapi.load('client:auth2',r));
+    await gapi.client.init({clientId:cid,scope:'https://www.googleapis.com/auth/drive.file',discoveryDocs:['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest']});
+    const auth=gapi.auth2.getAuthInstance();
+    if(!auth.isSignedIn.get())await auth.signIn();
+    gdriveAuthorized=true;gdriveToken=auth.currentUser.get().getAuthResponse().access_token;
+    DOM.gdriveConnected.classList.add('show');saveGdrive();showToast('✅ 已連接 Google Drive');
+    FILE_TARGETS.forEach(t=>{pendingFiles[t].forEach(f=>{if(f.status==='pending')uploadToDrive(t,f)})})
+  }catch(err){showToast('❌ 連接失敗','error')}
+}
+
+async function uploadToDrive(target,fd){
+  try{
+    const fid=await getDriveFolder();
+    const base64=fd.data.split(',')[1],mt=fd.type||'application/octet-stream';
+    const bs=atob(base64),ab=new ArrayBuffer(bs.length),ia=new Uint8Array(ab);
+    for(let i=0;i<bs.length;i++)ia[i]=bs.charCodeAt(i);
+    const blob=new Blob([ab],{type:mt});
+    const form=new FormData();
+    form.append('metadata',new Blob([JSON.stringify({name:FILE_LABELS[target]+'_'+fd.name,parents:[fid],mimeType:mt})],{type:'application/json'}));
+    form.append('file',blob);
+    const res=await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id,webViewLink',{method:'POST',headers:{Authorization:`Bearer ${gdriveToken}`},body:form});
+    const r=await res.json();
+    if(r.id){fd.gdriveId=r.id;fd.gdriveLink=r.webViewLink;fd.status='uploaded';pendingFiles[target]=pendingFiles[target].filter(f=>f.id!==fd.id);uploadedFiles[target].push(fd);renderFiles(target)}
+    else{fd.status='error';renderFiles(target)}
+  }catch(err){fd.status='error';renderFiles(target)}
+}
+
+async function getDriveFolder(){
+  const name='教師甄試報名文件';
+  const s=await fetch(`https://www.googleapis.com/drive/v3/files?q=name='${encodeURIComponent(name)}' and mimeType='application/vnd.google-apps.folder' and trashed=false&fields=files(id)`,{headers:{Authorization:`Bearer ${gdriveToken}`}});
+  const d=await s.json();
+  if(d.files&&d.files.length)return d.files[0].id;
+  const c=await fetch('https://www.googleapis.com/drive/v3/files?fields=id',{method:'POST',headers:{Authorization:`Bearer ${gdriveToken}`, 'Content-Type':'application/json'},body:JSON.stringify({name,mimeType:'application/vnd.google-apps.folder'})});
+  return(await c.json()).id
+}
+
+DOM.gdriveConnectBtn.addEventListener('click',connectGdrive);
+DOM.gdriveClearBtn.addEventListener('click',()=>{gdriveAuthorized=false;gdriveToken=null;DOM.gdriveConnected.classList.remove('show');localStorage.removeItem('gdrive_settings');showToast('已清除設定')});
+
+/* ===== 報名表單 ===== */
+function validateId(v){return/^[A-Z][12]\d{8}$/.test(v)}
+function validatePhone(v){return/^0\d{1,2}-\d{3,4}-\d{3,4}$/.test(v)||/^09\d{8}$/.test(v)}
+function getAllFiles(){const o={};FILE_TARGETS.forEach(t=>{o[t]=[...uploadedFiles[t],...pendingFiles[t]].map(f=>({id:f.id,name:f.name,size:f.size,type:f.type,data:f.data,gdriveId:f.gdriveId,gdriveLink:f.gdriveLink,status:f.status}))});return o}
+
+DOM.subjectsGroup.addEventListener('change',e=>{if(e.target.type==='checkbox')e.target.closest('label').classList.toggle('selected',e.target.checked)});
+DOM.form.addEventListener('submit',e=>{
+  e.preventDefault();
+  document.querySelectorAll('.form-group.invalid').forEach(el=>el.classList.remove('invalid'));
+  let v=true;
+  if(!DOM.name.value.trim()){DOM.name.closest('.form-group').classList.add('invalid');v=false}
+  if(!validateId(DOM.idNumber.value.trim())){DOM.idNumber.closest('.form-group').classList.add('invalid');v=false}
+  if(!DOM.gender.value){DOM.gender.closest('.form-group').classList.add('invalid');v=false}
+  if(!DOM.birthDate.value){DOM.birthDate.closest('.form-group').classList.add('invalid');v=false}
+  if(!validatePhone(DOM.phone.value.trim())){DOM.phone.closest('.form-group').classList.add('invalid');v=false}
+  if(!DOM.email.value.trim()||!DOM.email.value.includes('@')){DOM.email.closest('.form-group').classList.add('invalid');v=false}
+  if(!DOM.degree.value){DOM.degree.closest('.form-group').classList.add('invalid');v=false}
+  if(!DOM.school.value.trim()){DOM.school.closest('.form-group').classList.add('invalid');v=false}
+  if(!DOM.major.value.trim()){DOM.major.closest('.form-group').classList.add('invalid');v=false}
+  const subs=[...DOM.subjectsGroup.querySelectorAll('input:checked')].map(c=>c.value);
+  if(!subs.length){D('subjectsError').style.display='block';v=false}else D('subjectsError').style.display='none';
+  if(!DOM.region.value){DOM.region.closest('.form-group').classList.add('invalid');v=false}
+  if(!v)return;
+  loadRegs();
+  registrations.push({id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),name:DOM.name.value.trim(),idNumber:DOM.idNumber.value.trim(),gender:DOM.gender.value,birthDate:DOM.birthDate.value,phone:DOM.phone.value.trim(),email:DOM.email.value.trim(),address:DOM.address.value.trim(),degree:DOM.degree.value,school:DOM.school.value.trim(),major:DOM.major.value.trim(),certNo:DOM.certNo.value.trim(),subjects:subs,region:DOM.region.value,notes:DOM.notes.value.trim(),files:getAllFiles(),createdAt:new Date().toISOString()});
+  saveRegs();showToast('🎉 報名成功！');
+  DOM.form.reset();
+  DOM.subjectsGroup.querySelectorAll('label').forEach(l=>l.classList.remove('selected'));
+  FILE_TARGETS.forEach(t=>{pendingFiles[t]=[];uploadedFiles[t]=[];renderFiles(t)})
+});
+DOM.form.querySelector('button[type="reset"]').addEventListener('click',()=>{
+  document.querySelectorAll('.form-group.invalid').forEach(el=>el.classList.remove('invalid'));
+  DOM.subjectsGroup.querySelectorAll('label').forEach(l=>l.classList.remove('selected'));
+  FILE_TARGETS.forEach(t=>{pendingFiles[t]=[];uploadedFiles[t]=[];renderFiles(t)})
+});
+
+function loadRegs(){try{registrations=JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]')}catch{registrations=[]}}
+function saveRegs(){localStorage.setItem(STORAGE_KEY,JSON.stringify(registrations))}
+
+/* ===== 管理後台 ===== */
+let isAdmin=false;
+
+function showAdmin(){
+  isAdmin=true;
+  DOM.pageRegister.style.display='none';
+  DOM.pageAdmin.style.display='block';
+  DOM.adminLoginBtn.textContent='👋 登出';
+  renderAdmin()
+}
+
+function hideAdmin(){
+  isAdmin=false;
+  DOM.pageAdmin.style.display='none';
+  DOM.pageRegister.style.display='block';
+  DOM.adminLoginBtn.textContent='🔐 管理後台'
+}
+
+DOM.adminLoginBtn.addEventListener('click',()=>{
+  if(isAdmin){hideAdmin();return}
+  DOM.loginModal.classList.add('active');DOM.loginUser.focus()
+});
+
+function doLogin(){
+  const u=DOM.loginUser.value.trim(),p=DOM.loginPass.value.trim();
+  if(u===ADMIN_USER&&p===ADMIN_PASS){
+    DOM.loginModal.classList.remove('active');DOM.loginError.style.display='none';
+    DOM.loginUser.value='';DOM.loginPass.value='';
+    showAdmin()
+  }else DOM.loginError.style.display='block'
+}
+DOM.loginBtn.addEventListener('click',doLogin);
+DOM.loginPass.addEventListener('keydown',e=>{if(e.key==='Enter')doLogin()});
+DOM.modalCloseTop.addEventListener('click',()=>{DOM.loginModal.classList.remove('active');DOM.loginError.style.display='none'});
+DOM.loginModal.addEventListener('click',e=>{if(e.target===DOM.loginModal){DOM.loginModal.classList.remove('active');DOM.loginError.style.display='none'}});
+DOM.backToRegBtn.addEventListener('click',hideAdmin);
+
+function renderAdmin(){
+  loadRegs();
+  const total=registrations.length;
+  const approved=registrations.filter(r=>r.status==='approved').length;
+  const pending=registrations.filter(r=>!r.status||r.status==='pending').length;
+  const rejected=registrations.filter(r=>r.status==='rejected').length;
+  DOM.statTotal.textContent=total;
+  DOM.statApproved.textContent=approved;
+  DOM.statPending.textContent=pending;
+  DOM.statRejected.textContent=rejected;
+
+  const keyword=DOM.searchInput.value.trim().toLowerCase();
+  const sf=DOM.filterSubject.value,stf=DOM.filterStatus.value;
+  let filtered=registrations.filter(r=>{
+    if(keyword&&!r.name.toLowerCase().includes(keyword)&&!r.idNumber.toLowerCase().includes(keyword)&&!r.school.toLowerCase().includes(keyword))return false;
+    if(sf&&!r.subjects.includes(sf))return false;
+    if(stf){const s=r.status||'pending';if(s!==stf)return false}
+    return true
+  });
+  DOM.listTotal.textContent=`（共 ${total} 筆）`;
+  if(!filtered.length){DOM.listBody.innerHTML='';DOM.listEmpty.style.display='block';return}
+  DOM.listEmpty.style.display='none';
+  DOM.listBody.innerHTML=filtered.map(r=>{
+    const st=r.status||'pending';
+    const sl=st==='approved'?'✅ 已通過':st==='rejected'?'❌ 未通過':'⏳ 待審核';
+    const sc=st==='approved'?'approved':st==='rejected'?'rejected':'pending';
+    const files=r.files?Object.entries(r.files).filter(([,fs])=>fs.length).map(([k,fs])=>fs.map(f=>{
+      const label=FILE_LABELS[k]||k;
+      if(f.gdriveLink)return`<span class="file-preview-item">📎 ${label}: <a href="${f.gdriveLink}" target="_blank">☁️</a></span>`;
+      return`<span class="file-preview-item">📎 ${label}</span>`
+    }).join('')).join(''):'—';
+    return`<tr>
+      <td><strong>${esc(r.name)}</strong></td>
+      <td>${esc(r.idNumber)}</td>
+      <td>${esc(r.phone)}</td>
+      <td>${esc(r.degree)}</td>
+      <td>${esc(r.school)}</td>
+      <td><div class="subjects-cell">${r.subjects.map(s=>`<span>${esc(s)}</span>`).join('')}</div></td>
+      <td>${esc(r.region)}</td>
+      <td><span class="status-badge ${sc}">${sl}</span></td>
+      <td style="font-size:11px">${files}</td>
+      <td><div class="action-btns">
+        <button class="btn-approve" data-id="${r.id}">✓</button>
+        <button class="btn-reject" data-id="${r.id}">✗</button>
+        <button class="btn-delete" data-id="${r.id}">×</button>
+      </div></td>
+    </tr>`
+  }).join('');
+  DOM.listBody.querySelectorAll('.btn-approve').forEach(b=>b.addEventListener('click',()=>updateStatus(b.dataset.id,'approved')));
+  DOM.listBody.querySelectorAll('.btn-reject').forEach(b=>b.addEventListener('click',()=>updateStatus(b.dataset.id,'rejected')));
+  DOM.listBody.querySelectorAll('.btn-delete').forEach(b=>b.addEventListener('click',()=>deleteReg(b.dataset.id)))
+}
+
+function updateStatus(id,status){
+  const r=registrations.find(x=>x.id===id);
+  if(!r)return;
+  r.status=status;saveRegs();renderAdmin();
+  showToast(status==='approved'?'✅ 已核准':'❌ 已駁回')
+}
+function deleteReg(id){
+  if(!confirm('確定刪除？'))return;
+  registrations=registrations.filter(r=>r.id!==id);
+  saveRegs();renderAdmin();showToast('🗑️ 已刪除')
+}
+
+DOM.searchInput.addEventListener('input',renderAdmin);
+DOM.filterSubject.addEventListener('change',renderAdmin);
+DOM.filterStatus.addEventListener('change',renderAdmin);
+DOM.exportBtn.addEventListener('click',()=>{
+  if(!registrations.length){showToast('尚無資料','error');return}
+  const h=['姓名','身分證','性別','生日','電話','電郵','地址','學歷','學校','科系','教師證號','科目','地區','備註','狀態'];
+  const rows=registrations.map(r=>[r.name,r.idNumber,r.gender,r.birthDate,r.phone,r.email,r.address,r.degree,r.school,r.major,r.certNo||'',r.subjects.join('、'),r.region,r.notes||'',r.status==='approved'?'已通過':r.status==='rejected'?'未通過':'待審核'].map(v=>`"${(v||'').replace(/"/g,'""')}"`).join(','));
+  const csv='\uFEFF'+h.join(',')+'\n'+rows.join('\n');
+  const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');a.href=url;a.download=`教師甄試報名_${new Date().toISOString().slice(0,10)}.csv`;
+  document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);
+  showToast('📥 CSV 匯出成功')
+});
+
+/* ===== Toast & 工具 ===== */
+function showToast(msg,t='success'){DOM.toast.textContent=msg;DOM.toast.className='toast '+t;DOM.toast.classList.add('show');setTimeout(()=>DOM.toast.classList.remove('show'),3000)}
+function esc(s){const d=document.createElement('div');d.textContent=s;return d.innerHTML}
+
+/* ===== 初始化 ===== */
+loadRegs();
+loadGdrive();
+</script>
+</body>
+</html>
