@@ -1,0 +1,991 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>教師甄試報名系統</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  :root {
+    --primary: #1E3A5F;
+    --primary-light: #2C5282;
+    --primary-surface: #EBF0F6;
+    --accent: #D4A853;
+    --accent-light: #F5EDD6;
+    --text: #1A1A2E;
+    --text-dim: #6B7280;
+    --text-muted: #9CA3AF;
+    --bg: #F8F7F4;
+    --surface: #FFFFFF;
+    --border: #E2E6ED;
+    --border-light: #F0F2F5;
+    --success: #34C759;
+    --success-bg: rgba(52,199,89,0.08);
+    --error: #FF3B30;
+    --error-bg: rgba(255,59,48,0.06);
+    --radius: 12px;
+    --radius-sm: 8px;
+    --shadow: 0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.04);
+  }
+
+  body {
+    font-family: 'Noto Sans TC', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* 頂部橫幅 */
+  .header {
+    background: linear-gradient(135deg, var(--primary) 0%, #152A45 100%);
+    color: #fff;
+    padding: 0 24px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+  }
+
+  .header-inner {
+    max-width: 960px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 60px;
+  }
+
+  .header h1 {
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: 1px;
+  }
+
+  .header h1 small {
+    font-weight: 300;
+    font-size: 13px;
+    opacity: 0.7;
+    margin-left: 8px;
+    letter-spacing: 0;
+  }
+
+  .nav-tabs {
+    display: flex;
+    gap: 2px;
+  }
+
+  .nav-tabs button {
+    padding: 8px 18px;
+    border: none;
+    background: transparent;
+    color: rgba(255,255,255,0.6);
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 500;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.25s;
+  }
+
+  .nav-tabs button:hover {
+    color: #fff;
+    background: rgba(255,255,255,0.08);
+  }
+
+  .nav-tabs button.active {
+    color: #fff;
+    background: rgba(255,255,255,0.15);
+    font-weight: 600;
+  }
+
+  /* 主內容 */
+  .main {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 28px 24px 60px;
+  }
+
+  .page {
+    display: none;
+    animation: fadePage 0.35s ease;
+  }
+
+  .page.active {
+    display: block;
+  }
+
+  @keyframes fadePage {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* 表單卡片 */
+  .card {
+    background: var(--surface);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 28px 32px;
+    margin-bottom: 20px;
+  }
+
+  .card-title {
+    font-size: 17px;
+    font-weight: 700;
+    margin-bottom: 6px;
+    color: var(--primary);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .card-title .badge {
+    font-size: 11px;
+    font-weight: 600;
+    background: var(--primary-surface);
+    color: var(--primary-light);
+    padding: 1px 10px;
+    border-radius: 20px;
+  }
+
+  .card-desc {
+    font-size: 13px;
+    color: var(--text-dim);
+    margin-bottom: 20px;
+  }
+
+  /* 表單欄位 */
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px 24px;
+  }
+
+  .form-grid .full {
+    grid-column: 1 / -1;
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .form-group label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .form-group label .required {
+    color: var(--error);
+    margin-left: 2px;
+  }
+
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    padding: 10px 14px;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-size: 14px;
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    background: var(--bg);
+    color: var(--text);
+  }
+
+  .form-group input:focus,
+  .form-group select:focus,
+  .form-group textarea:focus {
+    border-color: var(--primary-light);
+    box-shadow: 0 0 0 3px rgba(30, 58, 95, 0.1);
+  }
+
+  .form-group textarea {
+    resize: vertical;
+    min-height: 80px;
+  }
+
+  .form-group .error-msg {
+    font-size: 12px;
+    color: var(--error);
+    display: none;
+  }
+
+  .form-group.invalid input,
+  .form-group.invalid select {
+    border-color: var(--error);
+  }
+
+  .form-group.invalid .error-msg {
+    display: block;
+  }
+
+  /* 科目選擇（複選框） */
+  .checkbox-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 4px;
+  }
+
+  .checkbox-group label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 400;
+    padding: 6px 12px;
+    border: 1.5px solid var(--border);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: var(--bg);
+  }
+
+  .checkbox-group label:hover {
+    border-color: var(--primary-light);
+    background: var(--primary-surface);
+  }
+
+  .checkbox-group label.selected {
+    border-color: var(--primary);
+    background: var(--primary-surface);
+    color: var(--primary-light);
+    font-weight: 500;
+  }
+
+  .checkbox-group input[type="checkbox"] {
+    display: none;
+  }
+
+  /* 送出按鈕 */
+  .form-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+    margin-top: 8px;
+  }
+
+  .btn {
+    padding: 10px 28px;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-size: 14px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .btn:active {
+    transform: scale(0.97);
+  }
+
+  .btn-primary {
+    background: var(--primary);
+    color: #fff;
+  }
+
+  .btn-primary:hover {
+    background: var(--primary-light);
+  }
+
+  .btn-outline {
+    background: transparent;
+    color: var(--text-dim);
+    border: 1.5px solid var(--border);
+  }
+
+  .btn-outline:hover {
+    background: var(--bg);
+    color: var(--text);
+  }
+
+  .btn-danger {
+    background: var(--error);
+    color: #fff;
+  }
+
+  .btn-danger:hover {
+    background: #D6302A;
+  }
+
+  /* 成功訊息 */
+  .toast {
+    position: fixed;
+    top: 80px;
+    right: 24px;
+    background: var(--success);
+    color: #fff;
+    padding: 14px 24px;
+    border-radius: var(--radius-sm);
+    font-size: 14px;
+    font-weight: 500;
+    box-shadow: 0 4px 20px rgba(52,199,89,0.3);
+    transform: translateX(120%);
+    transition: transform 0.4s ease;
+    z-index: 200;
+    max-width: 360px;
+  }
+
+  .toast.show {
+    transform: translateX(0);
+  }
+
+  .toast.error {
+    background: var(--error);
+    box-shadow: 0 4px 20px rgba(255,59,48,0.3);
+  }
+
+  /* 報名列表 */
+  .search-bar {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+  }
+
+  .search-bar input,
+  .search-bar select {
+    padding: 9px 14px;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-size: 14px;
+    font-family: inherit;
+    outline: none;
+    background: var(--bg);
+    color: var(--text);
+  }
+
+  .search-bar input:focus,
+  .search-bar select:focus {
+    border-color: var(--primary-light);
+  }
+
+  .search-bar input {
+    flex: 1;
+    min-width: 180px;
+  }
+
+  .table-wrap {
+    overflow-x: auto;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+
+  table th {
+    text-align: left;
+    padding: 10px 12px;
+    background: var(--primary-surface);
+    color: var(--primary);
+    font-weight: 600;
+    font-size: 12px;
+    white-space: nowrap;
+  }
+
+  table th:first-child { border-radius: 6px 0 0 0; }
+  table th:last-child { border-radius: 0 6px 0 0; }
+
+  table td {
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border-light);
+    vertical-align: middle;
+  }
+
+  table tr:hover td {
+    background: rgba(30,58,95,0.02);
+  }
+
+  table .subjects-cell {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+
+  table .subjects-cell span {
+    background: var(--primary-surface);
+    color: var(--primary-light);
+    padding: 1px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 500;
+  }
+
+  table .delete-cell button {
+    width: 28px;
+    height: 28px;
+    border: none;
+    background: transparent;
+    color: var(--text-muted);
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 18px;
+    transition: all 0.2s;
+  }
+
+  table .delete-cell button:hover {
+    background: var(--error-bg);
+    color: var(--error);
+  }
+
+  .table-empty {
+    text-align: center;
+    padding: 48px 0;
+    color: var(--text-dim);
+    font-size: 14px;
+  }
+
+  .table-count {
+    font-size: 13px;
+    color: var(--text-dim);
+    margin-bottom: 12px;
+  }
+
+  .table-count strong {
+    color: var(--text);
+    font-weight: 600;
+  }
+
+  /* 響應式 */
+  @media (max-width: 700px) {
+    .form-grid { grid-template-columns: 1fr; }
+    .header-inner { flex-direction: column; height: auto; padding: 12px 0; gap: 8px; }
+    .header h1 { font-size: 16px; }
+    .card { padding: 20px; }
+    .form-actions { flex-direction: column; }
+    .form-actions .btn { width: 100%; text-align: center; }
+    .search-bar { flex-direction: column; }
+    .search-bar input { min-width: auto; }
+    table { font-size: 12px; }
+    table th, table td { padding: 8px 8px; }
+  }
+
+  @media print {
+    .header { position: static; }
+    .nav-tabs, .form-actions, .search-bar, .delete-cell { display: none !important; }
+    .card { box-shadow: none; border: 1px solid #ddd; }
+    table th { background: #f5f5f5 !important; }
+    .page { display: block !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-inner">
+    <h1>教師甄試 <small>報名系統</small></h1>
+    <div class="nav-tabs">
+      <button class="active" data-page="register">填寫報名</button>
+      <button data-page="list">報名查詢</button>
+    </div>
+  </div>
+</div>
+
+<div class="main">
+  <!-- ===== 報名頁 ===== -->
+  <div class="page active" id="page-register">
+    <form id="regForm" novalidate>
+      <!-- 基本資料 -->
+      <div class="card">
+        <div class="card-title">基本資料 <span class="badge">必填</span></div>
+        <div class="card-desc">請填寫個人基本資訊</div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>姓名 <span class="required">*</span></label>
+            <input type="text" id="name" required>
+            <div class="error-msg">請輸入姓名</div>
+          </div>
+          <div class="form-group">
+            <label>身分證字號 <span class="required">*</span></label>
+            <input type="text" id="idNumber" placeholder="A123456789" required>
+            <div class="error-msg">請輸入正確的身分證字號</div>
+          </div>
+          <div class="form-group">
+            <label>性別 <span class="required">*</span></label>
+            <select id="gender" required>
+              <option value="">請選擇</option>
+              <option value="男">男</option>
+              <option value="女">女</option>
+            </select>
+            <div class="error-msg">請選擇性別</div>
+          </div>
+          <div class="form-group">
+            <label>出生日期 <span class="required">*</span></label>
+            <input type="date" id="birthDate" required>
+            <div class="error-msg">請選擇出生日期</div>
+          </div>
+          <div class="form-group">
+            <label>聯絡電話 <span class="required">*</span></label>
+            <input type="tel" id="phone" placeholder="0912-345-678" required>
+            <div class="error-msg">請輸入聯絡電話</div>
+          </div>
+          <div class="form-group">
+            <label>電子郵件 <span class="required">*</span></label>
+            <input type="email" id="email" placeholder="example@mail.com" required>
+            <div class="error-msg">請輸入有效的電子郵件</div>
+          </div>
+          <div class="form-group full">
+            <label>通訊地址</label>
+            <input type="text" id="address" placeholder="縣市／鄉鎮市區／路街／號">
+          </div>
+        </div>
+      </div>
+
+      <!-- 學歷與證照 -->
+      <div class="card">
+        <div class="card-title">學歷與證照 <span class="badge">必填</span></div>
+        <div class="card-desc">請填寫最高學歷及教師證資訊</div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>最高學歷 <span class="required">*</span></label>
+            <select id="degree" required>
+              <option value="">請選擇</option>
+              <option value="學士">學士</option>
+              <option value="碩士">碩士</option>
+              <option value="博士">博士</option>
+            </select>
+            <div class="error-msg">請選擇學歷</div>
+          </div>
+          <div class="form-group">
+            <label>畢業學校 <span class="required">*</span></label>
+            <input type="text" id="school" placeholder="例如：國立臺灣師範大學" required>
+            <div class="error-msg">請輸入畢業學校</div>
+          </div>
+          <div class="form-group">
+            <label>科系 <span class="required">*</span></label>
+            <input type="text" id="major" placeholder="例如：教育學系" required>
+            <div class="error-msg">請輸入科系</div>
+          </div>
+          <div class="form-group">
+            <label>教師證字號</label>
+            <input type="text" id="certNo" placeholder="例如：教中字第XXXXXXX號">
+          </div>
+        </div>
+      </div>
+
+      <!-- 應試資訊 -->
+      <div class="card">
+        <div class="card-title">應試資訊 <span class="badge">必填</span></div>
+        <div class="card-desc">選擇報考科目與志願地區</div>
+        <div class="form-grid">
+          <div class="form-group full">
+            <label>報考科目 <span class="required">*</span></label>
+            <div class="checkbox-group" id="subjectsGroup">
+              <label data-value="國文"><input type="checkbox" value="國文"> 國文</label>
+              <label data-value="英文"><input type="checkbox" value="英文"> 英文</label>
+              <label data-value="數學"><input type="checkbox" value="數學"> 數學</label>
+              <label data-value="社會"><input type="checkbox" value="社會"> 社會</label>
+              <label data-value="自然"><input type="checkbox" value="自然"> 自然</label>
+              <label data-value="音樂"><input type="checkbox" value="音樂"> 音樂</label>
+              <label data-value="美術"><input type="checkbox" value="美術"> 美術</label>
+              <label data-value="體育"><input type="checkbox" value="體育"> 體育</label>
+              <label data-value="資訊"><input type="checkbox" value="資訊"> 資訊</label>
+              <label data-value="特教"><input type="checkbox" value="特教"> 特教</label>
+            </div>
+            <div class="error-msg" id="subjectsError">請至少選擇一個報考科目</div>
+          </div>
+          <div class="form-group full">
+            <label>志願地區 <span class="required">*</span></label>
+            <select id="region" required>
+              <option value="">請選擇</option>
+              <option value="臺北市">臺北市</option>
+              <option value="新北市">新北市</option>
+              <option value="桃園市">桃園市</option>
+              <option value="臺中市">臺中市</option>
+              <option value="臺南市">臺南市</option>
+              <option value="高雄市">高雄市</option>
+              <option value="基隆市">基隆市</option>
+              <option value="新竹縣市">新竹縣市</option>
+              <option value="苗栗縣">苗栗縣</option>
+              <option value="彰化縣">彰化縣</option>
+              <option value="南投縣">南投縣</option>
+              <option value="雲林縣">雲林縣</option>
+              <option value="嘉義縣市">嘉義縣市</option>
+              <option value="屏東縣">屏東縣</option>
+              <option value="宜蘭縣">宜蘭縣</option>
+              <option value="花蓮縣">花蓮縣</option>
+              <option value="臺東縣">臺東縣</option>
+              <option value="澎湖縣">澎湖縣</option>
+            </select>
+            <div class="error-msg">請選擇志願地區</div>
+          </div>
+          <div class="form-group full">
+            <label>備註</label>
+            <textarea id="notes" placeholder="其他特殊需求或補充說明..."></textarea>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="reset" class="btn btn-outline">重新填寫</button>
+        <button type="submit" class="btn btn-primary">送出報名</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- ===== 查詢頁 ===== -->
+  <div class="page" id="page-list">
+    <div class="card">
+      <div class="card-title">報名查詢</div>
+      <div class="search-bar">
+        <input type="text" id="searchInput" placeholder="搜尋姓名、身分證字號、學校...">
+        <select id="filterSubject">
+          <option value="">全部科目</option>
+          <option value="國文">國文</option>
+          <option value="英文">英文</option>
+          <option value="數學">數學</option>
+          <option value="社會">社會</option>
+          <option value="自然">自然</option>
+          <option value="音樂">音樂</option>
+          <option value="美術">美術</option>
+          <option value="體育">體育</option>
+          <option value="資訊">資訊</option>
+          <option value="特教">特教</option>
+        </select>
+        <button class="btn btn-primary" id="exportBtn">匯出 CSV</button>
+      </div>
+      <div class="table-count">共 <strong id="listCount">0</strong> 筆報名資料</div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>姓名</th>
+              <th>身分證字號</th>
+              <th>性別</th>
+              <th>電話</th>
+              <th>學歷</th>
+              <th>學校</th>
+              <th>科目</th>
+              <th>地區</th>
+              <th style="width:40px"></th>
+            </tr>
+          </thead>
+          <tbody id="listBody"></tbody>
+        </table>
+      </div>
+      <div class="table-empty" id="listEmpty">尚無報名資料</div>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+const STORAGE_KEY = 'teacher_registrations';
+
+let registrations = [];
+let currentPage = 'register';
+
+const DOM = {
+  /* 頁面 */
+  pages: {
+    register: document.getElementById('page-register'),
+    list: document.getElementById('page-list')
+  },
+  navBtns: document.querySelectorAll('.nav-tabs button'),
+
+  /* 表單 */
+  form: document.getElementById('regForm'),
+  name: document.getElementById('name'),
+  idNumber: document.getElementById('idNumber'),
+  gender: document.getElementById('gender'),
+  birthDate: document.getElementById('birthDate'),
+  phone: document.getElementById('phone'),
+  email: document.getElementById('email'),
+  address: document.getElementById('address'),
+  degree: document.getElementById('degree'),
+  school: document.getElementById('school'),
+  major: document.getElementById('major'),
+  certNo: document.getElementById('certNo'),
+  subjectsGroup: document.getElementById('subjectsGroup'),
+  region: document.getElementById('region'),
+  notes: document.getElementById('notes'),
+
+  /* 列表 */
+  listBody: document.getElementById('listBody'),
+  listEmpty: document.getElementById('listEmpty'),
+  listCount: document.getElementById('listCount'),
+  searchInput: document.getElementById('searchInput'),
+  filterSubject: document.getElementById('filterSubject'),
+  exportBtn: document.getElementById('exportBtn'),
+
+  toast: document.getElementById('toast')
+};
+
+/* ===== 資料操作 ===== */
+function loadData() {
+  try {
+    const data = localStorage.getItem(STORAGE_KEY);
+    registrations = data ? JSON.parse(data) : [];
+  } catch { registrations = []; }
+}
+
+function saveData() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(registrations));
+}
+
+function generateId() {
+  return Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+}
+
+/* ===== 頁面切換 ===== */
+function switchPage(page) {
+  currentPage = page;
+  Object.keys(DOM.pages).forEach(key => {
+    DOM.pages[key].classList.toggle('active', key === page);
+  });
+  DOM.navBtns.forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.page === page);
+  });
+  if (page === 'list') renderList();
+}
+
+DOM.navBtns.forEach(btn => {
+  btn.addEventListener('click', () => switchPage(btn.dataset.page));
+});
+
+/* ===== 科目選擇互動 ===== */
+DOM.subjectsGroup.addEventListener('change', (e) => {
+  if (e.target.type === 'checkbox') {
+    e.target.closest('label').classList.toggle('selected', e.target.checked);
+  }
+});
+
+/* ===== 表單驗證與送出 ===== */
+function validateIdNumber(val) {
+  return /^[A-Z][12]\d{8}$/.test(val);
+}
+
+function validatePhone(val) {
+  return /^0\d{1,2}-\d{3,4}-\d{3,4}$/.test(val) || /^09\d{8}$/.test(val);
+}
+
+function getSelectedSubjects() {
+  return [...DOM.subjectsGroup.querySelectorAll('input:checked')].map(cb => cb.value);
+}
+
+function showFieldError(field) {
+  field.closest('.form-group').classList.add('invalid');
+}
+
+function clearFieldErrors() {
+  document.querySelectorAll('.form-group.invalid').forEach(el => el.classList.remove('invalid'));
+}
+
+function showToast(msg, isError = false) {
+  DOM.toast.textContent = msg;
+  DOM.toast.className = 'toast' + (isError ? ' error' : '');
+  DOM.toast.classList.add('show');
+  setTimeout(() => DOM.toast.classList.remove('show'), 3000);
+}
+
+DOM.form.addEventListener('submit', (e) => {
+  e.preventDefault();
+  clearFieldErrors();
+  let valid = true;
+
+  /* 姓名 */
+  if (!DOM.name.value.trim()) {
+    showFieldError(DOM.name); valid = false;
+  }
+
+  /* 身分證 */
+  if (!validateIdNumber(DOM.idNumber.value.trim())) {
+    showFieldError(DOM.idNumber); valid = false;
+  }
+
+  /* 性別 */
+  if (!DOM.gender.value) {
+    showFieldError(DOM.gender); valid = false;
+  }
+
+  /* 生日 */
+  if (!DOM.birthDate.value) {
+    showFieldError(DOM.birthDate); valid = false;
+  }
+
+  /* 電話 */
+  if (!validatePhone(DOM.phone.value.trim())) {
+    showFieldError(DOM.phone); valid = false;
+  }
+
+  /* 電郵 */
+  if (!DOM.email.value.trim() || !DOM.email.value.includes('@')) {
+    showFieldError(DOM.email); valid = false;
+  }
+
+  /* 學歷 */
+  if (!DOM.degree.value) {
+    showFieldError(DOM.degree); valid = false;
+  }
+
+  /* 學校 */
+  if (!DOM.school.value.trim()) {
+    showFieldError(DOM.school); valid = false;
+  }
+
+  /* 科系 */
+  if (!DOM.major.value.trim()) {
+    showFieldError(DOM.major); valid = false;
+  }
+
+  /* 科目 */
+  const subjects = getSelectedSubjects();
+  if (subjects.length === 0) {
+    document.getElementById('subjectsError').style.display = 'block';
+    valid = false;
+  } else {
+    document.getElementById('subjectsError').style.display = 'none';
+  }
+
+  /* 地區 */
+  if (!DOM.region.value) {
+    showFieldError(DOM.region); valid = false;
+  }
+
+  if (!valid) return;
+
+  /* 檢查重複 */
+  const idVal = DOM.idNumber.value.trim();
+  if (registrations.some(r => r.idNumber === idVal)) {
+    showToast('此身分證字號已報名，請勿重複送出', true);
+    return;
+  }
+
+  /* 送出 */
+  registrations.push({
+    id: generateId(),
+    name: DOM.name.value.trim(),
+    idNumber: idVal,
+    gender: DOM.gender.value,
+    birthDate: DOM.birthDate.value,
+    phone: DOM.phone.value.trim(),
+    email: DOM.email.value.trim(),
+    address: DOM.address.value.trim(),
+    degree: DOM.degree.value,
+    school: DOM.school.value.trim(),
+    major: DOM.major.value.trim(),
+    certNo: DOM.certNo.value.trim(),
+    subjects,
+    region: DOM.region.value,
+    notes: DOM.notes.value.trim(),
+    createdAt: new Date().toISOString()
+  });
+
+  saveData();
+  showToast('報名成功！');
+  DOM.form.reset();
+  DOM.subjectsGroup.querySelectorAll('label').forEach(l => l.classList.remove('selected'));
+  renderList();
+  switchPage('list');
+});
+
+DOM.form.querySelector('button[type="reset"]').addEventListener('click', () => {
+  clearFieldErrors();
+  DOM.subjectsGroup.querySelectorAll('label').forEach(l => l.classList.remove('selected'));
+});
+
+/* ===== 列表 ===== */
+function renderList() {
+  const keyword = DOM.searchInput.value.trim().toLowerCase();
+  const subjectFilter = DOM.filterSubject.value;
+
+  let filtered = registrations.filter(r => {
+    if (keyword && !r.name.toLowerCase().includes(keyword) &&
+        !r.idNumber.toLowerCase().includes(keyword) &&
+        !r.school.toLowerCase().includes(keyword)) return false;
+    if (subjectFilter && !r.subjects.includes(subjectFilter)) return false;
+    return true;
+  });
+
+  DOM.listCount.textContent = filtered.length;
+
+  if (filtered.length === 0) {
+    DOM.listBody.innerHTML = '';
+    DOM.listEmpty.style.display = 'block';
+    return;
+  }
+
+  DOM.listEmpty.style.display = 'none';
+
+  DOM.listBody.innerHTML = filtered.map(r => `
+    <tr>
+      <td><strong>${escHtml(r.name)}</strong></td>
+      <td>${escHtml(r.idNumber)}</td>
+      <td>${escHtml(r.gender)}</td>
+      <td>${escHtml(r.phone)}</td>
+      <td>${escHtml(r.degree)}</td>
+      <td>${escHtml(r.school)}</td>
+      <td><div class="subjects-cell">${r.subjects.map(s => `<span>${escHtml(s)}</span>`).join('')}</div></td>
+      <td>${escHtml(r.region)}</td>
+      <td class="delete-cell"><button data-id="${r.id}" title="刪除">×</button></td>
+    </tr>
+  `).join('');
+
+  /* 刪除事件 */
+  DOM.listBody.querySelectorAll('.delete-cell button').forEach(btn => {
+    btn.addEventListener('click', () => deleteRegistration(btn.dataset.id));
+  });
+}
+
+function escHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+function deleteRegistration(id) {
+  if (!confirm('確定刪除此筆報名資料？')) return;
+  registrations = registrations.filter(r => r.id !== id);
+  saveData();
+  renderList();
+}
+
+/* 搜尋與篩選 */
+DOM.searchInput.addEventListener('input', renderList);
+DOM.filterSubject.addEventListener('change', renderList);
+
+/* 匯出 CSV */
+DOM.exportBtn.addEventListener('click', () => {
+  if (registrations.length === 0) { showToast('尚無資料可匯出', true); return; }
+
+  const headers = ['姓名', '身分證字號', '性別', '生日', '電話', '電郵', '地址',
+                   '學歷', '學校', '科系', '教師證字號', '科目', '地區', '備註'];
+  const rows = registrations.map(r => [
+    r.name, r.idNumber, r.gender, r.birthDate, r.phone, r.email, r.address,
+    r.degree, r.school, r.major, r.certNo, r.subjects.join('、'), r.region, r.notes
+  ].map(v => `"${v.replace(/"/g, '""')}"`).join(','));
+
+  const csv = '\uFEFF' + headers.join(',') + '\n' + rows.join('\n');
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `教師甄試報名_${new Date().toISOString().slice(0,10)}.csv`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+});
+
+/* 初始化 */
+loadData();
+renderList();
+</script>
+</body>
+</html>
