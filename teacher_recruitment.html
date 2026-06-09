@@ -15,25 +15,26 @@
   }
 
   :root {
-    --primary: #1E3A5F;
-    --primary-light: #2C5282;
-    --primary-surface: #EBF0F6;
-    --accent: #D4A853;
-    --accent-light: #F5EDD6;
-    --text: #1A1A2E;
-    --text-dim: #6B7280;
-    --text-muted: #9CA3AF;
-    --bg: #F8F7F4;
+    --primary: #3D8B7E;
+    --primary-light: #5DA99B;
+    --primary-surface: #E6F3F0;
+    --primary-bg: #F0F7F5;
+    --accent: #E8B84B;
+    --accent-light: #FDF5E0;
+    --text: #2C3E3A;
+    --text-dim: #7A8F8B;
+    --text-muted: #A9BCB8;
+    --bg: #F5F8F7;
     --surface: #FFFFFF;
-    --border: #E2E6ED;
-    --border-light: #F0F2F5;
-    --success: #34C759;
-    --success-bg: rgba(52,199,89,0.08);
-    --error: #FF3B30;
-    --error-bg: rgba(255,59,48,0.06);
-    --radius: 12px;
-    --radius-sm: 8px;
-    --shadow: 0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.04);
+    --border: #D6E4E0;
+    --border-light: #E8F0ED;
+    --success: #3D8B7E;
+    --success-bg: rgba(61, 139, 126, 0.1);
+    --error: #D9655B;
+    --error-bg: rgba(217, 101, 91, 0.08);
+    --radius: 16px;
+    --radius-sm: 10px;
+    --shadow: 0 2px 8px rgba(61, 139, 126, 0.06), 0 8px 32px rgba(61, 139, 126, 0.04);
   }
 
   body {
@@ -41,17 +42,20 @@
     background: var(--bg);
     color: var(--text);
     min-height: 100vh;
+    background-image:
+      radial-gradient(ellipse 600px 400px at 10% 20%, rgba(61, 139, 126, 0.04) 0%, transparent 100%),
+      radial-gradient(ellipse 500px 500px at 90% 80%, rgba(232, 184, 75, 0.04) 0%, transparent 100%);
+    background-attachment: fixed;
   }
 
-  /* 頂部橫幅 */
   .header {
-    background: linear-gradient(135deg, var(--primary) 0%, #152A45 100%);
+    background: linear-gradient(135deg, var(--primary) 0%, #2D6B60 100%);
     color: #fff;
     padding: 0 24px;
     position: sticky;
     top: 0;
     z-index: 100;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 20px rgba(45, 107, 96, 0.15);
   }
 
   .header-inner {
@@ -60,39 +64,60 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    height: 60px;
+    height: 64px;
+  }
+
+  .header .brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .header .brand-icon {
+    width: 32px;
+    height: 32px;
+    background: rgba(255,255,255,0.15);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    backdrop-filter: blur(4px);
   }
 
   .header h1 {
     font-size: 18px;
     font-weight: 700;
-    letter-spacing: 1px;
+    letter-spacing: 0.5px;
   }
 
   .header h1 small {
     font-weight: 300;
-    font-size: 13px;
-    opacity: 0.7;
-    margin-left: 8px;
+    font-size: 12px;
+    opacity: 0.75;
+    margin-left: 6px;
     letter-spacing: 0;
   }
 
   .nav-tabs {
     display: flex;
     gap: 2px;
+    background: rgba(255,255,255,0.06);
+    padding: 3px;
+    border-radius: 10px;
   }
 
   .nav-tabs button {
-    padding: 8px 18px;
+    padding: 8px 20px;
     border: none;
     background: transparent;
-    color: rgba(255,255,255,0.6);
+    color: rgba(255,255,255,0.65);
     font-family: inherit;
     font-size: 14px;
     font-weight: 500;
     border-radius: 8px;
     cursor: pointer;
-    transition: all 0.25s;
+    transition: all 0.3s ease;
   }
 
   .nav-tabs button:hover {
@@ -101,81 +126,105 @@
   }
 
   .nav-tabs button.active {
-    color: #fff;
-    background: rgba(255,255,255,0.15);
+    color: var(--primary);
+    background: #fff;
     font-weight: 600;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
   }
 
-  /* 主內容 */
   .main {
     max-width: 960px;
     margin: 0 auto;
-    padding: 28px 24px 60px;
+    padding: 32px 24px 60px;
   }
 
   .page {
     display: none;
-    animation: fadePage 0.35s ease;
+    animation: fadeUp 0.4s ease;
   }
 
-  .page.active {
-    display: block;
-  }
+  .page.active { display: block; }
 
-  @keyframes fadePage {
-    from { opacity: 0; transform: translateY(8px); }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(12px); }
     to { opacity: 1; transform: translateY(0); }
   }
 
-  /* 表單卡片 */
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateX(-8px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+
   .card {
     background: var(--surface);
     border-radius: var(--radius);
     box-shadow: var(--shadow);
     padding: 28px 32px;
     margin-bottom: 20px;
+    border: 1px solid var(--border-light);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--primary), var(--accent), var(--primary));
+    background-size: 200% 100%;
+    animation: shimmer 4s ease-in-out infinite;
+  }
+
+  @keyframes shimmer {
+    0%, 100% { background-position: 0% 0%; }
+    50% { background-position: 100% 0%; }
   }
 
   .card-title {
     font-size: 17px;
     font-weight: 700;
-    margin-bottom: 6px;
+    margin-bottom: 4px;
     color: var(--primary);
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
   }
 
   .card-title .badge {
     font-size: 11px;
     font-weight: 600;
     background: var(--primary-surface);
-    color: var(--primary-light);
-    padding: 1px 10px;
+    color: var(--primary);
+    padding: 2px 12px;
     border-radius: 20px;
+  }
+
+  .card-title .icon {
+    font-size: 20px;
   }
 
   .card-desc {
     font-size: 13px;
     color: var(--text-dim);
     margin-bottom: 20px;
+    padding-left: 30px;
   }
 
-  /* 表單欄位 */
   .form-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 16px 24px;
   }
 
-  .form-grid .full {
-    grid-column: 1 / -1;
-  }
+  .form-grid .full { grid-column: 1 / -1; }
 
   .form-group {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 5px;
   }
 
   .form-group label {
@@ -192,22 +241,29 @@
   .form-group input,
   .form-group select,
   .form-group textarea {
-    padding: 10px 14px;
+    padding: 11px 14px;
     border: 1.5px solid var(--border);
     border-radius: var(--radius-sm);
     font-size: 14px;
     font-family: inherit;
     outline: none;
-    transition: border-color 0.2s, box-shadow 0.2s;
+    transition: all 0.25s ease;
     background: var(--bg);
     color: var(--text);
+  }
+
+  .form-group input:hover,
+  .form-group select:hover,
+  .form-group textarea:hover {
+    border-color: var(--primary-light);
   }
 
   .form-group input:focus,
   .form-group select:focus,
   .form-group textarea:focus {
-    border-color: var(--primary-light);
-    box-shadow: 0 0 0 3px rgba(30, 58, 95, 0.1);
+    border-color: var(--primary);
+    box-shadow: 0 0 0 4px rgba(61, 139, 126, 0.1);
+    background: #fff;
   }
 
   .form-group textarea {
@@ -219,18 +275,19 @@
     font-size: 12px;
     color: var(--error);
     display: none;
+    animation: slideIn 0.2s ease;
   }
 
   .form-group.invalid input,
   .form-group.invalid select {
     border-color: var(--error);
+    box-shadow: 0 0 0 4px rgba(217, 101, 91, 0.08);
   }
 
   .form-group.invalid .error-msg {
     display: block;
   }
 
-  /* 科目選擇（複選框） */
   .checkbox-group {
     display: flex;
     flex-wrap: wrap;
@@ -244,31 +301,33 @@
     gap: 6px;
     font-size: 13px;
     font-weight: 400;
-    padding: 6px 12px;
+    padding: 7px 14px;
     border: 1.5px solid var(--border);
-    border-radius: 6px;
+    border-radius: 8px;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all 0.25s ease;
     background: var(--bg);
+    color: var(--text-dim);
   }
 
   .checkbox-group label:hover {
     border-color: var(--primary-light);
     background: var(--primary-surface);
+    color: var(--primary);
   }
 
   .checkbox-group label.selected {
     border-color: var(--primary);
     background: var(--primary-surface);
-    color: var(--primary-light);
-    font-weight: 500;
+    color: var(--primary);
+    font-weight: 600;
+    box-shadow: 0 2px 8px rgba(61, 139, 126, 0.1);
   }
 
   .checkbox-group input[type="checkbox"] {
     display: none;
   }
 
-  /* 送出按鈕 */
   .form-actions {
     display: flex;
     gap: 12px;
@@ -277,27 +336,28 @@
   }
 
   .btn {
-    padding: 10px 28px;
+    padding: 11px 32px;
     border: none;
     border-radius: var(--radius-sm);
     font-size: 14px;
     font-weight: 600;
     font-family: inherit;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all 0.25s ease;
+    letter-spacing: 0.3px;
   }
 
-  .btn:active {
-    transform: scale(0.97);
-  }
+  .btn:active { transform: scale(0.96); }
 
   .btn-primary {
-    background: var(--primary);
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
     color: #fff;
+    box-shadow: 0 4px 16px rgba(61, 139, 126, 0.3);
   }
 
   .btn-primary:hover {
-    background: var(--primary-light);
+    box-shadow: 0 6px 24px rgba(61, 139, 126, 0.4);
+    transform: translateY(-1px);
   }
 
   .btn-outline {
@@ -309,21 +369,12 @@
   .btn-outline:hover {
     background: var(--bg);
     color: var(--text);
+    border-color: var(--text-muted);
   }
 
-  .btn-danger {
-    background: var(--error);
-    color: #fff;
-  }
-
-  .btn-danger:hover {
-    background: #D6302A;
-  }
-
-  /* 成功訊息 */
   .toast {
     position: fixed;
-    top: 80px;
+    top: 84px;
     right: 24px;
     background: var(--success);
     color: #fff;
@@ -331,54 +382,57 @@
     border-radius: var(--radius-sm);
     font-size: 14px;
     font-weight: 500;
-    box-shadow: 0 4px 20px rgba(52,199,89,0.3);
+    box-shadow: 0 8px 32px rgba(61, 139, 126, 0.3);
     transform: translateX(120%);
-    transition: transform 0.4s ease;
+    transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
     z-index: 200;
     max-width: 360px;
   }
 
-  .toast.show {
-    transform: translateX(0);
-  }
+  .toast.show { transform: translateX(0); }
 
   .toast.error {
     background: var(--error);
-    box-shadow: 0 4px 20px rgba(255,59,48,0.3);
+    box-shadow: 0 8px 32px rgba(217, 101, 91, 0.3);
   }
 
-  /* 報名列表 */
   .search-bar {
     display: flex;
-    gap: 12px;
+    gap: 10px;
     margin-bottom: 16px;
     flex-wrap: wrap;
   }
 
   .search-bar input,
   .search-bar select {
-    padding: 9px 14px;
+    padding: 10px 14px;
     border: 1.5px solid var(--border);
     border-radius: var(--radius-sm);
     font-size: 14px;
     font-family: inherit;
     outline: none;
+    transition: all 0.2s;
     background: var(--bg);
     color: var(--text);
   }
 
   .search-bar input:focus,
   .search-bar select:focus {
-    border-color: var(--primary-light);
+    border-color: var(--primary);
+    box-shadow: 0 0 0 4px rgba(61, 139, 126, 0.1);
   }
 
-  .search-bar input {
-    flex: 1;
-    min-width: 180px;
+  .search-bar input { flex: 1; min-width: 180px; }
+
+  .search-bar .btn-primary {
+    padding: 10px 20px;
+    box-shadow: none;
   }
 
   .table-wrap {
     overflow-x: auto;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border-light);
   }
 
   table {
@@ -389,26 +443,24 @@
 
   table th {
     text-align: left;
-    padding: 10px 12px;
+    padding: 12px 14px;
     background: var(--primary-surface);
     color: var(--primary);
     font-weight: 600;
     font-size: 12px;
     white-space: nowrap;
+    letter-spacing: 0.3px;
   }
 
-  table th:first-child { border-radius: 6px 0 0 0; }
-  table th:last-child { border-radius: 0 6px 0 0; }
-
   table td {
-    padding: 10px 12px;
+    padding: 12px 14px;
     border-bottom: 1px solid var(--border-light);
     vertical-align: middle;
   }
 
-  table tr:hover td {
-    background: rgba(30,58,95,0.02);
-  }
+  table tr:last-child td { border-bottom: none; }
+
+  table tr:hover td { background: rgba(61, 139, 126, 0.02); }
 
   table .subjects-cell {
     display: flex;
@@ -418,16 +470,16 @@
 
   table .subjects-cell span {
     background: var(--primary-surface);
-    color: var(--primary-light);
-    padding: 1px 8px;
+    color: var(--primary);
+    padding: 2px 10px;
     border-radius: 4px;
     font-size: 11px;
     font-weight: 500;
   }
 
   table .delete-cell button {
-    width: 28px;
-    height: 28px;
+    width: 30px;
+    height: 30px;
     border: none;
     background: transparent;
     color: var(--text-muted);
@@ -435,6 +487,9 @@
     cursor: pointer;
     font-size: 18px;
     transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   table .delete-cell button:hover {
@@ -449,6 +504,12 @@
     font-size: 14px;
   }
 
+  .table-empty .icon {
+    font-size: 40px;
+    margin-bottom: 8px;
+    opacity: 0.3;
+  }
+
   .table-count {
     font-size: 13px;
     color: var(--text-dim);
@@ -460,25 +521,61 @@
     font-weight: 600;
   }
 
-  /* 響應式 */
+  .welcome-banner {
+    background: linear-gradient(135deg, var(--primary) 0%, #2D6B60 100%);
+    border-radius: var(--radius);
+    padding: 28px 32px;
+    margin-bottom: 20px;
+    color: #fff;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .welcome-banner::after {
+    content: '🎓';
+    position: absolute;
+    right: 24px;
+    bottom: 12px;
+    font-size: 64px;
+    opacity: 0.12;
+  }
+
+  .welcome-banner h2 {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+
+  .welcome-banner p {
+    font-size: 14px;
+    opacity: 0.85;
+  }
+
   @media (max-width: 700px) {
     .form-grid { grid-template-columns: 1fr; }
-    .header-inner { flex-direction: column; height: auto; padding: 12px 0; gap: 8px; }
+    .header-inner { flex-direction: column; height: auto; padding: 12px 0; gap: 10px; }
     .header h1 { font-size: 16px; }
+    .header h1 small { display: block; margin-left: 0; }
+    .nav-tabs { width: 100%; }
+    .nav-tabs button { flex: 1; text-align: center; padding: 8px 12px; font-size: 13px; }
     .card { padding: 20px; }
+    .card-desc { padding-left: 0; }
     .form-actions { flex-direction: column; }
     .form-actions .btn { width: 100%; text-align: center; }
     .search-bar { flex-direction: column; }
     .search-bar input { min-width: auto; }
     table { font-size: 12px; }
-    table th, table td { padding: 8px 8px; }
+    table th, table td { padding: 8px 10px; }
+    .welcome-banner { padding: 20px; }
+    .welcome-banner::after { font-size: 40px; }
   }
 
   @media print {
     .header { position: static; }
-    .nav-tabs, .form-actions, .search-bar, .delete-cell { display: none !important; }
+    .nav-tabs, .form-actions, .search-bar, .delete-cell, .welcome-banner { display: none !important; }
     .card { box-shadow: none; border: 1px solid #ddd; }
-    table th { background: #f5f5f5 !important; }
+    .card::before { display: none; }
+    table th { background: #E6F3F0 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
     .page { display: block !important; }
   }
 </style>
@@ -487,10 +584,13 @@
 
 <div class="header">
   <div class="header-inner">
-    <h1>教師甄試 <small>報名系統</small></h1>
+    <div class="brand">
+      <div class="brand-icon">📚</div>
+      <h1>教師甄試 <small>報名系統</small></h1>
+    </div>
     <div class="nav-tabs">
-      <button class="active" data-page="register">填寫報名</button>
-      <button data-page="list">報名查詢</button>
+      <button class="active" data-page="register">📝 填寫報名</button>
+      <button data-page="list">📋 報名查詢</button>
     </div>
   </div>
 </div>
@@ -498,15 +598,19 @@
 <div class="main">
   <!-- ===== 報名頁 ===== -->
   <div class="page active" id="page-register">
+    <div class="welcome-banner">
+      <h2>歡迎使用教師甄試報名系統</h2>
+      <p>請填寫以下資料完成報名，所有標示 * 的欄位皆為必填</p>
+    </div>
+
     <form id="regForm" novalidate>
-      <!-- 基本資料 -->
       <div class="card">
-        <div class="card-title">基本資料 <span class="badge">必填</span></div>
+        <div class="card-title"><span class="icon">👤</span> 基本資料 <span class="badge">必填</span></div>
         <div class="card-desc">請填寫個人基本資訊</div>
         <div class="form-grid">
           <div class="form-group">
             <label>姓名 <span class="required">*</span></label>
-            <input type="text" id="name" required>
+            <input type="text" id="name" placeholder="請輸入姓名" required>
             <div class="error-msg">請輸入姓名</div>
           </div>
           <div class="form-group">
@@ -517,7 +621,7 @@
           <div class="form-group">
             <label>性別 <span class="required">*</span></label>
             <select id="gender" required>
-              <option value="">請選擇</option>
+              <option value="">請選擇性別</option>
               <option value="男">男</option>
               <option value="女">女</option>
             </select>
@@ -545,15 +649,14 @@
         </div>
       </div>
 
-      <!-- 學歷與證照 -->
       <div class="card">
-        <div class="card-title">學歷與證照 <span class="badge">必填</span></div>
+        <div class="card-title"><span class="icon">🎓</span> 學歷與證照 <span class="badge">必填</span></div>
         <div class="card-desc">請填寫最高學歷及教師證資訊</div>
         <div class="form-grid">
           <div class="form-group">
             <label>最高學歷 <span class="required">*</span></label>
             <select id="degree" required>
-              <option value="">請選擇</option>
+              <option value="">請選擇學歷</option>
               <option value="學士">學士</option>
               <option value="碩士">碩士</option>
               <option value="博士">博士</option>
@@ -577,49 +680,48 @@
         </div>
       </div>
 
-      <!-- 應試資訊 -->
       <div class="card">
-        <div class="card-title">應試資訊 <span class="badge">必填</span></div>
+        <div class="card-title"><span class="icon">📋</span> 應試資訊 <span class="badge">必填</span></div>
         <div class="card-desc">選擇報考科目與志願地區</div>
         <div class="form-grid">
           <div class="form-group full">
             <label>報考科目 <span class="required">*</span></label>
             <div class="checkbox-group" id="subjectsGroup">
-              <label data-value="國文"><input type="checkbox" value="國文"> 國文</label>
-              <label data-value="英文"><input type="checkbox" value="英文"> 英文</label>
-              <label data-value="數學"><input type="checkbox" value="數學"> 數學</label>
-              <label data-value="社會"><input type="checkbox" value="社會"> 社會</label>
-              <label data-value="自然"><input type="checkbox" value="自然"> 自然</label>
-              <label data-value="音樂"><input type="checkbox" value="音樂"> 音樂</label>
-              <label data-value="美術"><input type="checkbox" value="美術"> 美術</label>
-              <label data-value="體育"><input type="checkbox" value="體育"> 體育</label>
-              <label data-value="資訊"><input type="checkbox" value="資訊"> 資訊</label>
-              <label data-value="特教"><input type="checkbox" value="特教"> 特教</label>
+              <label data-value="國文"><input type="checkbox" value="國文"> 📖 國文</label>
+              <label data-value="英文"><input type="checkbox" value="英文"> 🌎 英文</label>
+              <label data-value="數學"><input type="checkbox" value="數學"> 🔢 數學</label>
+              <label data-value="社會"><input type="checkbox" value="社會"> 🏛️ 社會</label>
+              <label data-value="自然"><input type="checkbox" value="自然"> 🔬 自然</label>
+              <label data-value="音樂"><input type="checkbox" value="音樂"> 🎵 音樂</label>
+              <label data-value="美術"><input type="checkbox" value="美術"> 🎨 美術</label>
+              <label data-value="體育"><input type="checkbox" value="體育"> ⚽ 體育</label>
+              <label data-value="資訊"><input type="checkbox" value="資訊"> 💻 資訊</label>
+              <label data-value="特教"><input type="checkbox" value="特教"> ❤️ 特教</label>
             </div>
             <div class="error-msg" id="subjectsError">請至少選擇一個報考科目</div>
           </div>
           <div class="form-group full">
             <label>志願地區 <span class="required">*</span></label>
             <select id="region" required>
-              <option value="">請選擇</option>
-              <option value="臺北市">臺北市</option>
-              <option value="新北市">新北市</option>
-              <option value="桃園市">桃園市</option>
-              <option value="臺中市">臺中市</option>
-              <option value="臺南市">臺南市</option>
-              <option value="高雄市">高雄市</option>
-              <option value="基隆市">基隆市</option>
-              <option value="新竹縣市">新竹縣市</option>
-              <option value="苗栗縣">苗栗縣</option>
-              <option value="彰化縣">彰化縣</option>
-              <option value="南投縣">南投縣</option>
-              <option value="雲林縣">雲林縣</option>
-              <option value="嘉義縣市">嘉義縣市</option>
-              <option value="屏東縣">屏東縣</option>
-              <option value="宜蘭縣">宜蘭縣</option>
-              <option value="花蓮縣">花蓮縣</option>
-              <option value="臺東縣">臺東縣</option>
-              <option value="澎湖縣">澎湖縣</option>
+              <option value="">請選擇志願地區</option>
+              <option value="臺北市">📍 臺北市</option>
+              <option value="新北市">📍 新北市</option>
+              <option value="桃園市">📍 桃園市</option>
+              <option value="臺中市">📍 臺中市</option>
+              <option value="臺南市">📍 臺南市</option>
+              <option value="高雄市">📍 高雄市</option>
+              <option value="基隆市">📍 基隆市</option>
+              <option value="新竹縣市">📍 新竹縣市</option>
+              <option value="苗栗縣">📍 苗栗縣</option>
+              <option value="彰化縣">📍 彰化縣</option>
+              <option value="南投縣">📍 南投縣</option>
+              <option value="雲林縣">📍 雲林縣</option>
+              <option value="嘉義縣市">📍 嘉義縣市</option>
+              <option value="屏東縣">📍 屏東縣</option>
+              <option value="宜蘭縣">📍 宜蘭縣</option>
+              <option value="花蓮縣">📍 花蓮縣</option>
+              <option value="臺東縣">📍 臺東縣</option>
+              <option value="澎湖縣">📍 澎湖縣</option>
             </select>
             <div class="error-msg">請選擇志願地區</div>
           </div>
@@ -632,15 +734,16 @@
 
       <div class="form-actions">
         <button type="reset" class="btn btn-outline">重新填寫</button>
-        <button type="submit" class="btn btn-primary">送出報名</button>
+        <button type="submit" class="btn btn-primary">送出報名 ✨</button>
       </div>
     </form>
   </div>
 
   <!-- ===== 查詢頁 ===== -->
   <div class="page" id="page-list">
-    <div class="card">
-      <div class="card-title">報名查詢</div>
+    <div class="card" style="margin-bottom:0">
+      <div class="card-title"><span class="icon">📋</span> 報名查詢</div>
+      <div class="card-desc">查看已送出的報名資料</div>
       <div class="search-bar">
         <input type="text" id="searchInput" placeholder="搜尋姓名、身分證字號、學校...">
         <select id="filterSubject">
@@ -656,7 +759,7 @@
           <option value="資訊">資訊</option>
           <option value="特教">特教</option>
         </select>
-        <button class="btn btn-primary" id="exportBtn">匯出 CSV</button>
+        <button class="btn btn-primary" id="exportBtn">📥 匯出 CSV</button>
       </div>
       <div class="table-count">共 <strong id="listCount">0</strong> 筆報名資料</div>
       <div class="table-wrap">
@@ -677,12 +780,14 @@
           <tbody id="listBody"></tbody>
         </table>
       </div>
-      <div class="table-empty" id="listEmpty">尚無報名資料</div>
+      <div class="table-empty" id="listEmpty">
+        <div class="icon">📋</div>
+        <div>尚無報名資料</div>
+      </div>
     </div>
   </div>
 </div>
 
-<!-- Toast -->
 <div class="toast" id="toast"></div>
 
 <script>
@@ -692,14 +797,11 @@ let registrations = [];
 let currentPage = 'register';
 
 const DOM = {
-  /* 頁面 */
   pages: {
     register: document.getElementById('page-register'),
     list: document.getElementById('page-list')
   },
   navBtns: document.querySelectorAll('.nav-tabs button'),
-
-  /* 表單 */
   form: document.getElementById('regForm'),
   name: document.getElementById('name'),
   idNumber: document.getElementById('idNumber'),
@@ -715,19 +817,15 @@ const DOM = {
   subjectsGroup: document.getElementById('subjectsGroup'),
   region: document.getElementById('region'),
   notes: document.getElementById('notes'),
-
-  /* 列表 */
   listBody: document.getElementById('listBody'),
   listEmpty: document.getElementById('listEmpty'),
   listCount: document.getElementById('listCount'),
   searchInput: document.getElementById('searchInput'),
   filterSubject: document.getElementById('filterSubject'),
   exportBtn: document.getElementById('exportBtn'),
-
   toast: document.getElementById('toast')
 };
 
-/* ===== 資料操作 ===== */
 function loadData() {
   try {
     const data = localStorage.getItem(STORAGE_KEY);
@@ -743,7 +841,6 @@ function generateId() {
   return Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
 }
 
-/* ===== 頁面切換 ===== */
 function switchPage(page) {
   currentPage = page;
   Object.keys(DOM.pages).forEach(key => {
@@ -759,14 +856,12 @@ DOM.navBtns.forEach(btn => {
   btn.addEventListener('click', () => switchPage(btn.dataset.page));
 });
 
-/* ===== 科目選擇互動 ===== */
 DOM.subjectsGroup.addEventListener('change', (e) => {
   if (e.target.type === 'checkbox') {
     e.target.closest('label').classList.toggle('selected', e.target.checked);
   }
 });
 
-/* ===== 表單驗證與送出 ===== */
 function validateIdNumber(val) {
   return /^[A-Z][12]\d{8}$/.test(val);
 }
@@ -799,52 +894,16 @@ DOM.form.addEventListener('submit', (e) => {
   clearFieldErrors();
   let valid = true;
 
-  /* 姓名 */
-  if (!DOM.name.value.trim()) {
-    showFieldError(DOM.name); valid = false;
-  }
+  if (!DOM.name.value.trim()) { showFieldError(DOM.name); valid = false; }
+  if (!validateIdNumber(DOM.idNumber.value.trim())) { showFieldError(DOM.idNumber); valid = false; }
+  if (!DOM.gender.value) { showFieldError(DOM.gender); valid = false; }
+  if (!DOM.birthDate.value) { showFieldError(DOM.birthDate); valid = false; }
+  if (!validatePhone(DOM.phone.value.trim())) { showFieldError(DOM.phone); valid = false; }
+  if (!DOM.email.value.trim() || !DOM.email.value.includes('@')) { showFieldError(DOM.email); valid = false; }
+  if (!DOM.degree.value) { showFieldError(DOM.degree); valid = false; }
+  if (!DOM.school.value.trim()) { showFieldError(DOM.school); valid = false; }
+  if (!DOM.major.value.trim()) { showFieldError(DOM.major); valid = false; }
 
-  /* 身分證 */
-  if (!validateIdNumber(DOM.idNumber.value.trim())) {
-    showFieldError(DOM.idNumber); valid = false;
-  }
-
-  /* 性別 */
-  if (!DOM.gender.value) {
-    showFieldError(DOM.gender); valid = false;
-  }
-
-  /* 生日 */
-  if (!DOM.birthDate.value) {
-    showFieldError(DOM.birthDate); valid = false;
-  }
-
-  /* 電話 */
-  if (!validatePhone(DOM.phone.value.trim())) {
-    showFieldError(DOM.phone); valid = false;
-  }
-
-  /* 電郵 */
-  if (!DOM.email.value.trim() || !DOM.email.value.includes('@')) {
-    showFieldError(DOM.email); valid = false;
-  }
-
-  /* 學歷 */
-  if (!DOM.degree.value) {
-    showFieldError(DOM.degree); valid = false;
-  }
-
-  /* 學校 */
-  if (!DOM.school.value.trim()) {
-    showFieldError(DOM.school); valid = false;
-  }
-
-  /* 科系 */
-  if (!DOM.major.value.trim()) {
-    showFieldError(DOM.major); valid = false;
-  }
-
-  /* 科目 */
   const subjects = getSelectedSubjects();
   if (subjects.length === 0) {
     document.getElementById('subjectsError').style.display = 'block';
@@ -853,21 +912,15 @@ DOM.form.addEventListener('submit', (e) => {
     document.getElementById('subjectsError').style.display = 'none';
   }
 
-  /* 地區 */
-  if (!DOM.region.value) {
-    showFieldError(DOM.region); valid = false;
-  }
-
+  if (!DOM.region.value) { showFieldError(DOM.region); valid = false; }
   if (!valid) return;
 
-  /* 檢查重複 */
   const idVal = DOM.idNumber.value.trim();
   if (registrations.some(r => r.idNumber === idVal)) {
     showToast('此身分證字號已報名，請勿重複送出', true);
     return;
   }
 
-  /* 送出 */
   registrations.push({
     id: generateId(),
     name: DOM.name.value.trim(),
@@ -888,7 +941,7 @@ DOM.form.addEventListener('submit', (e) => {
   });
 
   saveData();
-  showToast('報名成功！');
+  showToast('🎉 報名成功！');
   DOM.form.reset();
   DOM.subjectsGroup.querySelectorAll('label').forEach(l => l.classList.remove('selected'));
   renderList();
@@ -900,7 +953,6 @@ DOM.form.querySelector('button[type="reset"]').addEventListener('click', () => {
   DOM.subjectsGroup.querySelectorAll('label').forEach(l => l.classList.remove('selected'));
 });
 
-/* ===== 列表 ===== */
 function renderList() {
   const keyword = DOM.searchInput.value.trim().toLowerCase();
   const subjectFilter = DOM.filterSubject.value;
@@ -937,7 +989,6 @@ function renderList() {
     </tr>
   `).join('');
 
-  /* 刪除事件 */
   DOM.listBody.querySelectorAll('.delete-cell button').forEach(btn => {
     btn.addEventListener('click', () => deleteRegistration(btn.dataset.id));
   });
@@ -956,11 +1007,9 @@ function deleteRegistration(id) {
   renderList();
 }
 
-/* 搜尋與篩選 */
 DOM.searchInput.addEventListener('input', renderList);
 DOM.filterSubject.addEventListener('change', renderList);
 
-/* 匯出 CSV */
 DOM.exportBtn.addEventListener('click', () => {
   if (registrations.length === 0) { showToast('尚無資料可匯出', true); return; }
 
@@ -983,7 +1032,6 @@ DOM.exportBtn.addEventListener('click', () => {
   URL.revokeObjectURL(url);
 });
 
-/* 初始化 */
 loadData();
 renderList();
 </script>
