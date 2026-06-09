@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vibe Coding 作品集</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Silkscreen:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg: #0a0a1a;
+  --surface: rgba(255,255,255,0.04);
+  --border: rgba(255,255,255,0.06);
+  --text: #e0e0f0;
+  --text-dim: #7070a0;
+  --cyan: #00f0ff;
+  --magenta: #ff00aa;
+  --green: #a0ff40;
+  --yellow: #ffd000;
+  --orange: #ff6600;
+  --radius: 16px;
+  --shadow: 0 8px 32px rgba(0,0,0,0.5);
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Noto Sans TC', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+  line-height: 1.7;
+}
+
+/* ── Grid Background ── */
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background-image:
+    linear-gradient(rgba(0,240,255,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,240,255,0.03) 1px, transparent 1px);
+  background-size: 40px 40px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── Scanline overlay ── */
+body::after {
+  content: '';
+  position: fixed; inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0,0,0,0.08) 2px,
+    rgba(0,0,0,0.08) 4px
+  );
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── Floating orbs ── */
+.orb {
+  position: fixed;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.15;
+  pointer-events: none;
+  z-index: 0;
+  animation: orbFloat 12s ease-in-out infinite alternate;
+}
+.orb--1 { width: 400px; height: 400px; background: var(--magenta); top: -100px; left: -100px; }
+.orb--2 { width: 500px; height: 500px; background: var(--cyan); bottom: -200px; right: -100px; animation-delay: -4s; }
+.orb--3 { width: 300px; height: 300px; background: var(--green); top: 50%; left: 50%; transform: translate(-50%,-50%); animation-delay: -8s; }
+
+@keyframes orbFloat {
+  0% { transform: translate(0,0) scale(1); }
+  100% { transform: translate(60px,-60px) scale(1.15); }
+}
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--cyan); border-radius: 3px; }
+
+/* ── Header / Hero ── */
+.hero {
+  position: relative; z-index: 1;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 40px 20px;
+}
+
+.hero__badge {
+  display: inline-block;
+  padding: 6px 20px;
+  border: 1px solid var(--cyan);
+  border-radius: 100px;
+  color: var(--cyan);
+  font-size: 13px;
+  letter-spacing: 2px;
+  margin-bottom: 24px;
+  animation: fadeUp 0.8s 0.2s both;
+}
+
+.hero h1 {
+  font-family: 'Silkscreen', monospace;
+  font-size: clamp(36px, 8vw, 80px);
+  line-height: 1.2;
+  color: #fff;
+  text-shadow: 0 0 40px rgba(0,240,255,0.3);
+  animation: fadeUp 0.8s 0.4s both;
+}
+
+.hero h1 .highlight {
+  background: linear-gradient(135deg, var(--cyan), var(--magenta));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.hero p {
+  font-size: clamp(16px, 2.5vw, 22px);
+  color: var(--text-dim);
+  max-width: 600px;
+  margin-top: 16px;
+  animation: fadeUp 0.8s 0.6s both;
+}
+
+.hero__scroll {
+  margin-top: 48px;
+  animation: fadeUp 0.8s 0.8s both, bounce 2s 1.5s infinite;
+}
+
+.hero__scroll a {
+  color: var(--cyan);
+  font-size: 32px;
+  opacity: 0.6;
+  transition: opacity 0.3s;
+}
+.hero__scroll a:hover { opacity: 1; }
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes bounce {
+  0%,100% { transform: translateY(0); }
+  50% { transform: translateY(10px); }
+}
+
+/* ── Stats Bar ── */
+.stats {
+  position: relative; z-index: 1;
+  display: flex;
+  justify-content: center;
+  gap: 48px;
+  padding: 32px 20px;
+  flex-wrap: wrap;
+  animation: fadeUp 0.8s 1s both;
+}
+
+.stat { text-align: center; }
+
+.stat__num {
+  font-family: 'Silkscreen', monospace;
+  font-size: 36px;
+  color: var(--cyan);
+  text-shadow: 0 0 20px rgba(0,240,255,0.3);
+}
+
+.stat__label {
+  font-size: 13px;
+  color: var(--text-dim);
+  margin-top: 4px;
+}
+
+/* ── Section ── */
+.section {
+  position: relative; z-index: 1;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 80px 20px;
+}
+
+.section__title {
+  font-family: 'Silkscreen', monospace;
+  font-size: 28px;
+  text-align: center;
+  margin-bottom: 8px;
+  color: #fff;
+}
+
+.section__sub {
+  text-align: center;
+  color: var(--text-dim);
+  margin-bottom: 48px;
+  font-size: 15px;
+}
+
+/* ── Filter Tags ── */
+.filters {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 40px;
+  flex-wrap: wrap;
+}
+
+.filter-btn {
+  padding: 8px 20px;
+  border: 1px solid var(--border);
+  border-radius: 100px;
+  background: var(--surface);
+  color: var(--text-dim);
+  cursor: pointer;
+  font-size: 14px;
+  font-family: 'Noto Sans TC', sans-serif;
+  transition: all 0.3s;
+}
+.filter-btn:hover { border-color: var(--cyan); color: var(--cyan); }
+.filter-btn.active {
+  background: rgba(0,240,255,0.1);
+  border-color: var(--cyan);
+  color: var(--cyan);
+}
+
+/* ── Project Grid ── */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 24px;
+}
+
+/* ── Project Card ── */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  transition: all 0.4s cubic-bezier(0.22,1,0.36,1);
+  position: relative;
+  backdrop-filter: blur(12px);
+}
+
+.card:hover {
+  transform: translateY(-6px) scale(1.01);
+  border-color: rgba(0,240,255,0.25);
+  box-shadow: 0 12px 48px rgba(0,240,255,0.08);
+}
+
+.card__preview {
+  position: relative;
+  height: 180px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.card__preview iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+  pointer-events: none;
+  transform: scale(0.5);
+  transform-origin: 0 0;
+  width: 200%;
+  height: 200%;
+}
+
+.card__type {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  padding: 3px 12px;
+  border-radius: 100px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  background: rgba(0,0,0,0.6);
+  backdrop-filter: blur(4px);
+}
+.card__type--html { color: var(--orange); border: 1px solid var(--orange); }
+.card__type--py   { color: var(--green);  border: 1px solid var(--green);  }
+
+.card__body {
+  padding: 20px 24px 24px;
+}
+
+.card__title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 4px;
+}
+
+.card__desc {
+  font-size: 14px;
+  color: var(--text-dim);
+  margin-bottom: 14px;
+  line-height: 1.6;
+}
+
+.card__tags {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.tag {
+  padding: 2px 10px;
+  border-radius: 100px;
+  font-size: 11px;
+  font-weight: 500;
+}
+.tag--html  { background: rgba(255,102,0,0.12); color: var(--orange); }
+.tag--css   { background: rgba(0,240,255,0.12); color: var(--cyan); }
+.tag--js    { background: rgba(255,208,0,0.12); color: var(--yellow); }
+.tag--py    { background: rgba(160,255,64,0.12); color: var(--green); }
+.tag--drive { background: rgba(0,200,100,0.12); color: #00c864; }
+.tag--admin { background: rgba(255,0,170,0.12); color: var(--magenta); }
+
+.card__links {
+  display: flex;
+  gap: 10px;
+}
+
+.card__links a {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 18px;
+  border-radius: 100px;
+  font-size: 13px;
+  text-decoration: none;
+  transition: all 0.3s;
+  font-family: 'Noto Sans TC', sans-serif;
+}
+
+.card__links .preview {
+  background: rgba(0,240,255,0.1);
+  color: var(--cyan);
+  border: 1px solid rgba(0,240,255,0.2);
+}
+.card__links .preview:hover {
+  background: rgba(0,240,255,0.2);
+  box-shadow: 0 0 20px rgba(0,240,255,0.1);
+}
+
+.card__links .source {
+  background: var(--surface);
+  color: var(--text-dim);
+  border: 1px solid var(--border);
+}
+.card__links .source:hover { color: #fff; border-color: rgba(255,255,255,0.2); }
+
+/* ── Python Preview ── */
+.py-preview {
+  background: #0d0d20;
+  padding: 20px;
+  font-family: 'Silkscreen', monospace;
+  font-size: 11px;
+  line-height: 1.8;
+  color: var(--green);
+  text-align: left;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  white-space: pre;
+}
+
+/* ── Divider ── */
+.divider {
+  position: relative; z-index: 1;
+  text-align: center;
+  padding: 20px;
+  color: var(--text-dim);
+  font-size: 13px;
+  letter-spacing: 3px;
+}
+.divider::before, .divider::after {
+  content: '';
+  display: inline-block;
+  width: 60px;
+  height: 1px;
+  background: var(--border);
+  margin: 0 16px;
+  vertical-align: middle;
+}
+
+/* ── Footer ── */
+.footer {
+  position: relative; z-index: 1;
+  text-align: center;
+  padding: 40px 20px 60px;
+  color: var(--text-dim);
+  font-size: 13px;
+}
+
+.footer a {
+  color: var(--cyan);
+  text-decoration: none;
+}
+.footer a:hover { text-decoration: underline; }
+
+/* ── Responsive ── */
+@media (max-width: 640px) {
+  .grid { grid-template-columns: 1fr; }
+  .stats { gap: 24px; }
+  .section { padding: 48px 16px; }
+  .card__preview { height: 140px; }
+}
+
+/* ── Reveal animation ── */
+.reveal {
+  opacity: 0;
+  transform: translateY(40px);
+  transition: all 0.7s cubic-bezier(0.22,1,0.36,1);
+}
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+</style>
+</head>
+<body>
+
+<div class="orb orb--1"></div>
+<div class="orb orb--2"></div>
+<div class="orb orb--3"></div>
+
+<!-- ═══ Hero ═══ -->
+<header class="hero">
+  <div class="hero__badge">✦ VIBE CODING</div>
+  <h1>
+    <span class="highlight">N</span>E<br>
+    的程式<br>作品集
+  </h1>
+  <p>用程式碼畫畫、寫遊戲、做網站 — 這是我的學習旅程</p>
+  <div class="hero__scroll">
+    <a href="#projects">⬇</a>
+  </div>
+</header>
+
+<!-- ═══ Stats ═══ -->
+<div class="stats">
+  <div class="stat">
+    <div class="stat__num" id="projectCount">0</div>
+    <div class="stat__label">作品數量</div>
+  </div>
+  <div class="stat">
+    <div class="stat__num">9</div>
+    <div class="stat__label">HTML</div>
+  </div>
+  <div class="stat">
+    <div class="stat__num">3</div>
+    <div class="stat__label">Python</div>
+  </div>
+  <div class="stat">
+    <div class="stat__num">∞</div>
+    <div class="stat__label">學習熱情</div>
+  </div>
+</div>
+
+<!-- ═══ Projects ═══ -->
+<section class="section" id="projects">
+  <h2 class="section__title reveal">所有作品</h2>
+  <p class="section__sub reveal">點擊預覽直接看效果，原始碼也在 GitHub 上</p>
+
+  <div class="filters reveal">
+    <button class="filter-btn active" data-filter="all">全部</button>
+    <button class="filter-btn" data-filter="html">HTML</button>
+    <button class="filter-btn" data-filter="py">Python</button>
+    <button class="filter-btn" data-filter="featured">精選</button>
+  </div>
+
+  <div class="grid" id="projectGrid"></div>
+</section>
+
+<div class="divider">✦ ✦ ✦</div>
+
+<!-- ═══ Footer ═══ -->
+<footer class="footer">
+  <p>用 ❤️ 與大量 ☕ 打造 &nbsp;|&nbsp; <a href="https://github.com/nee2427/20260609" target="_blank">GitHub</a></p>
+</footer>
+
+<script>
+const GITHUB_USER = 'nee2427';
+const GITHUB_REPO = '20260609';
+const GITHUB_BRANCH = 'master';
+const PREVIEW_BASE = `https://htmlpreview.github.io/?https://github.com/${GITHUB_USER}/${GITHUB_REPO}/blob/${GITHUB_BRANCH}/`;
+const RAW_BASE = `https://raw.githubusercontent.com/${GITHUB_USER}/${GITHUB_REPO}/${GITHUB_BRANCH}/`;
+const SOURCE_BASE = `https://github.com/${GITHUB_USER}/${GITHUB_REPO}/blob/${GITHUB_BRANCH}/`;
+
+const projects = [
+  {
+    id: 'teacher_all_in_one',
+    title: '教師招募系統 (旗艦版)',
+    desc: '整合註冊、管理員後台、檔案上傳與 Google Drive 的全功能招募平台。',
+    type: 'html',
+    featured: true,
+    tags: ['html', 'css', 'js', 'drive', 'admin'],
+    file: 'teacher_all_in_one.html',
+    pythonSnippet: null
+  },
+  {
+    id: 'teacher_with_drive',
+    title: '教師招募系統 (雲端版)',
+    desc: '含拖曳上傳與 Google Drive API 整合，資料直接存入雲端。',
+    type: 'html',
+    featured: true,
+    tags: ['html', 'css', 'js', 'drive'],
+    file: 'teacher_with_drive.html',
+    pythonSnippet: null
+  },
+  {
+    id: 'admin_panel',
+    title: '管理員後台',
+    desc: '登入儀表板，管理應聘者審核、狀態切換與 CSV 匯出。',
+    type: 'html',
+    featured: true,
+    tags: ['html', 'css', 'js', 'admin'],
+    file: 'admin_panel.html',
+    pythonSnippet: null
+  },
+  {
+    id: 'teacher_recruitment',
+    title: '教師招募表單',
+    desc: '教師應聘報名表，含欄位驗證、搜尋篩選與 localStorage 儲存。',
+    type: 'html',
+    featured: false,
+    tags: ['html', 'css', 'js'],
+    file: 'teacher_recruitment.html',
+    pythonSnippet: null
+  },
+  {
+    id: 'todo',
+    title: '待辦事項清單',
+    desc: '全功能 Todo List：新增、刪除、切換狀態、篩選與自動儲存。',
+    type: 'html',
+    featured: false,
+    tags: ['html', 'css', 'js'],
+    file: 'todo.html',
+    pythonSnippet: null
+  },
+  {
+    id: 'pomodoro',
+    title: '番茄鐘計時器',
+    desc: '25 分鐘倒數計時，有圓形進度條與可愛番茄 SVG 動畫。',
+    type: 'html',
+    featured: false,
+    tags: ['html', 'css', 'js'],
+    file: 'pomodoro.html',
+    pythonSnippet: null
+  },
+  {
+    id: 'guess',
+    title: '猜數字遊戲',
+    desc: '經典猜數字，系統提示「太大/太小」，隨機目標等你挑戰。',
+    type: 'py',
+    featured: false,
+    tags: ['py'],
+    file: 'guess.py',
+    pythonSnippet: `import random
+target = random.randint(1, 100)
+guess = None
+while guess != target:
+    guess = int(input("猜一個 1~100 的數字："))
+    if guess > target:
+        print("太大了！")
+    elif guess < target:
+        print("太小了！")
+print("答對了！")`
+  },
+  {
+    id: 'guess_math_hint',
+    title: '猜數字遊戲 (數學版)',
+    desc: '進階猜數字，加入數學提示讓推理更有趣。',
+    type: 'py',
+    featured: false,
+    tags: ['py'],
+    file: 'guess_math_hint.py',
+    pythonSnippet: `# 進階版猜數字
+# 加入奇偶數、倍數提示
+target = 42
+hints = [
+  "是偶數", "能被 3 整除",
+  "大於 30", "小於 50"
+]
+print("線索：", "、".join(hints))
+# 開始猜...`
+  },
+  {
+    id: 'square_circle_86',
+    title: '烏龜繪圖',
+    desc: '用 Python turtle 模組畫出幾何圖形，色彩繽紛的程式藝術。',
+    type: 'py',
+    featured: false,
+    tags: ['py'],
+    file: 'square_circle_86.py',
+    pythonSnippet: `import turtle
+t = turtle.Turtle()
+colors = ["red", "blue",
+  "green", "yellow"]
+for i in range(36):
+  t.pencolor(colors[i%4])
+  t.forward(100)
+  t.right(90)
+  t.forward(100)
+  t.right(90)
+  t.forward(100)
+  t.right(90)
+  t.forward(100)
+  t.right(10)
+turtle.done()`
+  }
+];
+
+function getPreviewUrl(file) {
+  return PREVIEW_BASE + file;
+}
+function getSourceUrl(file) {
+  return SOURCE_BASE + file;
+}
+
+function renderCard(project) {
+  const isPy = project.type === 'py';
+  const previewContent = isPy
+    ? `<div class="py-preview">${project.pythonSnippet}</div>`
+    : `<iframe src="${getPreviewUrl(project.file)}" loading="lazy" title="${project.title}"></iframe>`;
+
+  const tagHtml = project.tags.map(t => `<span class="tag tag--${t}">${t.toUpperCase()}</span>`).join('');
+
+  return `
+    <div class="card reveal" data-type="${project.type}" data-featured="${project.featured}">
+      <div class="card__preview">
+        <span class="card__type card__type--${isPy ? 'py' : 'html'}">${isPy ? 'Python' : 'HTML'}</span>
+        ${previewContent}
+      </div>
+      <div class="card__body">
+        <div class="card__title">${project.title}</div>
+        <div class="card__desc">${project.desc}</div>
+        <div class="card__tags">${tagHtml}</div>
+        <div class="card__links">
+          ${isPy ? `
+            <a href="${getSourceUrl(project.file)}" target="_blank" class="source">原始碼</a>
+          ` : `
+            <a href="${getPreviewUrl(project.file)}" target="_blank" class="preview">預覽</a>
+            <a href="${getSourceUrl(project.file)}" target="_blank" class="source">原始碼</a>
+          `}
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function renderAll(filter) {
+  const grid = document.getElementById('projectGrid');
+  let filtered = [...projects];
+  if (filter === 'html') filtered = filtered.filter(p => p.type === 'html');
+  else if (filter === 'py') filtered = filtered.filter(p => p.type === 'py');
+  else if (filter === 'featured') filtered = filtered.filter(p => p.featured);
+
+  grid.innerHTML = filtered.map(renderCard).join('');
+  document.getElementById('projectCount').textContent = filtered.length;
+  observeReveal();
+}
+
+// ── Filter buttons ──
+document.querySelectorAll('.filter-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    renderAll(btn.dataset.filter);
+  });
+});
+
+// ── Scroll reveal ──
+function observeReveal() {
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.15 });
+
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+}
+
+renderAll('all');
+</script>
+
+</body>
+</html>
