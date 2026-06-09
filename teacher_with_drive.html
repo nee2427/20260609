@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>教師甄試報名系統 — 含檔案上傳</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+  :root {
+    --primary: #3D8B7E; --primary-light: #5DA99B; --primary-surface: #E6F3F0;
+    --accent: #E8B84B; --text: #2C3E3A; --text-dim: #7A8F8B; --text-muted: #A9BCB8;
+    --bg: #F5F8F7; --surface: #FFFFFF; --border: #D6E4E0; --border-light: #E8F0ED;
+    --error: #D9655B; --radius: 16px; --radius-sm: 10px;
+    --shadow: 0 2px 8px rgba(61,139,126,0.06), 0 8px 32px rgba(61,139,126,0.04);
+  }
+  body {
+    font-family: 'Noto Sans TC', sans-serif;
+    background: var(--bg); color: var(--text); min-height: 100vh;
+    background-image: radial-gradient(ellipse 600px 400px at 10% 20%, rgba(61,139,126,0.04) 0%, transparent 100%);
+    background-attachment: fixed;
+  }
+
+  /* Header */
+  .header {
+    background: linear-gradient(135deg, var(--primary) 0%, #2D6B60 100%);
+    color: #fff; padding: 0 24px; position: sticky; top: 0; z-index: 100;
+    box-shadow: 0 4px 20px rgba(45,107,96,0.15);
+  }
+  .header-inner {
+    max-width: 960px; margin: 0 auto;
+    display: flex; align-items: center; justify-content: space-between; height: 64px;
+  }
+  .header .brand { display: flex; align-items: center; gap: 10px; }
+  .header .brand-icon {
+    width: 32px; height: 32px; background: rgba(255,255,255,0.15); border-radius: 8px;
+    display: flex; align-items: center; justify-content: center; font-size: 18px;
+  }
+  .header h1 { font-size: 18px; font-weight: 700; letter-spacing: 0.5px; }
+  .header h1 small { font-weight: 300; font-size: 12px; opacity: 0.75; margin-left: 6px; }
+
+  .nav-tabs {
+    display: flex; gap: 2px; background: rgba(255,255,255,0.06);
+    padding: 3px; border-radius: 10px;
+  }
+  .nav-tabs button {
+    padding: 8px 20px; border: none; background: transparent;
+    color: rgba(255,255,255,0.65); font-family: inherit; font-size: 14px;
+    font-weight: 500; border-radius: 8px; cursor: pointer; transition: all 0.3s;
+  }
+  .nav-tabs button:hover { color: #fff; background: rgba(255,255,255,0.08); }
+  .nav-tabs button.active { color: var(--primary); background: #fff; font-weight: 600; }
+
+  .main { max-width: 960px; margin: 0 auto; padding: 32px 24px 60px; }
+  .page { display: none; animation: fadeUp 0.4s ease; }
+  .page.active { display: block; }
+  @keyframes fadeUp { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
+
+  /* Card */
+  .card {
+    background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow);
+    padding: 28px 32px; margin-bottom: 20px; border: 1px solid var(--border-light);
+    position: relative; overflow: hidden;
+  }
+  .card::before {
+    content:''; position:absolute; top:0; left:0; right:0; height:3px;
+    background: linear-gradient(90deg, var(--primary), var(--accent), var(--primary));
+    background-size: 200% 100%; animation: shimmer 4s ease-in-out infinite;
+  }
+  @keyframes shimmer { 0%,100% { background-position:0% 0%; } 50% { background-position:100% 0%; } }
+
+  .card-title {
+    font-size: 17px; font-weight: 700; margin-bottom: 4px; color: var(--primary);
+    display: flex; align-items: center; gap: 10px;
+  }
+  .card-title .badge {
+    font-size: 11px; font-weight: 600; background: var(--primary-surface);
+    color: var(--primary); padding: 2px 12px; border-radius: 20px;
+  }
+  .card-title .icon { font-size: 20px; }
+  .card-desc { font-size: 13px; color: var(--text-dim); margin-bottom: 20px; padding-left: 30px; }
+
+  .welcome-banner {
+    background: linear-gradient(135deg, var(--primary) 0%, #2D6B60 100%);
+    border-radius: var(--radius); padding: 28px 32px; margin-bottom: 20px; color: #fff;
+    position: relative; overflow: hidden;
+  }
+  .welcome-banner::after { content:'📄'; position:absolute; right:24px; bottom:12px; font-size: 56px; opacity:0.12; }
+  .welcome-banner h2 { font-size: 20px; font-weight: 700; margin-bottom: 4px; }
+  .welcome-banner p { font-size: 14px; opacity: 0.85; }
+
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px 24px; }
+  .form-grid .full { grid-column: 1 / -1; }
+
+  .form-group { display: flex; flex-direction: column; gap: 5px; }
+  .form-group label { font-size: 13px; font-weight: 600; color: var(--text); }
+  .form-group label .required { color: var(--error); margin-left: 2px; }
+
+  .form-group input, .form-group select, .form-group textarea {
+    padding: 11px 14px; border: 1.5px solid var(--border); border-radius: var(--radius-sm);
+    font-size: 14px; font-family: inherit; outline: none; transition: all 0.25s ease;
+    background: var(--bg); color: var(--text);
+  }
+  .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+    border-color: var(--primary); box-shadow: 0 0 0 4px rgba(61,139,126,0.1); background: #fff;
+  }
+  .form-group textarea { resize: vertical; min-height: 80px; }
+  .form-group .error-msg { font-size: 12px; color: var(--error); display: none; }
+  .form-group.invalid input, .form-group.invalid select {
+    border-color: var(--error); box-shadow: 0 0 0 4px rgba(217,101,91,0.08);
+  }
+  .form-group.invalid .error-msg { display: block; }
+
+  /* 檔案上傳 */
+  .file-upload-area {
+    border: 2px dashed var(--border); border-radius: var(--radius-sm);
+    padding: 24px; text-align: center; cursor: pointer;
+    transition: all 0.25s; background: var(--bg); position: relative;
+  }
+  .file-upload-area:hover {
+    border-color: var(--primary); background: var(--primary-surface);
+  }
+  .file-upload-area.dragover {
+    border-color: var(--primary); background: var(--primary-surface);
+    box-shadow: 0 0 0 4px rgba(61,139,126,0.1);
+  }
+  .file-upload-area .upload-icon { font-size: 36px; margin-bottom: 8px; opacity: 0.5; }
+  .file-upload-area .upload-text { font-size: 14px; color: var(--text-dim); }
+  .file-upload-area .upload-hint { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+  .file-upload-area input[type="file"] {
+    position: absolute; inset: 0; opacity: 0; cursor: pointer;
+  }
+  .file-list {
+    display: flex; flex-direction: column; gap: 8px; margin-top: 12px;
+  }
+  .file-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px 12px; background: var(--primary-surface);
+    border-radius: var(--radius-sm); font-size: 13px;
+  }
+  .file-item .file-icon { font-size: 20px; }
+  .file-item .file-info { flex: 1; }
+  .file-item .file-info .file-name { font-weight: 500; color: var(--text); }
+  .file-item .file-info .file-size { font-size: 11px; color: var(--text-dim); }
+  .file-item .file-status {
+    font-size: 11px; padding: 2px 8px; border-radius: 10px; font-weight: 500;
+  }
+  .file-item .file-status.uploaded { background: rgba(61,139,126,0.1); color: var(--primary); }
+  .file-item .file-status.pending { background: var(--accent-light); color: #B8860B; }
+  .file-item .file-status.error { background: rgba(217,101,91,0.1); color: var(--error); }
+  .file-item .file-remove {
+    width: 24px; height: 24px; border: none; background: transparent;
+    color: var(--text-muted); border-radius: 4px; cursor: pointer; font-size: 16px;
+    transition: all 0.2s;
+  }
+  .file-item .file-remove:hover { background: rgba(217,101,91,0.1); color: var(--error); }
+
+  /* Google Drive 設定區 */
+  .gdrive-setup {
+    background: #FEF9E7; border: 1px solid #F9E79F; border-radius: var(--radius-sm);
+    padding: 14px 18px; margin-bottom: 16px; font-size: 13px;
+  }
+  .gdrive-setup .gdrive-title { font-weight: 600; color: #7D6608; margin-bottom: 6px; }
+  .gdrive-setup .gdrive-step { color: #7D6608; margin: 2px 0; font-size: 12px; }
+  .gdrive-setup input {
+    width: 100%; padding: 8px 12px; border: 1.5px solid #F9E79F;
+    border-radius: 6px; font-size: 13px; font-family: monospace;
+    outline: none; margin: 6px 0; background: #fff;
+  }
+  .gdrive-setup input:focus { border-color: #D4AC0D; }
+  .gdrive-setup .btn-sm {
+    padding: 6px 14px; border: none; border-radius: 6px; font-size: 12px;
+    font-weight: 600; font-family: inherit; cursor: pointer;
+    background: var(--primary); color: #fff; transition: background 0.2s;
+  }
+  .gdrive-setup .btn-sm:hover { background: var(--primary-light); }
+
+  .gdrive-connected {
+    display: none; background: #E8F5E9; border: 1px solid #A5D6A7;
+    border-radius: var(--radius-sm); padding: 10px 16px; font-size: 13px; margin-bottom: 12px;
+  }
+  .gdrive-connected.show { display: flex; align-items: center; gap: 8px; }
+  .gdrive-connected .check { color: var(--success); font-weight: 600; }
+
+  .checkbox-group {
+    display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px;
+  }
+  .checkbox-group label {
+    display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 400;
+    padding: 7px 14px; border: 1.5px solid var(--border); border-radius: 8px;
+    cursor: pointer; transition: all 0.25s; background: var(--bg); color: var(--text-dim);
+  }
+  .checkbox-group label:hover { border-color: var(--primary-light); background: var(--primary-surface); color: var(--primary); }
+  .checkbox-group label.selected { border-color: var(--primary); background: var(--primary-surface); color: var(--primary); font-weight: 600; }
+  .checkbox-group input[type="checkbox"] { display: none; }
+
+  .form-actions { display: flex; gap: 12px; justify-content: flex-end; margin-top: 8px; flex-wrap: wrap; }
+  .btn {
+    padding: 11px 32px; border: none; border-radius: var(--radius-sm);
+    font-size: 14px; font-weight: 600; font-family: inherit; cursor: pointer;
+    transition: all 0.25s; letter-spacing: 0.3px;
+  }
+  .btn:active { transform: scale(0.96); }
+  .btn-primary {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+    color: #fff; box-shadow: 0 4px 16px rgba(61,139,126,0.3);
+  }
+  .btn-primary:hover { box-shadow: 0 6px 24px rgba(61,139,126,0.4); transform: translateY(-1px); }
+  .btn-outline { background: transparent; color: var(--text-dim); border: 1.5px solid var(--border); }
+  .btn-outline:hover { background: var(--bg); color: var(--text); }
+  .btn-google {
+    background: #fff; color: #333; border: 1.5px solid #ddd;
+    display: flex; align-items: center; gap: 8px; justify-content: center;
+  }
+  .btn-google:hover { background: #f5f5f5; }
+  .btn-google img { width: 18px; height: 18px; }
+
+  .toast {
+    position: fixed; top: 84px; right: 24px; padding: 14px 24px;
+    border-radius: var(--radius-sm); font-size: 14px; font-weight: 500;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+    transform: translateX(120%); transition: transform 0.5s cubic-bezier(0.34,1.56,0.64,1);
+    z-index: 200; max-width: 360px; color: #fff;
+  }
+  .toast.show { transform: translateX(0); }
+  .toast.success { background: var(--primary); }
+  .toast.error { background: var(--error); }
+
+  /* 檔案預覽 */
+  .file-preview-grid {
+    display: flex; flex-wrap: wrap; gap: 8px;
+  }
+  .file-preview-item {
+    width: 80px; height: 80px; border-radius: 8px; overflow: hidden;
+    border: 1px solid var(--border-light); position: relative; cursor: pointer;
+    background: var(--bg);
+  }
+  .file-preview-item img, .file-preview-item object {
+    width: 100%; height: 100%; object-fit: cover;
+  }
+  .file-preview-item .file-type-icon {
+    width: 100%; height: 100%; display: flex; align-items: center;
+    justify-content: center; font-size: 28px;
+  }
+  .file-preview-item .file-label {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    background: rgba(0,0,0,0.5); color: #fff; font-size: 9px;
+    text-align: center; padding: 1px 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+
+  @media (max-width: 700px) {
+    .form-grid { grid-template-columns: 1fr; }
+    .header-inner { flex-direction: column; height: auto; padding: 12px 0; gap: 10px; }
+    .nav-tabs { width: 100%; }
+    .nav-tabs button { flex: 1; text-align: center; padding: 8px 12px; font-size: 13px; }
+    .card { padding: 20px; }
+    .card-desc { padding-left: 0; }
+    .form-actions { flex-direction: column; }
+    .form-actions .btn { width: 100%; text-align: center; }
+    .welcome-banner { padding: 20px; }
+    .welcome-banner::after { display: none; }
+    .file-preview-grid { justify-content: center; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-inner">
+    <div class="brand">
+      <div class="brand-icon">📚</div>
+      <h1>教師甄試 <small>報名系統</small></h1>
+    </div>
+  </div>
+</div>
+
+<div class="main">
+  <div class="page active" id="page-register">
+    <div class="welcome-banner">
+      <h2>教師甄試線上報名</h2>
+      <p>請填寫資料並上傳相關掃描文件</p>
+    </div>
+
+    <!-- Google Drive 設定區塊 -->
+    <div class="card" id="gdriveConfigCard">
+      <div class="card-title"><span class="icon">☁️</span> Google Drive 雲端儲存設定</div>
+      <div class="card-desc">設定後上傳的檔案將自動存入你的 Google 雲端硬碟</div>
+
+      <div class="gdrive-connected" id="gdriveConnected">
+        <span class="check">✅</span> 已連接 Google Drive — 檔案將自動上傳到雲端
+      </div>
+
+      <div class="gdrive-setup" id="gdriveSetup">
+        <div class="gdrive-title">🔑 設定步驟</div>
+        <div class="gdrive-step">1. 前往 <a href="https://console.cloud.google.com/apis/credentials" target="_blank">Google Cloud Console</a> 建立憑證</div>
+        <div class="gdrive-step">2. 建立 OAuth 2.0 用戶端 ID（應用程式類型：網頁應用程式）</div>
+        <div class="gdrive-step">3. 新增授權的 JavaScript 來源：<code>https://htmlpreview.github.io</code></div>
+        <div class="gdrive-step">4. 將下方的「用戶端 ID」貼入輸入框</div>
+        <label style="font-size:12px;font-weight:600;margin-top:8px;display:block">Google API 用戶端 ID</label>
+        <input type="text" id="gdriveClientId" placeholder="請貼上你的 Google OAuth Client ID">
+        <div style="display:flex;gap:8px;margin-top:6px">
+          <button class="btn-sm" id="gdriveConnectBtn">🔗 連接 Google Drive</button>
+          <button class="btn-sm" id="gdriveClearBtn" style="background:#ddd;color:#666">清除</button>
+        </div>
+      </div>
+    </div>
+
+    <form id="regForm" novalidate>
+      <!-- 基本資料 -->
+      <div class="card">
+        <div class="card-title"><span class="icon">👤</span> 基本資料 <span class="badge">必填</span></div>
+        <div class="card-desc">請填寫個人基本資訊</div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>姓名 <span class="required">*</span></label>
+            <input type="text" id="name" placeholder="請輸入姓名" required>
+            <div class="error-msg">請輸入姓名</div>
+          </div>
+          <div class="form-group">
+            <label>身分證字號 <span class="required">*</span></label>
+            <input type="text" id="idNumber" placeholder="A123456789" required>
+            <div class="error-msg">請輸入正確的身分證字號</div>
+          </div>
+          <div class="form-group">
+            <label>性別 <span class="required">*</span></label>
+            <select id="gender" required>
+              <option value="">請選擇性別</option>
+              <option value="男">男</option>
+              <option value="女">女</option>
+            </select>
+            <div class="error-msg">請選擇性別</div>
+          </div>
+          <div class="form-group">
+            <label>出生日期 <span class="required">*</span></label>
+            <input type="date" id="birthDate" required>
+            <div class="error-msg">請選擇出生日期</div>
+          </div>
+          <div class="form-group">
+            <label>聯絡電話 <span class="required">*</span></label>
+            <input type="tel" id="phone" placeholder="0912-345-678" required>
+            <div class="error-msg">請輸入聯絡電話</div>
+          </div>
+          <div class="form-group">
+            <label>電子郵件 <span class="required">*</span></label>
+            <input type="email" id="email" placeholder="example@mail.com" required>
+            <div class="error-msg">請輸入有效的電子郵件</div>
+          </div>
+          <div class="form-group full">
+            <label>通訊地址</label>
+            <input type="text" id="address" placeholder="縣市／鄉鎮市區／路街／號">
+          </div>
+        </div>
+      </div>
+
+      <!-- 學歷與證照 -->
+      <div class="card">
+        <div class="card-title"><span class="icon">🎓</span> 學歷與證照 <span class="badge">必填</span></div>
+        <div class="card-desc">請填寫最高學歷及教師證資訊</div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>最高學歷 <span class="required">*</span></label>
+            <select id="degree" required>
+              <option value="">請選擇學歷</option>
+              <option value="學士">學士</option>
+              <option value="碩士">碩士</option>
+              <option value="博士">博士</option>
+            </select>
+            <div class="error-msg">請選擇學歷</div>
+          </div>
+          <div class="form-group">
+            <label>畢業學校 <span class="required">*</span></label>
+            <input type="text" id="school" placeholder="例如：國立臺灣師範大學" required>
+            <div class="error-msg">請輸入畢業學校</div>
+          </div>
+          <div class="form-group">
+            <label>科系 <span class="required">*</span></label>
+            <input type="text" id="major" placeholder="例如：教育學系" required>
+            <div class="error-msg">請輸入科系</div>
+          </div>
+          <div class="form-group">
+            <label>教師證字號</label>
+            <input type="text" id="certNo" placeholder="例如：教中字第XXXXXXX號">
+          </div>
+        </div>
+      </div>
+
+      <!-- 應試資訊 -->
+      <div class="card">
+        <div class="card-title"><span class="icon">📋</span> 應試資訊 <span class="badge">必填</span></div>
+        <div class="card-desc">選擇報考科目與志願地區</div>
+        <div class="form-grid">
+          <div class="form-group full">
+            <label>報考科目 <span class="required">*</span></label>
+            <div class="checkbox-group" id="subjectsGroup">
+              <label data-value="國文"><input type="checkbox" value="國文"> 📖 國文</label>
+              <label data-value="英文"><input type="checkbox" value="英文"> 🌎 英文</label>
+              <label data-value="數學"><input type="checkbox" value="數學"> 🔢 數學</label>
+              <label data-value="社會"><input type="checkbox" value="社會"> 🏛️ 社會</label>
+              <label data-value="自然"><input type="checkbox" value="自然"> 🔬 自然</label>
+              <label data-value="音樂"><input type="checkbox" value="音樂"> 🎵 音樂</label>
+              <label data-value="美術"><input type="checkbox" value="美術"> 🎨 美術</label>
+              <label data-value="體育"><input type="checkbox" value="體育"> ⚽ 體育</label>
+              <label data-value="資訊"><input type="checkbox" value="資訊"> 💻 資訊</label>
+              <label data-value="特教"><input type="checkbox" value="特教"> ❤️ 特教</label>
+            </div>
+            <div class="error-msg" id="subjectsError">請至少選擇一個報考科目</div>
+          </div>
+          <div class="form-group full">
+            <label>志願地區 <span class="required">*</span></label>
+            <select id="region" required>
+              <option value="">請選擇志願地區</option>
+              <option value="臺北市">📍 臺北市</option>
+              <option value="新北市">📍 新北市</option>
+              <option value="桃園市">📍 桃園市</option>
+              <option value="臺中市">📍 臺中市</option>
+              <option value="臺南市">📍 臺南市</option>
+              <option value="高雄市">📍 高雄市</option>
+              <option value="基隆市">📍 基隆市</option>
+              <option value="新竹縣市">📍 新竹縣市</option>
+              <option value="苗栗縣">📍 苗栗縣</option>
+              <option value="彰化縣">📍 彰化縣</option>
+              <option value="南投縣">📍 南投縣</option>
+              <option value="雲林縣">📍 雲林縣</option>
+              <option value="嘉義縣市">📍 嘉義縣市</option>
+              <option value="屏東縣">📍 屏東縣</option>
+              <option value="宜蘭縣">📍 宜蘭縣</option>
+              <option value="花蓮縣">📍 花蓮縣</option>
+              <option value="臺東縣">📍 臺東縣</option>
+              <option value="澎湖縣">📍 澎湖縣</option>
+            </select>
+            <div class="error-msg">請選擇志願地區</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 檔案上傳 -->
+      <div class="card">
+        <div class="card-title"><span class="icon">📎</span> 掃描文件上傳</div>
+        <div class="card-desc">請上傳相關證明文件的掃描檔或照片（支援圖片、PDF）</div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+          <div class="form-group">
+            <label>身分證正反面</label>
+            <div class="file-upload-area" id="dropIdCard">
+              <div class="upload-icon">📇</div>
+              <div class="upload-text">點選或拖曳檔案至此</div>
+              <div class="upload-hint">支援 JPG / PNG / PDF</div>
+              <input type="file" accept="image/*,application/pdf" data-target="idCard">
+            </div>
+            <div class="file-list" id="fileIdCard"></div>
+          </div>
+          <div class="form-group">
+            <label>教師證書</label>
+            <div class="file-upload-area" id="dropCert">
+              <div class="upload-icon">📜</div>
+              <div class="upload-text">點選或拖曳檔案至此</div>
+              <div class="upload-hint">支援 JPG / PNG / PDF</div>
+              <input type="file" accept="image/*,application/pdf" data-target="cert">
+            </div>
+            <div class="file-list" id="fileCert"></div>
+          </div>
+          <div class="form-group">
+            <label>畢業證書</label>
+            <div class="file-upload-area" id="dropDiploma">
+              <div class="upload-icon">🎓</div>
+              <div class="upload-text">點選或拖曳檔案至此</div>
+              <div class="upload-hint">支援 JPG / PNG / PDF</div>
+              <input type="file" accept="image/*,application/pdf" data-target="diploma">
+            </div>
+            <div class="file-list" id="fileDiploma"></div>
+          </div>
+          <div class="form-group">
+            <label>其他證明文件</label>
+            <div class="file-upload-area" id="dropOther">
+              <div class="upload-icon">📁</div>
+              <div class="upload-text">點選或拖曳檔案至此</div>
+              <div class="upload-hint">支援 JPG / PNG / PDF</div>
+              <input type="file" accept="image/*,application/pdf" data-target="other">
+            </div>
+            <div class="file-list" id="fileOther"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><span class="icon">✏️</span> 備註</div>
+        <div class="form-group" style="margin-top:12px">
+          <textarea id="notes" placeholder="其他特殊需求或補充說明..." style="min-height:80px"></textarea>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="reset" class="btn btn-outline">重新填寫</button>
+        <button id="gdriveUploadBtn" class="btn btn-outline" style="display:none">☁️ 上傳檔案到雲端</button>
+        <button type="submit" class="btn btn-primary">📤 送出報名</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://apis.google.com/js/api.js"></script>
+<script>
+const STORAGE_KEY = 'teacher_registrations_with_files';
+
+let registrations = [];
+let gdriveAuthorized = false;
+let gdriveToken = null;
+let pendingFiles = { idCard: [], cert: [], diploma: [], other: [] };
+let uploadedFiles = { idCard: [], cert: [], diploma: [], other: [] };
+
+const FILE_TARGETS = ['idCard', 'cert', 'diploma', 'other'];
+const FILE_LABELS = { idCard: '身分證', cert: '教師證書', diploma: '畢業證書', other: '其他證明' };
+const FILE_ICONS = { idCard: '📇', cert: '📜', diploma: '🎓', other: '📁' };
+
+const DOM = {
+  name: document.getElementById('name'),
+  idNumber: document.getElementById('idNumber'),
+  gender: document.getElementById('gender'),
+  birthDate: document.getElementById('birthDate'),
+  phone: document.getElementById('phone'),
+  email: document.getElementById('email'),
+  address: document.getElementById('address'),
+  degree: document.getElementById('degree'),
+  school: document.getElementById('school'),
+  major: document.getElementById('major'),
+  certNo: document.getElementById('certNo'),
+  subjectsGroup: document.getElementById('subjectsGroup'),
+  region: document.getElementById('region'),
+  notes: document.getElementById('notes'),
+  form: document.getElementById('regForm'),
+  gdriveClientId: document.getElementById('gdriveClientId'),
+  gdriveConnectBtn: document.getElementById('gdriveConnectBtn'),
+  gdriveClearBtn: document.getElementById('gdriveClearBtn'),
+  gdriveConnected: document.getElementById('gdriveConnected'),
+  gdriveSetup: document.getElementById('gdriveSetup'),
+  gdriveUploadBtn: document.getElementById('gdriveUploadBtn'),
+  toast: document.getElementById('toast')
+};
+
+/* ===== 檔案上傳處理 ===== */
+FILE_TARGETS.forEach(target => {
+  const input = document.querySelector(`input[data-target="${target}"]`);
+  const list = document.getElementById(`file${target.charAt(0).toUpperCase() + target.slice(1)}`);
+  const area = document.getElementById(`drop${target.charAt(0).toUpperCase() + target.slice(1)}`);
+
+  input.addEventListener('change', () => {
+    Array.from(input.files).forEach(file => addFile(target, file));
+    input.value = '';
+  });
+
+  /* Drag & Drop */
+  area.addEventListener('dragover', e => { e.preventDefault(); area.classList.add('dragover'); });
+  area.addEventListener('dragleave', () => area.classList.remove('dragover'));
+  area.addEventListener('drop', e => {
+    e.preventDefault();
+    area.classList.remove('dragover');
+    Array.from(e.dataTransfer.files).forEach(file => addFile(target, file));
+  });
+});
+
+function addFile(target, file) {
+  const maxSize = 10 * 1024 * 1024;
+  if (file.size > maxSize) {
+    showToast(`⚠️ ${file.name} 超過 10MB 限制`, 'error');
+    return;
+  }
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const fileData = {
+      id: Date.now().toString(36) + Math.random().toString(36).slice(2, 4),
+      name: file.name,
+      size: file.size,
+      type: file.type,
+      data: e.target.result,
+      status: gdriveAuthorized ? 'pending' : 'local',
+      gdriveId: null,
+      gdriveLink: null
+    };
+    pendingFiles[target].push(fileData);
+    renderFiles(target);
+    if (gdriveAuthorized) uploadFileToDrive(target, fileData);
+  };
+  reader.readAsDataURL(file);
+}
+
+function removeFile(target, fileId) {
+  pendingFiles[target] = pendingFiles[target].filter(f => f.id !== fileId);
+  uploadedFiles[target] = uploadedFiles[target].filter(f => f.id !== fileId);
+  renderFiles(target);
+}
+
+function renderFiles(target) {
+  const list = document.getElementById(`file${target.charAt(0).toUpperCase() + target.slice(1)}`);
+  const allFiles = [...uploadedFiles[target], ...pendingFiles[target]];
+  if (allFiles.length === 0) { list.innerHTML = ''; return; }
+
+  list.innerHTML = allFiles.map(f => {
+    const isUploaded = f.status === 'uploaded' || f.gdriveId;
+    const statusText = isUploaded ? '☁️ 已上傳' : (f.status === 'error' ? '❌ 上傳失敗' : '⏳ 排隊中');
+    const statusClass = isUploaded ? 'uploaded' : (f.status === 'error' ? 'error' : 'pending');
+    const size = f.size > 1024 * 1024 ? (f.size / 1024 / 1024).toFixed(1) + ' MB' : (f.size / 1024).toFixed(0) + ' KB';
+    return `<div class="file-item">
+      <div class="file-icon">${FILE_ICONS[target]}</div>
+      <div class="file-info"><div class="file-name">${escHtml(f.name)}</div><div class="file-size">${size}</div></div>
+      <span class="file-status ${statusClass}">${statusText}</span>
+      ${isUploaded && f.gdriveLink ? `<a href="${f.gdriveLink}" target="_blank" style="text-decoration:none;font-size:16px" title="在 Google Drive 中開啟">🔗</a>` : ''}
+      <button class="file-remove" onclick="removeFile('${target}','${f.id}')">×</button>
+    </div>`;
+  }).join('');
+}
+
+/* ===== Google Drive API ===== */
+function loadGdriveSettings() {
+  try {
+    const saved = localStorage.getItem('gdrive_settings');
+    if (saved) {
+      const s = JSON.parse(saved);
+      DOM.gdriveClientId.value = s.clientId || '';
+      gdriveAuthorized = s.authorized || false;
+      gdriveToken = s.token || null;
+      if (gdriveAuthorized) {
+        DOM.gdriveConnected.classList.add('show');
+        DOM.gdriveUploadBtn.style.display = '';
+      }
+    }
+  } catch {}
+}
+
+function saveGdriveSettings() {
+  localStorage.setItem('gdrive_settings', JSON.stringify({
+    clientId: DOM.gdriveClientId.value.trim(),
+    authorized: gdriveAuthorized,
+    token: gdriveToken
+  }));
+}
+
+function initGapi() {
+  return new Promise((resolve) => {
+    gapi.load('client:auth2', resolve);
+  });
+}
+
+async function connectGdrive() {
+  const clientId = DOM.gdriveClientId.value.trim();
+  if (!clientId) { showToast('請先輸入 Google API 用戶端 ID', 'error'); return; }
+
+  try {
+    await initGapi();
+    await gapi.client.init({
+      clientId: clientId,
+      scope: 'https://www.googleapis.com/auth/drive.file',
+      discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest']
+    });
+
+    const auth = gapi.auth2.getAuthInstance();
+    if (!auth.isSignedIn.get()) {
+      await auth.signIn();
+    }
+
+    gdriveAuthorized = true;
+    gdriveToken = auth.currentUser.get().getAuthResponse().access_token;
+    DOM.gdriveConnected.classList.add('show');
+    DOM.gdriveUploadBtn.style.display = '';
+    saveGdriveSettings();
+    showToast('✅ 成功連接 Google Drive！');
+
+    /* 上傳所有待上傳檔案 */
+    FILE_TARGETS.forEach(target => {
+      pendingFiles[target].forEach(f => {
+        if (f.status === 'pending') uploadFileToDrive(target, f);
+      });
+    });
+  } catch (err) {
+    showToast('❌ 連接失敗：' + (err.error || err.message || '請檢查設定'), 'error');
+    console.error(err);
+  }
+}
+
+async function uploadFileToDrive(target, fileData) {
+  if (!gdriveAuthorized || !gdriveToken) return;
+
+  try {
+    /* 建立資料夾 */
+    const folderId = await getOrCreateFolder();
+
+    /* 將 base64 轉 blob */
+    const base64 = fileData.data.split(',')[1];
+    const mimeType = fileData.type || 'application/octet-stream';
+    const byteString = atob(base64);
+    const ab = new ArrayBuffer(byteString.length);
+    const ia = new Uint8Array(ab);
+    for (let i = 0; i < byteString.length; i++) ia[i] = byteString.charCodeAt(i);
+    const blob = new Blob([ab], { type: mimeType });
+
+    const metadata = {
+      name: `${FILE_LABELS[target]}_${fileData.name}`,
+      parents: [folderId],
+      mimeType: mimeType
+    };
+
+    const form = new FormData();
+    form.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
+    form.append('file', blob);
+
+    const res = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id,webViewLink', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${gdriveToken}` },
+      body: form
+    });
+
+    const result = await res.json();
+    if (result.id) {
+      fileData.gdriveId = result.id;
+      fileData.gdriveLink = result.webViewLink;
+      fileData.status = 'uploaded';
+
+      /* 移到已上傳 */
+      pendingFiles[target] = pendingFiles[target].filter(f => f.id !== fileData.id);
+      uploadedFiles[target].push(fileData);
+      renderFiles(target);
+      showToast(`✅ ${FILE_LABELS[target]} 已上傳至 Google Drive`);
+    } else {
+      fileData.status = 'error';
+      renderFiles(target);
+      showToast('❌ 上傳失敗：' + (result.error?.message || '未知錯誤'), 'error');
+    }
+  } catch (err) {
+    fileData.status = 'error';
+    renderFiles(target);
+    showToast('❌ 上傳失敗：' + err.message, 'error');
+  }
+}
+
+async function getOrCreateFolder() {
+  const folderName = '教師甄試報名文件';
+
+  /* 查詢是否已有資料夾 */
+  const searchRes = await fetch(`https://www.googleapis.com/drive/v3/files?q=name='${encodeURIComponent(folderName)}' and mimeType='application/vnd.google-apps.folder' and trashed=false&fields=files(id)`, {
+    headers: { Authorization: `Bearer ${gdriveToken}` }
+  });
+  const searchData = await searchRes.json();
+  if (searchData.files && searchData.files.length > 0) return searchData.files[0].id;
+
+  /* 建立新資料夾 */
+  const createRes = await fetch('https://www.googleapis.com/drive/v3/files?fields=id', {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${gdriveToken}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      name: folderName,
+      mimeType: 'application/vnd.google-apps.folder'
+    })
+  });
+  const createData = await createRes.json();
+  return createData.id;
+}
+
+function clearGdriveSettings() {
+  gdriveAuthorized = false;
+  gdriveToken = null;
+  DOM.gdriveClientId.value = '';
+  DOM.gdriveConnected.classList.remove('show');
+  DOM.gdriveUploadBtn.style.display = 'none';
+  localStorage.removeItem('gdrive_settings');
+  showToast('已清除 Google Drive 設定');
+}
+
+/* ===== 表單處理 ===== */
+function validateIdNumber(val) { return /^[A-Z][12]\d{8}$/.test(val); }
+function validatePhone(val) {
+  return /^0\d{1,2}-\d{3,4}-\d{3,4}$/.test(val) || /^09\d{8}$/.test(val);
+}
+
+function getAllFiles() {
+  const files = {};
+  FILE_TARGETS.forEach(target => {
+    files[target] = [...uploadedFiles[target], ...pendingFiles[target]].map(f => ({
+      id: f.id, name: f.name, size: f.size, type: f.type,
+      data: f.data,
+      gdriveId: f.gdriveId || null,
+      gdriveLink: f.gdriveLink || null,
+      status: f.status
+    }));
+  });
+  return files;
+}
+
+function showToast(msg, type = 'success') {
+  DOM.toast.textContent = msg;
+  DOM.toast.className = 'toast ' + type;
+  DOM.toast.classList.add('show');
+  setTimeout(() => DOM.toast.classList.remove('show'), 3000);
+}
+
+function escHtml(str) {
+  const d = document.createElement('div');
+  d.textContent = str; return d.innerHTML;
+}
+
+/* ===== 事件綁定 ===== */
+DOM.gdriveConnectBtn.addEventListener('click', connectGdrive);
+DOM.gdriveClearBtn.addEventListener('click', clearGdriveSettings);
+
+DOM.subjectsGroup.addEventListener('change', (e) => {
+  if (e.target.type === 'checkbox') {
+    e.target.closest('label').classList.toggle('selected', e.target.checked);
+  }
+});
+
+DOM.form.addEventListener('submit', (e) => {
+  e.preventDefault();
+
+  /* 檢查必填 */
+  let valid = true;
+  document.querySelectorAll('.form-group.invalid').forEach(el => el.classList.remove('invalid'));
+
+  if (!DOM.name.value.trim()) { DOM.name.closest('.form-group').classList.add('invalid'); valid = false; }
+  if (!validateIdNumber(DOM.idNumber.value.trim())) { DOM.idNumber.closest('.form-group').classList.add('invalid'); valid = false; }
+  if (!DOM.gender.value) { DOM.gender.closest('.form-group').classList.add('invalid'); valid = false; }
+  if (!DOM.birthDate.value) { DOM.birthDate.closest('.form-group').classList.add('invalid'); valid = false; }
+  if (!validatePhone(DOM.phone.value.trim())) { DOM.phone.closest('.form-group').classList.add('invalid'); valid = false; }
+  if (!DOM.email.value.trim() || !DOM.email.value.includes('@')) { DOM.email.closest('.form-group').classList.add('invalid'); valid = false; }
+  if (!DOM.degree.value) { DOM.degree.closest('.form-group').classList.add('invalid'); valid = false; }
+  if (!DOM.school.value.trim()) { DOM.school.closest('.form-group').classList.add('invalid'); valid = false; }
+  if (!DOM.major.value.trim()) { DOM.major.closest('.form-group').classList.add('invalid'); valid = false; }
+
+  const subjects = [...DOM.subjectsGroup.querySelectorAll('input:checked')].map(cb => cb.value);
+  if (subjects.length === 0) {
+    document.getElementById('subjectsError').style.display = 'block';
+    valid = false;
+  } else {
+    document.getElementById('subjectsError').style.display = 'none';
+  }
+  if (!DOM.region.value) { DOM.region.closest('.form-group').classList.add('invalid'); valid = false; }
+  if (!valid) return;
+
+  /* 儲存報名 */
+  loadData();
+  registrations.push({
+    id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+    name: DOM.name.value.trim(),
+    idNumber: DOM.idNumber.value.trim(),
+    gender: DOM.gender.value,
+    birthDate: DOM.birthDate.value,
+    phone: DOM.phone.value.trim(),
+    email: DOM.email.value.trim(),
+    address: DOM.address.value.trim(),
+    degree: DOM.degree.value,
+    school: DOM.school.value.trim(),
+    major: DOM.major.value.trim(),
+    certNo: DOM.certNo.value.trim(),
+    subjects,
+    region: DOM.region.value,
+    notes: DOM.notes.value.trim(),
+    files: getAllFiles(),
+    createdAt: new Date().toISOString()
+  });
+  saveData();
+  showToast('🎉 報名成功！檔案已儲存');
+
+  /* 重置 */
+  DOM.form.reset();
+  DOM.subjectsGroup.querySelectorAll('label').forEach(l => l.classList.remove('selected'));
+  FILE_TARGETS.forEach(target => {
+    pendingFiles[target] = [];
+    uploadedFiles[target] = [];
+    renderFiles(target);
+  });
+});
+
+DOM.form.querySelector('button[type="reset"]').addEventListener('click', () => {
+  document.querySelectorAll('.form-group.invalid').forEach(el => el.classList.remove('invalid'));
+  DOM.subjectsGroup.querySelectorAll('label').forEach(l => l.classList.remove('selected'));
+  FILE_TARGETS.forEach(target => {
+    pendingFiles[target] = [];
+    uploadedFiles[target] = [];
+    renderFiles(target);
+  });
+});
+
+function loadData() {
+  try {
+    const data = localStorage.getItem(STORAGE_KEY);
+    registrations = data ? JSON.parse(data) : [];
+  } catch { registrations = []; }
+}
+
+function saveData() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(registrations));
+}
+
+/* 初始化 */
+loadGdriveSettings();
+</script>
+</body>
+</html>
