@@ -10,20 +10,20 @@
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
 
 :root{
-  --bg:#0f0806;
-  --bg2:#1a0f0a;
-  --surface:rgba(255,255,255,0.04);
-  --border:rgba(255,255,255,0.06);
-  --text:#e8ddd0;
+  --bg:#f5efe8;
+  --bg2:#faf6f0;
+  --surface:#ffffff;
+  --border:rgba(0,0,0,0.06);
+  --text:#2c1810;
   --text-dim:#8a7a6a;
-  --cream:#f5ede3;
+  --cream:#fdfaf5;
   --caramel:#c68e5b;
   --copper:#b87333;
   --espresso:#2c1810;
   --warm:#d4a05a;
-  --steam:rgba(255,255,255,0.15);
+  --steam:rgba(200,160,120,0.25);
   --radius:16px;
-  --shadow:0 8px 40px rgba(0,0,0,0.6);
+  --shadow:0 8px 40px rgba(0,0,0,0.08);
 }
 
 html{scroll-behavior:smooth}
@@ -40,16 +40,15 @@ body{
 /* ── Background texture ── */
 body::before{
   content:'';position:fixed;inset:0;
-  background:radial-gradient(ellipse at 20% 50%,rgba(198,142,91,0.06) 0%,transparent 60%),
-             radial-gradient(ellipse at 80% 30%,rgba(184,115,51,0.04) 0%,transparent 50%),
-             radial-gradient(ellipse at 50% 80%,rgba(212,160,90,0.03) 0%,transparent 50%);
+  background:radial-gradient(ellipse at 20% 50%,rgba(198,142,91,0.08) 0%,transparent 60%),
+             radial-gradient(ellipse at 80% 30%,rgba(184,115,51,0.05) 0%,transparent 50%);
   pointer-events:none;z-index:0;
 }
 
 /* ── Noise overlay ── */
 body::after{
   content:'';position:fixed;inset:0;
-  opacity:0.03;
+  opacity:0.015;
   background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   pointer-events:none;z-index:0;
 }
@@ -80,12 +79,12 @@ body::after{
   padding:20px 40px;
   display:flex;justify-content:space-between;align-items:center;
   backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
-  background:rgba(15,8,6,0.6);
+  background:rgba(250,246,240,0.7);
   border-bottom:1px solid var(--border);
 }
 .header__logo{
   font-family:'Playfair Display',serif;
-  font-size:22px;font-weight:700;color:var(--cream);
+  font-size:22px;font-weight:700;color:var(--espresso);
   letter-spacing:3px;
 }
 .header__logo span{color:var(--caramel)}
@@ -96,7 +95,7 @@ body::after{
   font-weight:300;
 }
 .header__nav a:hover{color:var(--caramel)}
-.header__menu{display:none;background:none;border:none;color:var(--cream);font-size:24px;cursor:pointer}
+.header__menu{display:none;background:none;border:none;color:var(--espresso);font-size:24px;cursor:pointer}
 
 /* ═══ Hero ═══ */
 .hero{
@@ -183,21 +182,21 @@ body::after{
 /* ── CSS 3D Coffee Cup ── */
 .cup{
   position:relative;width:200px;
-  filter:drop-shadow(0 20px 60px rgba(198,142,91,0.15));
+  filter:drop-shadow(0 20px 40px rgba(198,142,91,0.2));
 }
 /* Saucer */
 .cup__saucer{
   width:220px;height:22px;
-  background:linear-gradient(180deg,#3d281a,#2c1810);
+  background:linear-gradient(180deg,#e8ddd0,#d4c4b4);
   border-radius:50%;
   margin:-6px auto 0;
   position:relative;z-index:1;
-  box-shadow:0 4px 20px rgba(0,0,0,0.4);
+  box-shadow:0 4px 20px rgba(0,0,0,0.1);
 }
 .cup__saucer-inner{
   position:absolute;top:6px;left:50%;transform:translateX(-50%);
   width:190px;height:10px;
-  background:linear-gradient(180deg,var(--espresso),#1a0f0a);
+  background:linear-gradient(180deg,#d4c4b4,#c0b0a0);
   border-radius:50%;
 }
 
@@ -205,7 +204,7 @@ body::after{
 .cup__handle{
   position:absolute;right:-34px;top:42px;
   width:32px;height:60px;
-  border:5px solid var(--espresso);
+  border:5px solid #d4c4b4;
   border-left-color:transparent;
   border-radius:0 30px 30px 0;
   z-index:0;
@@ -215,25 +214,25 @@ body::after{
 .cup__body{
   position:relative;z-index:1;
   width:200px;height:170px;
-  background:linear-gradient(170deg,#3d281a 0%,#2c1810 40%,#1a0f0a 100%);
+  background:linear-gradient(170deg,#f0e8e0 0%,#e8ddd0 40%,#dccfc0 100%);
   border-radius:0 0 20px 20px;
   box-shadow:
-    inset 0 0 40px rgba(0,0,0,0.3),
-    inset 0 4px 20px rgba(198,142,91,0.05);
+    inset 0 0 40px rgba(0,0,0,0.04),
+    inset 0 4px 20px rgba(198,142,91,0.06);
   overflow:hidden;
 }
 
 /* Cup rim highlight */
 .cup__body::before{
   content:'';position:absolute;top:0;left:10%;right:10%;height:1px;
-  background:linear-gradient(90deg,transparent,rgba(255,255,255,0.08),transparent);
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,0.3),transparent);
 }
 
 /* Cup shine */
 .cup__shine{
   position:absolute;top:12px;left:14px;
   width:18px;height:80px;
-  background:linear-gradient(180deg,rgba(255,255,255,0.06),transparent);
+  background:linear-gradient(180deg,rgba(255,255,255,0.35),transparent);
   border-radius:10px;
   transform:rotate(-8deg);
 }
@@ -284,6 +283,7 @@ body::after{
   text-align:center;color:var(--text-dim);
   font-size:15px;margin-bottom:56px;
 }
+.section--alt{background:var(--bg2);border-radius:var(--radius);}
 
 /* ═══ Features ═══ */
 .features{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:24px}
@@ -293,13 +293,13 @@ body::after{
   border-radius:var(--radius);
   padding:36px 28px;
   text-align:center;
-  backdrop-filter:blur(12px);
   transition:all 0.4s cubic-bezier(0.22,1,0.36,1);
+  box-shadow:0 2px 12px rgba(0,0,0,0.03);
 }
 .feature:hover{
   transform:translateY(-4px);
-  border-color:rgba(198,142,91,0.2);
-  box-shadow:0 12px 40px rgba(198,142,91,0.06);
+  border-color:rgba(198,142,91,0.15);
+  box-shadow:0 12px 40px rgba(0,0,0,0.06);
 }
 .feature__icon{
   width:56px;height:56px;margin:0 auto 20px;
@@ -332,35 +332,35 @@ body::after{
 }
 .cup-mini__body{
   width:130px;height:100px;
-  background:linear-gradient(170deg,#3d281a,#2c1810);
+  background:linear-gradient(170deg,#f0e8e0,#e8ddd0);
   border-radius:0 0 14px 14px;
   margin:0 auto;
-  box-shadow:inset 0 0 20px rgba(0,0,0,0.3);
+  box-shadow:inset 0 0 20px rgba(0,0,0,0.04);
 }
 .cup-mini__handle{
   position:absolute;right:28px;top:20px;
   width:20px;height:36px;
-  border:4px solid var(--espresso);
+  border:4px solid #d4c4b4;
   border-left-color:transparent;
   border-radius:0 20px 20px 0;
 }
 .cup-mini__coffee{
   position:absolute;top:4px;left:10px;right:10px;height:28px;
-  background:radial-gradient(ellipse at 40% 50%,#3a2010,#1e1008);
+  background:radial-gradient(ellipse at 40% 50%,#3a2010,#2c1810);
   border-radius:50%;
-  box-shadow:inset 0 2px 6px rgba(0,0,0,0.5);
+  box-shadow:inset 0 2px 6px rgba(0,0,0,0.3);
 }
 .cup-mini__saucer{
   width:150px;height:16px;
-  background:linear-gradient(180deg,#3d281a,#2c1810);
+  background:linear-gradient(180deg,#e8ddd0,#d4c4b4);
   border-radius:50%;
   margin:-4px auto 0;
-  box-shadow:0 4px 16px rgba(0,0,0,0.4);
+  box-shadow:0 4px 16px rgba(0,0,0,0.08);
 }
 .cup-mini__saucer-inner{
   position:absolute;bottom:6px;left:50%;transform:translateX(-50%);
   width:130px;height:8px;
-  background:linear-gradient(180deg,var(--espresso),#1a0f0a);
+  background:linear-gradient(180deg,#d4c4b4,#c0b0a0);
   border-radius:50%;
 }
 
@@ -372,7 +372,7 @@ body::after{
 .steam-mini span{
   position:absolute;bottom:0;
   width:2px;border-radius:50%;
-  background:rgba(255,255,255,0.1);
+  background:rgba(200,160,120,0.2);
   animation:steamRiseMini var(--d,2.5s) ease-out infinite;
   animation-delay:var(--dd,0s);
   left:var(--x,50%);
@@ -395,9 +395,10 @@ body::after{
 .quote blockquote{
   font-family:'Playfair Display',serif;
   font-size:clamp(20px,3vw,32px);
-  font-style:italic;color:var(--text-dim);
+  font-style:italic;color:var(--text);
   max-width:700px;margin:0 auto 16px;
   line-height:1.6;
+  opacity:0.7;
 }
 .quote cite{font-style:normal;font-size:13px;color:var(--caramel);letter-spacing:2px}
 
@@ -449,7 +450,7 @@ body::after{
 /* ── Mobile nav ── */
 .mobile-nav{
   display:none;position:fixed;top:0;left:0;right:0;bottom:0;
-  background:rgba(15,8,6,0.97);
+  background:rgba(250,246,240,0.97);
   z-index:200;
   flex-direction:column;align-items:center;justify-content:center;
   gap:32px;
@@ -459,12 +460,12 @@ body::after{
 .mobile-nav a{
   color:var(--text-dim);text-decoration:none;
   font-size:20px;letter-spacing:2px;
-  font-weight:300;transition:color 0.3s;
+  font-weight:500;transition:color 0.3s;
 }
 .mobile-nav a:hover{color:var(--caramel)}
 .mobile-nav__close{
   position:absolute;top:24px;right:24px;
-  background:none;border:none;color:var(--cream);
+  background:none;border:none;color:var(--espresso);
   font-size:28px;cursor:pointer;
 }
 </style>
@@ -564,7 +565,7 @@ body::after{
 </section>
 
 <!-- ═══ About ═══ -->
-<section class="section" id="about">
+<section class="section section--alt" id="about">
   <div class="about">
     <div class="about__visual reveal">
       <div class="cup-mini">
