@@ -1,0 +1,992 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>管理者後台 — 教師甄試報名系統</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+
+  :root {
+    --primary: #2C3E50;
+    --primary-light: #34495E;
+    --primary-surface: #EBEFF2;
+    --accent: #E8B84B;
+    --accent-light: #FDF5E0;
+    --success: #27AE60;
+    --warning: #F39C12;
+    --error: #E74C3C;
+    --text: #2C3E50;
+    --text-dim: #7F8C8D;
+    --text-muted: #BDC3C7;
+    --bg: #F5F6FA;
+    --surface: #FFFFFF;
+    --border: #DCE1E5;
+    --border-light: #E8ECF0;
+    --radius: 12px;
+    --radius-sm: 8px;
+    --shadow: 0 2px 8px rgba(0,0,0,0.04), 0 8px 24px rgba(0,0,0,0.04);
+  }
+
+  body {
+    font-family: 'Noto Sans TC', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* ===== 登入頁 ===== */
+  .login-page {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background: linear-gradient(135deg, var(--primary) 0%, #1A252F 100%);
+  }
+
+  .login-card {
+    background: var(--surface);
+    border-radius: 20px;
+    padding: 40px 36px;
+    width: 100%;
+    max-width: 400px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+    animation: fadeUp 0.5s ease;
+  }
+
+  .login-card .logo {
+    text-align: center;
+    margin-bottom: 28px;
+  }
+
+  .login-card .logo .icon {
+    font-size: 48px;
+    margin-bottom: 8px;
+  }
+
+  .login-card .logo h1 {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--primary);
+  }
+
+  .login-card .logo p {
+    font-size: 13px;
+    color: var(--text-dim);
+    margin-top: 4px;
+  }
+
+  .login-card .form-group {
+    margin-bottom: 16px;
+  }
+
+  .login-card .form-group label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 5px;
+    color: var(--text);
+  }
+
+  .login-card .form-group input {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-size: 14px;
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.2s;
+    background: var(--bg);
+  }
+
+  .login-card .form-group input:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 4px rgba(44,62,80,0.08);
+  }
+
+  .login-card .login-error {
+    color: var(--error);
+    font-size: 13px;
+    text-align: center;
+    margin-bottom: 12px;
+    display: none;
+  }
+
+  .login-card .btn {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-size: 15px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    background: var(--primary);
+    color: #fff;
+    transition: background 0.2s;
+  }
+
+  .login-card .btn:hover { background: var(--primary-light); }
+
+  /* ===== 後台 ===== */
+  .admin-page { display: none; }
+
+  .admin-page.active { display: block; }
+
+  .admin-header {
+    background: var(--primary);
+    color: #fff;
+    padding: 0 24px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+  }
+
+  .admin-header-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 60px;
+  }
+
+  .admin-header .brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 16px;
+    font-weight: 700;
+  }
+
+  .admin-header .brand small {
+    font-weight: 300;
+    font-size: 12px;
+    opacity: 0.7;
+  }
+
+  .admin-header .user-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 13px;
+  }
+
+  .admin-header .user-info .logout-btn {
+    padding: 6px 14px;
+    border: 1px solid rgba(255,255,255,0.3);
+    background: transparent;
+    color: #fff;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 12px;
+    font-family: inherit;
+    transition: all 0.2s;
+  }
+
+  .admin-header .user-info .logout-btn:hover {
+    background: rgba(255,255,255,0.1);
+    border-color: rgba(255,255,255,0.5);
+  }
+
+  .admin-main {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 24px;
+  }
+
+  /* 統計卡片 */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+
+  .stat-card {
+    background: var(--surface);
+    border-radius: var(--radius);
+    padding: 20px;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border-light);
+  }
+
+  .stat-card .stat-icon { font-size: 28px; margin-bottom: 8px; }
+  .stat-card .stat-number { font-size: 28px; font-weight: 800; color: var(--primary); line-height: 1.2; }
+  .stat-card .stat-label { font-size: 13px; color: var(--text-dim); margin-top: 4px; }
+
+  .stat-card.accent .stat-number { color: var(--accent); }
+  .stat-card.success .stat-number { color: var(--success); }
+  .stat-card.error .stat-number { color: var(--error); }
+
+  /* 內容卡片 */
+  .admin-card {
+    background: var(--surface);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border-light);
+    margin-bottom: 20px;
+  }
+
+  .admin-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 24px;
+    border-bottom: 1px solid var(--border-light);
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .admin-card-header h2 {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--primary);
+  }
+
+  .admin-card-header h2 span { font-weight: 400; color: var(--text-dim); font-size: 13px; }
+
+  .admin-card-body { padding: 20px 24px; }
+
+  .toolbar {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .toolbar input,
+  .toolbar select {
+    padding: 9px 12px;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-size: 13px;
+    font-family: inherit;
+    outline: none;
+    background: var(--bg);
+    transition: border-color 0.2s;
+  }
+
+  .toolbar input:focus,
+  .toolbar select:focus {
+    border-color: var(--primary);
+  }
+
+  .toolbar input { flex: 1; min-width: 160px; }
+
+  .toolbar .btn {
+    padding: 9px 18px;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-size: 13px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+
+  .toolbar .btn-primary {
+    background: var(--primary);
+    color: #fff;
+  }
+
+  .toolbar .btn-primary:hover { background: var(--primary-light); }
+
+  .toolbar .btn-outline {
+    background: transparent;
+    color: var(--text-dim);
+    border: 1.5px solid var(--border);
+  }
+
+  .toolbar .btn-outline:hover {
+    background: var(--bg);
+    color: var(--text);
+  }
+
+  .toolbar .btn-success {
+    background: var(--success);
+    color: #fff;
+  }
+
+  .toolbar .btn-success:hover { background: #219A52; }
+
+  .toolbar .btn-danger {
+    background: var(--error);
+    color: #fff;
+  }
+
+  .toolbar .btn-danger:hover { background: #C0392B; }
+
+  /* 表格 */
+  .table-wrap { overflow-x: auto; }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+
+  table thead { position: sticky; top: 0; z-index: 2; }
+
+  table th {
+    text-align: left;
+    padding: 12px 14px;
+    background: var(--primary-surface);
+    color: var(--primary);
+    font-weight: 600;
+    font-size: 12px;
+    white-space: nowrap;
+  }
+
+  table td {
+    padding: 11px 14px;
+    border-bottom: 1px solid var(--border-light);
+    vertical-align: middle;
+  }
+
+  table tr:hover td { background: rgba(44,62,80,0.02); }
+
+  table td .status-badge {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+  }
+
+  table td .status-badge.pending {
+    background: var(--accent-light);
+    color: var(--warning);
+  }
+
+  table td .status-badge.approved {
+    background: rgba(39,174,96,0.1);
+    color: var(--success);
+  }
+
+  table td .status-badge.rejected {
+    background: rgba(231,76,60,0.1);
+    color: var(--error);
+  }
+
+  table td .subjects-cell {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 3px;
+  }
+
+  table td .subjects-cell span {
+    background: var(--primary-surface);
+    color: var(--primary);
+    padding: 1px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 500;
+  }
+
+  table td .action-btns { display: flex; gap: 4px; }
+
+  table td .action-btns button {
+    padding: 4px 10px;
+    border: none;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  table td .action-btns .btn-sm-approve {
+    background: rgba(39,174,96,0.1);
+    color: var(--success);
+  }
+
+  table td .action-btns .btn-sm-approve:hover { background: var(--success); color: #fff; }
+
+  table td .action-btns .btn-sm-reject {
+    background: rgba(231,76,60,0.1);
+    color: var(--error);
+  }
+
+  table td .action-btns .btn-sm-reject:hover { background: var(--error); color: #fff; }
+
+  table td .action-btns .btn-sm-delete {
+    background: transparent;
+    color: var(--text-muted);
+    font-size: 16px;
+    padding: 4px 6px;
+  }
+
+  table td .action-btns .btn-sm-delete:hover { color: var(--error); }
+
+  .table-empty {
+    text-align: center;
+    padding: 48px 0;
+    color: var(--text-dim);
+    font-size: 14px;
+  }
+
+  .table-empty .icon { font-size: 40px; margin-bottom: 8px; opacity: 0.3; }
+
+  /* 頁籤導航 */
+  .admin-tabs {
+    display: flex;
+    gap: 2px;
+    background: rgba(255,255,255,0.06);
+    padding: 3px;
+    border-radius: 10px;
+  }
+
+  .admin-tabs button {
+    padding: 8px 18px;
+    border: none;
+    background: transparent;
+    color: rgba(255,255,255,0.6);
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 500;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.25s;
+    white-space: nowrap;
+  }
+
+  .admin-tabs button:hover { color: #fff; background: rgba(255,255,255,0.08); }
+
+  .admin-tabs button.active {
+    color: var(--primary);
+    background: #fff;
+    font-weight: 600;
+  }
+
+  .tab-content { display: none; animation: fadeUp 0.35s ease; }
+  .tab-content.active { display: block; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Toast */
+  .toast {
+    position: fixed;
+    top: 80px;
+    right: 24px;
+    padding: 14px 24px;
+    border-radius: var(--radius-sm);
+    font-size: 14px;
+    font-weight: 500;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+    transform: translateX(120%);
+    transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+    z-index: 200;
+    max-width: 360px;
+    color: #fff;
+  }
+
+  .toast.show { transform: translateX(0); }
+  .toast.success { background: var(--success); }
+  .toast.error { background: var(--error); }
+
+  .toast.success { box-shadow: 0 8px 32px rgba(39,174,96,0.3); }
+  .toast.error { box-shadow: 0 8px 32px rgba(231,76,60,0.3); }
+
+  /* 明細彈窗 */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.4);
+    z-index: 300;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+
+  .modal-overlay.active { display: flex; }
+
+  .modal {
+    background: var(--surface);
+    border-radius: var(--radius);
+    width: 100%;
+    max-width: 520px;
+    max-height: 80vh;
+    overflow-y: auto;
+    padding: 28px 32px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+    animation: fadeUp 0.3s ease;
+  }
+
+  .modal h3 {
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--primary);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .modal .detail-row {
+    display: flex;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border-light);
+    font-size: 13px;
+  }
+
+  .modal .detail-row:last-child { border: none; }
+
+  .modal .detail-row .label {
+    width: 100px;
+    flex-shrink: 0;
+    color: var(--text-dim);
+    font-weight: 500;
+  }
+
+  .modal .detail-row .value {
+    flex: 1;
+    color: var(--text);
+    font-weight: 500;
+  }
+
+  .modal .modal-close {
+    margin-top: 16px;
+    padding: 10px 24px;
+    border: none;
+    border-radius: var(--radius-sm);
+    background: var(--primary);
+    color: #fff;
+    font-size: 14px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    width: 100%;
+    transition: background 0.2s;
+  }
+
+  .modal .modal-close:hover { background: var(--primary-light); }
+
+  @media (max-width: 768px) {
+    .stats-grid { grid-template-columns: repeat(2, 1fr); }
+    .admin-header-inner { flex-direction: column; height: auto; padding: 12px 0; gap: 8px; }
+    .admin-card-header { flex-direction: column; align-items: flex-start; }
+    .toolbar { flex-direction: column; width: 100%; }
+    .toolbar input { min-width: auto; width: 100%; }
+    .toolbar .btn { width: 100%; text-align: center; }
+    table th, table td { padding: 8px 10px; }
+    .admin-tabs { width: 100%; }
+    .admin-tabs button { flex: 1; text-align: center; font-size: 12px; padding: 8px 10px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ===== 登入頁 ===== -->
+<div class="login-page" id="loginPage">
+  <div class="login-card">
+    <div class="logo">
+      <div class="icon">🔐</div>
+      <h1>管理者後台</h1>
+      <p>教師甄試報名管理系統</p>
+    </div>
+    <div class="login-error" id="loginError">帳號或密碼錯誤</div>
+    <div class="form-group">
+      <label>管理者帳號</label>
+      <input type="text" id="loginUser" placeholder="請輸入帳號" autofocus>
+    </div>
+    <div class="form-group">
+      <label>密碼</label>
+      <input type="password" id="loginPass" placeholder="請輸入密碼">
+    </div>
+    <button class="btn" id="loginBtn">登入後台</button>
+  </div>
+</div>
+
+<!-- ===== 後台頁 ===== -->
+<div class="admin-page" id="adminPage">
+  <div class="admin-header">
+    <div class="admin-header-inner">
+      <div class="brand">📋 教師甄試 <small>管理者後台</small></div>
+      <div class="user-info">
+        <span id="displayUser">admin</span>
+        <button class="logout-btn" id="logoutBtn">登出</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="admin-main">
+    <!-- 統計 -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon">📝</div>
+        <div class="stat-number" id="statTotal">0</div>
+        <div class="stat-label">總報名人數</div>
+      </div>
+      <div class="stat-card success">
+        <div class="stat-icon">✅</div>
+        <div class="stat-number" id="statApproved">0</div>
+        <div class="stat-label">已審核通過</div>
+      </div>
+      <div class="stat-card accent">
+        <div class="stat-icon">⏳</div>
+        <div class="stat-number" id="statPending">0</div>
+        <div class="stat-label">待審核</div>
+      </div>
+      <div class="stat-card error">
+        <div class="stat-icon">❌</div>
+        <div class="stat-number" id="statRejected">0</div>
+        <div class="stat-label">未通過</div>
+      </div>
+    </div>
+
+    <!-- 管理區塊 -->
+    <div class="admin-card">
+      <div class="admin-card-header">
+        <h2>報名資料管理 <span id="listTotal"></span></h2>
+        <div class="toolbar">
+          <input type="text" id="searchInput" placeholder="搜尋姓名、身分證、學校...">
+          <select id="filterSubject">
+            <option value="">全部科目</option>
+            <option value="國文">國文</option>
+            <option value="英文">英文</option>
+            <option value="數學">數學</option>
+            <option value="社會">社會</option>
+            <option value="自然">自然</option>
+            <option value="音樂">音樂</option>
+            <option value="美術">美術</option>
+            <option value="體育">體育</option>
+            <option value="資訊">資訊</option>
+            <option value="特教">特教</option>
+          </select>
+          <select id="filterStatus">
+            <option value="">全部狀態</option>
+            <option value="pending">待審核</option>
+            <option value="approved">已通過</option>
+            <option value="rejected">未通過</option>
+          </select>
+          <button class="btn btn-primary" id="exportBtn">📥 匯出 CSV</button>
+        </div>
+      </div>
+      <div class="admin-card-body" style="padding:0">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>姓名</th>
+                <th>身分證</th>
+                <th>電話</th>
+                <th>學歷</th>
+                <th>學校</th>
+                <th>科目</th>
+                <th>地區</th>
+                <th>狀態</th>
+                <th style="width:160px">操作</th>
+              </tr>
+            </thead>
+            <tbody id="listBody"></tbody>
+          </table>
+        </div>
+        <div class="table-empty" id="listEmpty">
+          <div class="icon">📋</div>
+          <div>尚無報名資料</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<!-- 明細彈窗 -->
+<div class="modal-overlay" id="detailModal">
+  <div class="modal">
+    <h3>👤 報名詳細資料</h3>
+    <div id="detailContent"></div>
+    <button class="modal-close" id="modalCloseBtn">關閉</button>
+  </div>
+</div>
+
+<script>
+const STORAGE_KEY = 'teacher_registrations';
+const ADMIN_CREDENTIALS = { username: 'admin', password: 'admin123' };
+
+let registrations = [];
+let isLoggedIn = false;
+
+const DOM = {
+  loginPage: document.getElementById('loginPage'),
+  adminPage: document.getElementById('adminPage'),
+  loginUser: document.getElementById('loginUser'),
+  loginPass: document.getElementById('loginPass'),
+  loginBtn: document.getElementById('loginBtn'),
+  loginError: document.getElementById('loginError'),
+  logoutBtn: document.getElementById('logoutBtn'),
+  displayUser: document.getElementById('displayUser'),
+  statTotal: document.getElementById('statTotal'),
+  statApproved: document.getElementById('statApproved'),
+  statPending: document.getElementById('statPending'),
+  statRejected: document.getElementById('statRejected'),
+  listBody: document.getElementById('listBody'),
+  listEmpty: document.getElementById('listEmpty'),
+  listTotal: document.getElementById('listTotal'),
+  searchInput: document.getElementById('searchInput'),
+  filterSubject: document.getElementById('filterSubject'),
+  filterStatus: document.getElementById('filterStatus'),
+  exportBtn: document.getElementById('exportBtn'),
+  toast: document.getElementById('toast'),
+  detailModal: document.getElementById('detailModal'),
+  detailContent: document.getElementById('detailContent'),
+  modalCloseBtn: document.getElementById('modalCloseBtn')
+};
+
+/* ===== 資料操作 ===== */
+function loadData() {
+  try {
+    const data = localStorage.getItem(STORAGE_KEY);
+    registrations = data ? JSON.parse(data) : [];
+  } catch { registrations = []; }
+}
+
+function saveData() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(registrations));
+}
+
+/* ===== 登入 ===== */
+function login(username, password) {
+  if (username === ADMIN_CREDENTIALS.username && password === ADMIN_CREDENTIALS.password) {
+    isLoggedIn = true;
+    DOM.loginPage.style.display = 'none';
+    DOM.adminPage.classList.add('active');
+    DOM.displayUser.textContent = username;
+    DOM.loginError.style.display = 'none';
+    renderDashboard();
+    return true;
+  }
+  DOM.loginError.style.display = 'block';
+  return false;
+}
+
+function logout() {
+  isLoggedIn = false;
+  DOM.loginPage.style.display = 'flex';
+  DOM.adminPage.classList.remove('active');
+  DOM.loginUser.value = '';
+  DOM.loginPass.value = '';
+  DOM.loginError.style.display = 'none';
+}
+
+DOM.loginBtn.addEventListener('click', () => {
+  login(DOM.loginUser.value.trim(), DOM.loginPass.value.trim());
+});
+
+DOM.loginPass.addEventListener('keydown', e => {
+  if (e.key === 'Enter') DOM.loginBtn.click();
+});
+
+DOM.logoutBtn.addEventListener('click', logout);
+
+/* ===== 統計儀表板 ===== */
+function renderDashboard() {
+  const total = registrations.length;
+  const approved = registrations.filter(r => r.status === 'approved').length;
+  const pending = registrations.filter(r => !r.status || r.status === 'pending').length;
+  const rejected = registrations.filter(r => r.status === 'rejected').length;
+
+  DOM.statTotal.textContent = total;
+  DOM.statApproved.textContent = approved;
+  DOM.statPending.textContent = pending;
+  DOM.statRejected.textContent = rejected;
+
+  renderList();
+}
+
+/* ===== 列表 ===== */
+function renderList() {
+  const keyword = DOM.searchInput.value.trim().toLowerCase();
+  const subjectFilter = DOM.filterSubject.value;
+  const statusFilter = DOM.filterStatus.value;
+
+  let filtered = registrations.filter(r => {
+    if (keyword && !r.name.toLowerCase().includes(keyword) &&
+        !r.idNumber.toLowerCase().includes(keyword) &&
+        !r.school.toLowerCase().includes(keyword)) return false;
+    if (subjectFilter && !r.subjects.includes(subjectFilter)) return false;
+    if (statusFilter) {
+      const s = r.status || 'pending';
+      if (s !== statusFilter) return false;
+    }
+    return true;
+  });
+
+  const total = registrations.length;
+  DOM.listTotal.textContent = `（共 ${total} 筆，顯示 ${filtered.length} 筆）`;
+
+  if (filtered.length === 0) {
+    DOM.listBody.innerHTML = '';
+    DOM.listEmpty.style.display = 'block';
+    return;
+  }
+
+  DOM.listEmpty.style.display = 'none';
+
+  DOM.listBody.innerHTML = filtered.map(r => {
+    const status = r.status || 'pending';
+    const statusLabel = status === 'approved' ? '✅ 已通過' : status === 'rejected' ? '❌ 未通過' : '⏳ 待審核';
+    const statusClass = status === 'approved' ? 'approved' : status === 'rejected' ? 'rejected' : 'pending';
+    return `
+    <tr>
+      <td><strong>${escHtml(r.name)}</strong></td>
+      <td>${escHtml(r.idNumber)}</td>
+      <td>${escHtml(r.phone)}</td>
+      <td>${escHtml(r.degree)}</td>
+      <td>${escHtml(r.school)}</td>
+      <td><div class="subjects-cell">${r.subjects.map(s => `<span>${escHtml(s)}</span>`).join('')}</div></td>
+      <td>${escHtml(r.region)}</td>
+      <td><span class="status-badge ${statusClass}">${statusLabel}</span></td>
+      <td>
+        <div class="action-btns">
+          <button class="btn-sm-approve" data-id="${r.id}" title="核准">✓</button>
+          <button class="btn-sm-reject" data-id="${r.id}" title="駁回">✗</button>
+          <button class="btn-sm-detail" data-id="${r.id}" title="查看">👁️</button>
+          <button class="btn-sm-delete" data-id="${r.id}" title="刪除">×</button>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+
+  /* 事件綁定 */
+  DOM.listBody.querySelectorAll('.btn-sm-approve').forEach(btn => {
+    btn.addEventListener('click', () => updateStatus(btn.dataset.id, 'approved'));
+  });
+  DOM.listBody.querySelectorAll('.btn-sm-reject').forEach(btn => {
+    btn.addEventListener('click', () => updateStatus(btn.dataset.id, 'rejected'));
+  });
+  DOM.listBody.querySelectorAll('.btn-sm-detail').forEach(btn => {
+    btn.addEventListener('click', () => showDetail(btn.dataset.id));
+  });
+  DOM.listBody.querySelectorAll('.btn-sm-delete').forEach(btn => {
+    btn.addEventListener('click', () => deleteRegistration(btn.dataset.id));
+  });
+}
+
+function escHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+/* ===== 狀態更新 ===== */
+function updateStatus(id, status) {
+  const r = registrations.find(item => item.id === id);
+  if (!r) return;
+  r.status = status;
+  saveData();
+  renderDashboard();
+  showToast(status === 'approved' ? '✅ 已核准該報名' : '❌ 已駁回該報名', 'success');
+}
+
+/* ===== 刪除 ===== */
+function deleteRegistration(id) {
+  if (!confirm('確定刪除此筆資料？此操作無法復原。')) return;
+  registrations = registrations.filter(r => r.id !== id);
+  saveData();
+  renderDashboard();
+  showToast('🗑️ 已刪除該筆資料', 'success');
+}
+
+/* ===== 明細 ===== */
+function showDetail(id) {
+  const r = registrations.find(item => item.id === id);
+  if (!r) return;
+  const statusLabel = r.status === 'approved' ? '✅ 已通過' : r.status === 'rejected' ? '❌ 未通過' : '⏳ 待審核';
+  DOM.detailContent.innerHTML = `
+    <div class="detail-row"><span class="label">姓名</span><span class="value">${escHtml(r.name)}</span></div>
+    <div class="detail-row"><span class="label">身分證</span><span class="value">${escHtml(r.idNumber)}</span></div>
+    <div class="detail-row"><span class="label">性別</span><span class="value">${escHtml(r.gender)}</span></div>
+    <div class="detail-row"><span class="label">生日</span><span class="value">${escHtml(r.birthDate)}</span></div>
+    <div class="detail-row"><span class="label">電話</span><span class="value">${escHtml(r.phone)}</span></div>
+    <div class="detail-row"><span class="label">電郵</span><span class="value">${escHtml(r.email)}</span></div>
+    <div class="detail-row"><span class="label">地址</span><span class="value">${escHtml(r.address || '—')}</span></div>
+    <div class="detail-row"><span class="label">學歷</span><span class="value">${escHtml(r.degree)}</span></div>
+    <div class="detail-row"><span class="label">學校</span><span class="value">${escHtml(r.school)}</span></div>
+    <div class="detail-row"><span class="label">科系</span><span class="value">${escHtml(r.major)}</span></div>
+    <div class="detail-row"><span class="label">教師證</span><span class="value">${escHtml(r.certNo || '—')}</span></div>
+    <div class="detail-row"><span class="label">科目</span><span class="value">${r.subjects.map(s => escHtml(s)).join('、')}</span></div>
+    <div class="detail-row"><span class="label">地區</span><span class="value">${escHtml(r.region)}</span></div>
+    <div class="detail-row"><span class="label">備註</span><span class="value">${escHtml(r.notes || '—')}</span></div>
+    <div class="detail-row"><span class="label">狀態</span><span class="value">${statusLabel}</span></div>
+  `;
+  DOM.detailModal.classList.add('active');
+}
+
+DOM.modalCloseBtn.addEventListener('click', () => DOM.detailModal.classList.remove('active'));
+DOM.detailModal.addEventListener('click', e => {
+  if (e.target === DOM.detailModal) DOM.detailModal.classList.remove('active');
+});
+
+/* ===== Toast ===== */
+function showToast(msg, type = 'success') {
+  DOM.toast.textContent = msg;
+  DOM.toast.className = 'toast ' + type;
+  DOM.toast.classList.add('show');
+  setTimeout(() => DOM.toast.classList.remove('show'), 3000);
+}
+
+/* ===== 事件綁定 ===== */
+DOM.searchInput.addEventListener('input', renderList);
+DOM.filterSubject.addEventListener('change', renderList);
+DOM.filterStatus.addEventListener('change', renderList);
+
+/* ===== 匯出 CSV ===== */
+DOM.exportBtn.addEventListener('click', () => {
+  if (registrations.length === 0) { showToast('尚無資料可匯出', 'error'); return; }
+  const headers = ['姓名','身分證','性別','生日','電話','電郵','地址','學歷','學校','科系','教師證號','科目','地區','備註','狀態'];
+  const rows = registrations.map(r => [
+    r.name, r.idNumber, r.gender, r.birthDate, r.phone, r.email, r.address,
+    r.degree, r.school, r.major, r.certNo || '', r.subjects.join('、'), r.region, r.notes || '',
+    r.status === 'approved' ? '已通過' : r.status === 'rejected' ? '未通過' : '待審核'
+  ].map(v => `"${(v||'').replace(/"/g, '""')}"`).join(','));
+
+  const csv = '\uFEFF' + headers.join(',') + '\n' + rows.join('\n');
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `教師甄試報名_後台_${new Date().toISOString().slice(0,10)}.csv`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  showToast('📥 CSV 匯出成功');
+});
+
+/* ===== 初始化 ===== */
+loadData();
+
+/* 預設填入測試資料（若無資料） */
+if (registrations.length === 0) {
+  const demo = [
+    { name:'王小明', idNumber:'A123456789', gender:'男', birthDate:'1995-03-15', phone:'0912-111-111', email:'ming@test.com', address:'臺北市大安區', degree:'碩士', school:'國立臺灣師範大學', major:'教育學系', certNo:'教中字第A100001號', subjects:['國文','社會'], region:'臺北市', notes:'', createdAt:new Date().toISOString(), status:'approved' },
+    { name:'李小華', idNumber:'B234567890', gender:'女', birthDate:'1998-07-22', phone:'0928-222-222', email:'hua@test.com', address:'新北市板橋區', degree:'學士', school:'國立臺北教育大學', major:'特殊教育學系', certNo:'', subjects:['特教'], region:'新北市', notes:'希望安排國小階段', createdAt:new Date().toISOString(), status:'pending' },
+    { name:'張大偉', idNumber:'C345678901', gender:'男', birthDate:'1993-11-08', phone:'0933-333-333', email:'wei@test.com', address:'桃園市中壢區', degree:'碩士', school:'國立清華大學', major:'數學系', certNo:'教中字第B200002號', subjects:['數學','資訊'], region:'桃園市', notes:'', createdAt:new Date().toISOString(), status:'rejected' },
+    { name:'陳怡君', idNumber:'D456789012', gender:'女', birthDate:'1996-05-30', phone:'0955-444-444', email:'jun@test.com', address:'臺中市西屯區', degree:'博士', school:'國立彰化師範大學', major:'英語學系', certNo:'教中字第C300003號', subjects:['英文'], region:'臺中市', notes:'具備雙語教學證照', createdAt:new Date().toISOString(), status:'pending' }
+  ];
+  /* 給每個 demo 資料加 id */
+  demo.forEach(d => { d.id = Date.now().toString(36) + Math.random().toString(36).slice(2,6); });
+  registrations = demo;
+  saveData();
+}
+
+renderDashboard();
+</script>
+</body>
+</html>
