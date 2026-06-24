@@ -204,6 +204,7 @@
       <button class="header-btn" onclick="exportData()">📋 配課表</button>
       <button class="header-btn" onclick="resetAllData()">⟳ 重置</button>
     </div>
+  </div>
   <input type="file" id="fullImportInput" accept=".json" style="display:none" onchange="importFullData(event)">
 </div>
 
@@ -651,7 +652,8 @@
     const body = document.getElementById('modalBody')
     document.getElementById('modalConfirm').style.display = ''
     document.querySelector('.modal').classList.remove('modal-wide')
-    document.querySelector('#modal .modal-actions .btn-outline').textContent = '取消'
+    const cancelEl = document.querySelector('#modal .modal-actions .btn-outline:not(.btn-export)')
+    if (cancelEl) cancelEl.textContent = '取消'
 
     if (type === 'teacher') {
       title.textContent = data ? '編輯教師' : '新增教師'
@@ -1026,7 +1028,8 @@
       ).join('')
     }
     document.getElementById('modalConfirm').style.display = 'none'
-    document.querySelector('#modal .modal-actions .btn-outline').textContent = '關閉'
+    const cancelEl3 = document.querySelector('#modal .modal-actions .btn-outline:not(.btn-export)')
+    if (cancelEl3) cancelEl3.textContent = '關閉'
     document.querySelector('.modal').classList.add('modal-wide')
     m.classList.add('show')
   }
@@ -1205,7 +1208,7 @@
     document.getElementById('modalConfirm').style.display = 'none'
     document.querySelector('.modal').classList.add('modal-wide')
     document.getElementById('modal').classList.add('show')
-    const closeBtn = document.querySelector('#modal .modal-actions .btn-outline')
+    const closeBtn = document.querySelector('#modal .modal-actions .btn-outline:not(.btn-export)')
     if (closeBtn) closeBtn.textContent = '關閉'
   }
 
@@ -1697,15 +1700,16 @@
     document.getElementById('modalConfirm').style.display = 'none'
     document.querySelector('.modal').classList.add('modal-wide')
     document.getElementById('modal').classList.add('show')
-    const closeBtn = document.querySelector('#modal .modal-actions .btn-outline')
-    if (closeBtn) closeBtn.textContent = '關閉'
-    const exportBtn = document.querySelector('#modal .modal-actions .btn-export')
+    const cancelBtn = document.querySelector('#modal .modal-actions .btn-outline:not(.btn-export)')
+    if (cancelBtn) cancelBtn.textContent = '關閉'
+    let exportBtn = document.querySelector('#modal .modal-actions .btn-export')
     if (!exportBtn) {
-      const btn = document.createElement('button')
-      btn.className = 'btn btn-outline btn-sm btn-export'
-      btn.textContent = '📤 匯出分析'
-      btn.onclick = exportWorkforceAnalysis
-      document.querySelector('#modal .modal-actions').insertBefore(btn, closeBtn)
+      exportBtn = document.createElement('button')
+      exportBtn.className = 'btn btn-outline btn-sm btn-export'
+      exportBtn.textContent = '📤 匯出分析'
+      exportBtn.onclick = exportWorkforceAnalysis
+      const actions = document.querySelector('#modal .modal-actions')
+      actions.insertBefore(exportBtn, actions.querySelector('.btn-outline:not(.btn-export)'))
     }
   }
 
@@ -1833,7 +1837,8 @@
       <div style="font-size:12px;color:var(--text-muted);line-height:1.6">⚠️ 已存在的同名教師不會重複新增；已存在的同名科目會略過；已存在的班級會更新配課。</div>`
     document.getElementById('modalConfirm').style.display = ''
     document.querySelector('.modal').classList.add('modal-wide')
-    document.querySelector('#modal .modal-actions .btn-outline').textContent = '取消'
+    const cancelEl2 = document.querySelector('#modal .modal-actions .btn-outline:not(.btn-export)')
+    if (cancelEl2) cancelEl2.textContent = '取消'
     document.getElementById('modalConfirm').textContent = '開始匯入'
     modalContext = { type: 'importTimetable' }
     m.classList.add('show')
