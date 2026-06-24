@@ -2,95 +2,95 @@
   "subjects": [
     {
       "name": "健康",
-      "hours": 1.0
+      "hours": 1
     },
     {
       "name": "公民與社會",
-      "hours": 1.0
+      "hours": 1
     },
     {
       "name": "國文",
-      "hours": 5.0
+      "hours": 5
     },
     {
       "name": "地理",
-      "hours": 1.0
+      "hours": 1
     },
     {
       "name": "家政",
-      "hours": 1.0
+      "hours": 1
     },
     {
       "name": "就勢愛閱讀",
-      "hours": 1.0
+      "hours": 1
     },
     {
       "name": "數學",
-      "hours": 4.0
+      "hours": 4
     },
     {
       "name": "時空饗宴",
-      "hours": 1.0
+      "hours": 1
     },
     {
       "name": "本土語文",
-      "hours": 1.0
+      "hours": 1
     },
     {
       "name": "歌唱學英語",
-      "hours": 1.0
+      "hours": 1
     },
     {
       "name": "歷史",
-      "hours": 1.0
+      "hours": 1
     },
     {
       "name": "班會",
-      "hours": 1.0
+      "hours": 1
     },
     {
       "name": "理化",
-      "hours": 3.0
+      "hours": 3
     },
     {
       "name": "環遊新勢界",
-      "hours": 1.0
+      "hours": 1
     },
     {
       "name": "生活科技",
-      "hours": 1.0
+      "hours": 1
     },
     {
       "name": "生物",
-      "hours": 3.0
+      "hours": 3
     },
     {
       "name": "社團",
-      "hours": 1.0
+      "hours": 1
     },
     {
       "name": "童軍",
-      "hours": 1.0
+      "hours": 1
     },
     {
       "name": "美語生活大小事",
-      "hours": 1.0
+      "hours": 1
     },
     {
       "name": "英文",
-      "hours": 3.0
+      "hours": 3
     },
     {
       "name": "表演藝術",
-      "hours": 1.0
+      "hours": 1
     },
     {
       "name": "視覺藝術",
-      "hours": 1.0
+      "hours": 1
     },
     {
       "name": "資訊科技",
-      "hours": 1.0
+      "hours": 1
     },
     {
       "name": "走向國際",
@@ -98,15 +98,15 @@
     },
     {
       "name": "輔導",
-      "hours": 1.0
+      "hours": 1
     },
     {
       "name": "音樂",
-      "hours": 1.0
+      "hours": 1
     },
     {
       "name": "體育",
-      "hours": 2.0
+      "hours": 2
     }
   ],
   "classes": [
@@ -137,7 +137,7 @@
   ],
   "teachers": [
     {
-      "name": "任倩儀",
+      "name": "任O儀",
       "specialties": [
         "家政",
         "班會"
@@ -146,7 +146,7 @@
       "hours": 14
     },
     {
-      "name": "健教教甄",
+      "name": "健O教甄",
       "specialties": [
         "健康"
       ],
@@ -154,7 +154,7 @@
       "hours": 6
     },
     {
-      "name": "公民教甄1",
+      "name": "公O教甄1",
       "specialties": [
         "公民與社會",
         "班會",
@@ -164,7 +164,7 @@
       "hours": 14
     },
     {
-      "name": "公民教甄2",
+      "name": "公O教甄2",
       "specialties": [
         "公民與社會",
         "班會",
@@ -174,7 +174,7 @@
       "hours": 14
     },
     {
-      "name": "劉育誠",
+      "name": "劉O誠",
       "specialties": [
         "體育"
       ],
@@ -182,7 +182,7 @@
       "hours": 2
     },
     {
-      "name": "吳佩儒",
+      "name": "吳O儒",
       "specialties": [
         "輔導"
       ],
@@ -190,7 +190,7 @@
       "hours": 18
     },
     {
-      "name": "吳懿珊",
+      "name": "吳O珊",
       "specialties": [
         "班會",
         "社團",
@@ -200,7 +200,7 @@
       "hours": 14
     },
     {
-      "name": "國文代理",
+      "name": "國O代理",
       "specialties": [
         "國文",
         "就勢愛閱讀"
@@ -209,7 +209,7 @@
       "hours": 18
     },
     {
-      "name": "國文增置",
+      "name": "國O增置",
       "specialties": [
         "國文",
         "就勢愛閱讀"
@@ -218,7 +218,7 @@
       "hours": 18
     },
     {
-      "name": "國文教甄1",
+      "name": "國O教甄1",
       "specialties": [
         "國文",
         "就勢愛閱讀",
@@ -228,7 +228,7 @@
       "hours": 14
     },
     {
-      "name": "國文教甄2",
+      "name": "國O教甄2",
       "specialties": [
         "國文",
         "就勢愛閱讀",
@@ -238,7 +238,7 @@
       "hours": 14
     },
     {
-      "name": "國文教甄3",
+      "name": "國O教甄3",
       "specialties": [
         "國文",
         "就勢愛閱讀",
@@ -248,7 +248,7 @@
       "hours": 14
     },
     {
-      "name": "國文教甄4",
+      "name": "國O教甄4",
       "specialties": [
         "國文",
         "就勢愛閱讀"
@@ -257,7 +257,7 @@
       "hours": 18
     },
     {
-      "name": "國文教甄5",
+      "name": "國O教甄5",
       "specialties": [
         "國文",
         "就勢愛閱讀"
@@ -266,7 +266,7 @@
       "hours": 18
     },
     {
-      "name": "地理教甄",
+      "name": "地O教甄",
       "specialties": [
         "地理",
         "時空饗宴",
@@ -276,7 +276,7 @@
       "hours": 14
     },
     {
-      "name": "家政代課",
+      "name": "家O代課",
       "specialties": [
         "家政"
       ],
@@ -284,7 +284,7 @@
       "hours": 18
     },
     {
-      "name": "專輔教甄",
+      "name": "專O教甄",
       "specialties": [
         "輔導"
       ],
@@ -292,7 +292,7 @@
       "hours": 6
     },
     {
-      "name": "張怡",
+      "name": "張O",
       "specialties": [
         "班會",
         "生物",
@@ -302,7 +302,7 @@
       "hours": 14
     },
     {
-      "name": "張毓蘋",
+      "name": "張O蘋",
       "specialties": [
         "數學",
         "班會",
@@ -312,7 +312,7 @@
       "hours": 14
     },
     {
-      "name": "張芷榆",
+      "name": "張O榆",
       "specialties": [
         "地理",
         "時空饗宴",
@@ -322,7 +322,7 @@
       "hours": 14
     },
     {
-      "name": "數學代理",
+      "name": "數O代理",
       "specialties": [
         "數學",
         "環遊新勢界"
@@ -331,7 +331,7 @@
       "hours": 18
     },
     {
-      "name": "數學教甄1",
+      "name": "數O教甄1",
       "specialties": [
         "數學",
         "班會",
@@ -341,7 +341,7 @@
       "hours": 14
     },
     {
-      "name": "數學教甄2",
+      "name": "數O教甄2",
       "specialties": [
         "數學",
         "環遊新勢界"
@@ -350,7 +350,7 @@
       "hours": 18
     },
     {
-      "name": "數學教甄3",
+      "name": "數O教甄3",
       "specialties": [
         "數學",
         "環遊新勢界"
@@ -359,7 +359,7 @@
       "hours": 18
     },
     {
-      "name": "曾冠堯",
+      "name": "曾O堯",
       "specialties": [
         "視覺藝術"
       ],
@@ -367,7 +367,7 @@
       "hours": 18
     },
     {
-      "name": "本土代課",
+      "name": "本O代課",
       "specialties": [
         "本土語文"
       ],
@@ -375,7 +375,7 @@
       "hours": 18
     },
     {
-      "name": "本土教甄",
+      "name": "本O教甄",
       "specialties": [
         "本土語文"
       ],
@@ -383,7 +383,7 @@
       "hours": 18
     },
     {
-      "name": "李平生",
+      "name": "李O生",
       "specialties": [
         "國文",
         "就勢愛閱讀"
@@ -392,7 +392,7 @@
       "hours": 18
     },
     {
-      "name": "李紫毓",
+      "name": "李O毓",
       "specialties": [
         "歌唱學英語",
         "英文"
@@ -401,7 +401,7 @@
       "hours": 18
     },
     {
-      "name": "林怡均",
+      "name": "林O均",
       "specialties": [
         "表演藝術"
       ],
@@ -409,7 +409,7 @@
       "hours": 6
     },
     {
-      "name": "林美銀",
+      "name": "林O銀",
       "specialties": [
         "國文",
         "就勢愛閱讀",
@@ -419,7 +419,7 @@
       "hours": 14
     },
     {
-      "name": "楊翔閔",
+      "name": "楊O閔",
       "specialties": [
         "數學",
         "班會",
@@ -429,7 +429,7 @@
       "hours": 14
     },
     {
-      "name": "歷史代課",
+      "name": "歷O代課",
       "specialties": [
         "歷史"
       ],
@@ -437,7 +437,7 @@
       "hours": 18
     },
     {
-      "name": "歷史教甄",
+      "name": "歷O教甄",
       "specialties": [
         "時空饗宴",
         "歷史"
@@ -446,7 +446,7 @@
       "hours": 18
     },
     {
-      "name": "游育嫻",
+      "name": "游O嫻",
       "specialties": [
         "國文",
         "就勢愛閱讀"
@@ -455,7 +455,7 @@
       "hours": 6
     },
     {
-      "name": "理化教甄1",
+      "name": "理O教甄1",
       "specialties": [
         "班會",
         "理化",
@@ -465,7 +465,7 @@
       "hours": 14
     },
     {
-      "name": "理化教甄2",
+      "name": "理O教甄2",
       "specialties": [
         "理化"
       ],
@@ -473,7 +473,7 @@
       "hours": 6
     },
     {
-      "name": "生物代理",
+      "name": "生O代理",
       "specialties": [
         "生物",
         "社團"
@@ -482,7 +482,7 @@
       "hours": 18
     },
     {
-      "name": "生科教甄",
+      "name": "生O教甄",
       "specialties": [
         "班會",
         "生活科技",
@@ -492,7 +492,7 @@
       "hours": 14
     },
     {
-      "name": "童軍代課",
+      "name": "童O代課",
       "specialties": [
         "童軍"
       ],
@@ -500,7 +500,7 @@
       "hours": 18
     },
     {
-      "name": "童軍教甄",
+      "name": "童O教甄",
       "specialties": [
         "童軍"
       ],
@@ -508,7 +508,7 @@
       "hours": 18
     },
     {
-      "name": "翁子涵",
+      "name": "翁O涵",
       "specialties": [
         "班會",
         "生活科技",
@@ -518,7 +518,7 @@
       "hours": 14
     },
     {
-      "name": "胡俊男",
+      "name": "胡O男",
       "specialties": [
         "資訊科技"
       ],
@@ -526,7 +526,7 @@
       "hours": 2
     },
     {
-      "name": "英語代理",
+      "name": "英O代理",
       "specialties": [
         "歌唱學英語",
         "英文"
@@ -535,7 +535,7 @@
       "hours": 18
     },
     {
-      "name": "英語代課",
+      "name": "英O代課",
       "specialties": [
         "美語生活大小事",
         "英文",
@@ -545,7 +545,7 @@
       "hours": 18
     },
     {
-      "name": "英語教甄1",
+      "name": "英O教甄1",
       "specialties": [
         "班會",
         "美語生活大小事",
@@ -556,7 +556,7 @@
       "hours": 14
     },
     {
-      "name": "英語教甄2",
+      "name": "英O教甄2",
       "specialties": [
         "美語生活大小事",
         "英文",
@@ -566,7 +566,7 @@
       "hours": 18
     },
     {
-      "name": "英語組創",
+      "name": "英O組創",
       "specialties": [
         "美語生活大小事",
         "英文",
@@ -576,7 +576,7 @@
       "hours": 18
     },
     {
-      "name": "蔡晏寧",
+      "name": "蔡O寧",
       "specialties": [
         "時空饗宴",
         "歷史"
@@ -585,7 +585,7 @@
       "hours": 2
     },
     {
-      "name": "蔡秀偉",
+      "name": "蔡O偉",
       "specialties": [
         "輔導"
       ],
@@ -593,7 +593,7 @@
       "hours": 2
     },
     {
-      "name": "表藝代課",
+      "name": "表O代課",
       "specialties": [
         "表演藝術"
       ],
@@ -601,7 +601,7 @@
       "hours": 18
     },
     {
-      "name": "視藝代課",
+      "name": "視O代課",
       "specialties": [
         "視覺藝術"
       ],
@@ -609,7 +609,7 @@
       "hours": 18
     },
     {
-      "name": "謝妙鐶",
+      "name": "謝O鐶",
       "specialties": [
         "家政"
       ],
@@ -617,7 +617,7 @@
       "hours": 2
     },
     {
-      "name": "謝珮真",
+      "name": "謝O真",
       "specialties": [
         "資訊科技"
       ],
@@ -625,7 +625,7 @@
       "hours": 18
     },
     {
-      "name": "謝筱梅",
+      "name": "謝O梅",
       "specialties": [
         "國文",
         "就勢愛閱讀",
@@ -635,7 +635,7 @@
       "hours": 14
     },
     {
-      "name": "資訊教甄",
+      "name": "資O教甄",
       "specialties": [
         "社團",
         "資訊科技"
@@ -644,7 +644,7 @@
       "hours": 6
     },
     {
-      "name": "趙宏邦",
+      "name": "趙O邦",
       "specialties": [
         "歌唱學英語",
         "英文"
@@ -653,7 +653,7 @@
       "hours": 6
     },
     {
-      "name": "趙興融",
+      "name": "趙O融",
       "specialties": [
         "健康",
         "班會",
@@ -663,7 +663,7 @@
       "hours": 14
     },
     {
-      "name": "輔導代課",
+      "name": "輔O代課",
       "specialties": [
         "輔導"
       ],
@@ -671,7 +671,7 @@
       "hours": 18
     },
     {
-      "name": "陳依苓",
+      "name": "陳O苓",
       "specialties": [
         "班會",
         "體育"
@@ -680,7 +680,7 @@
       "hours": 14
     },
     {
-      "name": "陳俞安",
+      "name": "陳O安",
       "specialties": [
         "生物"
       ],
@@ -688,7 +688,7 @@
       "hours": 6
     },
     {
-      "name": "陳思元",
+      "name": "陳O元",
       "specialties": [
         "歌唱學英語",
         "班會",
@@ -699,7 +699,7 @@
       "hours": 14
     },
     {
-      "name": "陳泰安",
+      "name": "陳O安",
       "specialties": [
         "數學"
       ],
@@ -707,7 +707,7 @@
       "hours": 6
     },
     {
-      "name": "陳韻羽",
+      "name": "陳O羽",
       "specialties": [
         "班會",
         "理化",
@@ -717,7 +717,7 @@
       "hours": 14
     },
     {
-      "name": "音樂教甄",
+      "name": "音O教甄",
       "specialties": [
         "班會",
         "社團",
@@ -727,7 +727,7 @@
       "hours": 14
     },
     {
-      "name": "體育代理",
+      "name": "體O代理",
       "specialties": [
         "體育"
       ],
@@ -735,7 +735,7 @@
       "hours": 18
     },
     {
-      "name": "體育代課",
+      "name": "體O代課",
       "specialties": [
         "體育"
       ],
@@ -743,7 +743,7 @@
       "hours": 18
     },
     {
-      "name": "體育教甄",
+      "name": "體O教甄",
       "specialties": [
         "體育"
       ],
