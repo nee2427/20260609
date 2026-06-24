@@ -199,10 +199,12 @@
     </div>
     <div class="header-actions">
       <button class="header-btn" onclick="showWorkforceAnalysis()">5. 📈 人力分析</button>
-      <button class="header-btn" onclick="exportData()">📋 匯出</button>
+      <button class="header-btn" onclick="exportFullData()">💾 匯出全部</button>
+      <button class="header-btn" onclick="document.getElementById('fullImportInput').click()">📂 匯入全部</button>
+      <button class="header-btn" onclick="exportData()">📋 配課表</button>
       <button class="header-btn" onclick="resetAllData()">⟳ 重置</button>
     </div>
-  </div>
+  <input type="file" id="fullImportInput" accept=".json" style="display:none" onchange="importFullData(event)">
 </div>
 
 <div class="main">
@@ -1494,6 +1496,39 @@
     lines.push(``, `━━━━━━━━━━━━━━━━`, `✅ 已配課：${assigned}/${totalSlots}`)
     navigator.clipboard.writeText(lines.join('\n')).then(() => showToast('📋 已複製到剪貼簿！'))
       .catch(() => prompt('請手動複製：', lines.join('\n')))
+  }
+
+  function exportFullData() {
+    const data = { ver: STORAGE_VER, teachers, subjects, classes, allocations }
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url; a.download = `opencode_backup_${new Date().toISOString().slice(0,10)}.json`
+    document.body.appendChild(a); a.click(); document.body.removeChild(a)
+    URL.revokeObjectURL(url)
+    showToast('✅ 全部資料已匯出！')
+  }
+
+  function importFullData(evt) {
+    const file = evt.target.files[0]
+    if (!file) return
+    const reader = new FileReader()
+    reader.onload = function(e) {
+      try {
+        const data = JSON.parse(e.target.result)
+        if (!data.ver || !data.teachers || !data.subjects || !data.classes || data.allocations == null) {
+          return showToast('❌ 無效的備份檔案格式')
+        }
+        if (!confirm(`確定匯入此備份？\n\n現有 ${teachers.length} 位教師、${subjects.length} 科、${classes.length} 個班級將被取代。`)) return
+        teachers = data.teachers; subjects = data.subjects; classes = data.classes; allocations = data.allocations
+        save()
+        switchPage(currentPage)
+        renderClasses()
+        showToast('✅ 全部資料已匯入！')
+      } catch(err) { showToast('❌ 匯入失敗：' + err.message) }
+    }
+    reader.readAsText(file)
+    evt.target.value = ''
   }
 
   function resetAllData() {

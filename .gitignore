@@ -1,0 +1,10 @@
+node_modules
+package.json
+package-lock.json
+bun.lock
+.DS_Store
+Thumbs.db
+*.pyc
+__pycache__/
+.env
+parsed_data.json
