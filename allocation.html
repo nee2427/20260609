@@ -1,0 +1,1879 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>配課系統</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+<style>
+  *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+  :root{
+    --primary:#3D8B7E;--primary-light:#5DA99B;--primary-surface:#E6F3F0;
+    --accent:#E8B84B;--text:#2C3E3A;--text-dim:#7A8F8B;--text-muted:#A9BCB8;
+    --bg:#F5F8F7;--surface:#FFFFFF;--border:#D6E4E0;--border-light:#E8F0ED;
+    --error:#D9655B;--success:#3D8B7E;--warning:#F39C12;
+    --radius:16px;--radius-sm:10px;
+    --shadow:0 2px 8px rgba(61,139,126,0.06),0 8px 32px rgba(61,139,126,0.04)
+  }
+  body{
+    font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;
+    background-image:radial-gradient(ellipse 600px 400px at 10% 20%,rgba(61,139,126,0.04) 0%,transparent 100%);
+    background-attachment:fixed
+  }
+  .header{
+    background:linear-gradient(135deg,var(--primary) 0%,#2D6B60 100%);color:#fff;padding:0 24px;
+    position:sticky;top:0;z-index:100;box-shadow:0 4px 20px rgba(45,107,96,0.15)
+  }
+  .header-inner{
+    max-width:1100px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:64px
+  }
+  .header .brand{display:flex;align-items:center;gap:10px}
+  .header .brand-icon{
+    width:32px;height:32px;background:rgba(255,255,255,0.15);border-radius:8px;
+    display:flex;align-items:center;justify-content:center;font-size:18px
+  }
+  .header h1{font-size:18px;font-weight:700;letter-spacing:.5px;display:flex;align-items:center;gap:10px}
+  .header h1 small{font-weight:300;font-size:12px;opacity:.75;margin-left:6px}
+  .nav-tabs{
+    display:flex;gap:2px;background:rgba(255,255,255,0.08);padding:3px;
+    border-radius:10px;margin:0 16px
+  }
+  .nav-tabs button{
+    padding:6px 16px;border:none;background:transparent;color:rgba(255,255,255,0.6);
+    font-size:13px;font-weight:500;font-family:inherit;cursor:pointer;
+    border-radius:7px;transition:all .25s;white-space:nowrap
+  }
+  .nav-tabs button:hover{color:rgba(255,255,255,0.85)}
+  .nav-tabs button.active{background:rgba(255,255,255,0.2);color:#fff}
+  .header .header-actions{display:flex;gap:8px}
+  .header .header-btn{
+    padding:6px 14px;border:1px solid rgba(255,255,255,0.25);background:transparent;
+    color:rgba(255,255,255,0.7);border-radius:8px;cursor:pointer;font-size:12px;
+    font-family:inherit;transition:all .25s;text-decoration:none;white-space:nowrap
+  }
+  .header .header-btn:hover{background:rgba(255,255,255,0.1);color:#fff;border-color:rgba(255,255,255,0.4)}
+  .main{max-width:1100px;margin:0 auto;padding:32px 24px 60px}
+  .page{display:none;animation:fadeUp .4s ease}
+  .page.active{display:block}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes shimmer{0%,100%{background-position:0% 0%}50%{background-position:100% 0%}}
+  .card{
+    background:var(--surface);border-radius:var(--radius);box-shadow:var(--shadow);
+    padding:28px 32px;margin-bottom:20px;border:1px solid var(--border-light);position:relative;overflow:hidden
+  }
+  .card::before{
+    content:'';position:absolute;top:0;left:0;right:0;height:3px;
+    background:linear-gradient(90deg,var(--primary),var(--accent),var(--primary));
+    background-size:200% 100%;animation:shimmer 4s ease-in-out infinite
+  }
+  .card-header{
+    display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px
+  }
+  .card-header h2{font-size:17px;font-weight:700;color:var(--primary);display:flex;align-items:center;gap:10px}
+  .card-header .badge{font-size:11px;font-weight:600;background:var(--primary-surface);color:var(--primary);padding:2px 12px;border-radius:20px}
+  .card-actions{display:flex;gap:8px;flex-wrap:wrap}
+  .btn{
+    padding:9px 22px;border:none;border-radius:var(--radius-sm);font-size:13px;
+    font-weight:600;font-family:inherit;cursor:pointer;transition:all .25s;letter-spacing:.3px
+  }
+  .btn:active{transform:scale(0.96)}
+  .btn-primary{
+    background:linear-gradient(135deg,var(--primary) 0%,var(--primary-light) 100%);
+    color:#fff;box-shadow:0 4px 16px rgba(61,139,126,0.3)
+  }
+  .btn-primary:hover{box-shadow:0 6px 24px rgba(61,139,126,0.4);transform:translateY(-1px)}
+  .btn-outline{background:transparent;color:var(--text-dim);border:1.5px solid var(--border)}
+  .btn-outline:hover{background:var(--bg);color:var(--text)}
+  .btn-sm{padding:6px 14px;font-size:12px}
+  .btn-danger{background:transparent;color:var(--error);border:1.5px solid rgba(217,101,91,0.3)}
+  .btn-danger:hover{background:rgba(217,101,91,0.06);border-color:var(--error)}
+  .btn-success{background:transparent;color:var(--success);border:1.5px solid rgba(61,139,126,0.3)}
+  .btn-success:hover{background:var(--primary-surface);border-color:var(--success)}
+  .table-wrap{overflow-x:auto;margin:0 -4px}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  table th{
+    text-align:left;padding:10px 14px;background:var(--primary-surface);
+    color:var(--primary);font-weight:600;font-size:12px;white-space:nowrap
+  }
+  table td{padding:10px 14px;border-bottom:1px solid var(--border-light);vertical-align:middle}
+  table tr:hover td{background:rgba(44,62,80,0.02)}
+  table .empty{text-align:center;padding:40px 0;color:var(--text-dim);font-size:14px}
+  table .empty .icon{font-size:36px;margin-bottom:6px;opacity:.3}
+  .form-inline{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  .form-inline input,.form-inline select{
+    padding:9px 12px;border:1.5px solid var(--border);border-radius:var(--radius-sm);
+    font-size:13px;font-family:inherit;outline:none;background:var(--bg);transition:border-color .2s;min-width:140px
+  }
+  .form-inline input:focus,.form-inline select:focus{border-color:var(--primary)}
+  .form-inline input[type="color"]{width:40px;height:36px;padding:3px;min-width:auto;cursor:pointer}
+  .tag{
+    display:inline-block;padding:2px 10px;border-radius:20px;font-size:11px;font-weight:500;margin:1px
+  }
+  .grid-alloc{
+    display:grid;gap:8px
+  }
+  .alloc-cell{
+    position:relative;padding:8px 6px;border-radius:8px;text-align:center;
+    font-size:12px;border:1.5px solid var(--border-light);cursor:pointer;
+    transition:all .2s;min-height:52px;display:flex;flex-direction:column;align-items:center;justify-content:center
+  }
+  .alloc-cell:hover{border-color:var(--primary-light);box-shadow:0 2px 8px rgba(61,139,126,0.08)}
+  .alloc-cell .subject-name{font-weight:600;font-size:12px;color:var(--text)}
+  .alloc-cell .teacher-name{font-size:11px;color:var(--text-dim);margin-top:2px}
+  .alloc-cell .empty-hint{font-size:11px;color:var(--text-muted)}
+  .alloc-cell.selected{border-color:var(--primary);box-shadow:0 0 0 3px rgba(61,139,126,0.12)}
+  .alloc-cell.has-teacher{border-color:rgba(61,139,126,0.25);background:rgba(61,139,126,0.03)}
+  .stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:24px}
+  .stat-item{
+    padding:16px;border-radius:var(--radius-sm);background:var(--bg);
+    border:1.5px solid var(--border-light);text-align:center
+  }
+  .stat-item .num{font-size:26px;font-weight:800;color:var(--primary);line-height:1.2}
+  .stat-item .label{font-size:12px;color:var(--text-dim);margin-top:2px}
+  .modal-overlay{
+    display:none;position:fixed;inset:0;background:rgba(0,0,0,0.3);backdrop-filter:blur(4px);
+    z-index:200;align-items:center;justify-content:center;padding:24px
+  }
+  .modal-overlay.show{display:flex}
+  .modal{
+    background:var(--surface);border-radius:var(--radius);width:100%;max-width:440px;
+    padding:28px 32px;box-shadow:0 20px 60px rgba(0,0,0,0.15);border:1px solid var(--border-light);
+    animation:fadeUp .25s ease;max-height:80vh;overflow-y:auto
+  }
+  .modal h3{font-size:18px;font-weight:700;color:var(--primary);margin-bottom:4px}
+  .modal .modal-sub{font-size:13px;color:var(--text-dim);margin-bottom:18px}
+  .modal .form-group{margin-bottom:14px}
+  .modal .form-group label{display:block;font-size:13px;font-weight:600;margin-bottom:5px;color:var(--text)}
+  .modal .form-group input,.modal .form-group select{
+    width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:var(--radius-sm);
+    font-size:14px;font-family:inherit;outline:none;transition:border-color .2s;background:var(--bg)
+  }
+  .modal .form-group input:focus,.modal .form-group select:focus{border-color:var(--primary);box-shadow:0 0 0 4px rgba(61,139,126,0.1)}
+  .modal .modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:6px}
+  .modal-wide{max-width:720px}
+  .report-table-wrap{overflow-x:auto;margin:12px -4px;padding:0 4px}
+  .report-table{width:100%;border-collapse:collapse;font-size:13px;margin:0}
+  .report-table th,.report-table td{padding:8px 12px;text-align:left;border-bottom:1px solid var(--border-light);white-space:nowrap}
+  .report-table th{background:var(--primary-surface);color:var(--primary);font-weight:600;font-size:12px}
+  .report-table .num{text-align:center;font-weight:600}
+  .report-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin:16px 0}
+  .report-grid .item{padding:14px;border-radius:var(--radius-sm);background:var(--bg);border:1.5px solid var(--border-light);text-align:center}
+  .report-grid .item .val{font-size:22px;font-weight:800;color:var(--primary)}
+  .report-grid .item .val.over{color:var(--error)}
+  .report-grid .item .val.ok{color:var(--success)}
+  .report-grid .item .lbl{font-size:12px;color:var(--text-dim);margin-top:2px}
+  .report-hr{border:none;border-top:1.5px solid var(--border-light);margin:16px 0}
+  .report-hint{font-size:12px;color:var(--text-muted);padding:10px 14px;background:var(--bg);border-radius:8px;margin:8px 0;line-height:1.6}
+  .toast{
+    position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(100px);
+    background:var(--text);color:#fff;padding:12px 24px;border-radius:12px;
+    font-size:14px;font-weight:500;opacity:0;transition:all .4s ease;z-index:999;
+    box-shadow:0 8px 32px rgba(0,0,0,0.15);pointer-events:none
+  }
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  @media(max-width:700px){
+    .header-inner{flex-wrap:wrap;height:auto;padding:10px 0;gap:8px;justify-content:center}
+    .nav-tabs{order:3;width:100%;justify-content:center}
+    .card{padding:20px 16px}
+    .main{padding:20px 12px 40px}
+    .stat-grid{grid-template-columns:repeat(2,1fr)}
+  }
+</style>
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.gstatic.com; font-src https://fonts.gstatic.com; img-src 'self' data:;">
+</head>
+<body>
+
+<div class="header">
+  <div class="header-inner">
+    <div class="brand">
+      <div class="brand-icon">📚</div>
+      <h1>配課系統 <small>班級 × 科目 × 教師</small></h1>
+    </div>
+    <div class="nav-tabs">
+      <button data-page="classes" onclick="switchPage('classes')">1. 🏫 班級</button>
+      <button data-page="subjects" onclick="switchPage('subjects')">2. 📖 科目</button>
+      <button data-page="teachers" onclick="switchPage('teachers')">3. 👤 教師</button>
+      <button class="active" data-page="allocation" onclick="switchPage('allocation')">4. 📊 配課表</button>
+    </div>
+    <div class="header-actions">
+      <button class="header-btn" onclick="showWorkforceAnalysis()">5. 📈 人力分析</button>
+      <button class="header-btn" onclick="exportData()">📋 匯出</button>
+      <button class="header-btn" onclick="resetAllData()">⟳ 重置</button>
+    </div>
+  </div>
+</div>
+
+<div class="main">
+  <div class="page" id="page-classes">
+    <div class="card">
+      <div class="card-header">
+        <h2>🏫 班級管理</h2>
+        <div class="card-actions">
+          <button class="btn btn-outline btn-sm" onclick="showModal('batchClass')">📦 批次新增</button>
+          <button class="btn btn-outline btn-sm" onclick="exportClasses()">📤 匯出</button>
+          <button class="btn btn-outline btn-sm" onclick="document.getElementById('classFileInput').click()">📂 匯入</button>
+          <button class="btn btn-outline btn-sm" onclick="mergeDuplicateClasses()">🔀 合併重複</button>
+          <button class="btn btn-primary btn-sm" onclick="showModal('class')">＋ 新增班級</button>
+        </div>
+      </div>
+      <div class="table-wrap"><table><thead><tr>
+        <th style="width:40px">#</th><th>年級</th><th>班級</th><th>顯示名稱</th><th style="width:130px">操作</th>
+      </tr></thead><tbody id="classTable"></tbody></table></div>
+    </div>
+  </div>
+
+  <div class="page" id="page-subjects">
+    <div class="card">
+      <div class="card-header">
+        <h2>📖 科目管理</h2>
+        <div class="card-actions">
+          <button class="btn btn-outline btn-sm" onclick="load108Subjects()">📜 載入108課綱</button>
+          <button class="btn btn-primary btn-sm" onclick="showModal('subject')">＋ 新增科目</button>
+        </div>
+      </div>
+      <div class="table-wrap"><table><thead><tr>
+        <th style="width:40px">#</th><th>科目名稱</th><th>顏色標記</th><th style="text-align:center">每週節數</th><th style="width:100px">操作</th>
+      </tr></thead><tbody id="subjectTable"></tbody></table></div>
+    </div>
+  </div>
+
+  <div class="page" id="page-teachers">
+    <div class="card">
+      <div class="card-header">
+        <h2>👤 教師管理</h2>
+        <div class="card-actions">
+          <button class="btn btn-outline btn-sm" onclick="document.getElementById('teacherFileInput').click()">📂 匯入</button>
+          <button class="btn btn-outline btn-sm" onclick="exportTeachers()">📤 匯出</button>
+          <button class="btn btn-primary btn-sm" onclick="showModal('teacher')">＋ 新增教師</button>
+        </div>
+      </div>
+      <div class="form-inline" style="margin-bottom:16px;display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+        <input type="text" id="teacherSearch" placeholder="搜尋教師..." oninput="renderTeachers()" style="flex:1;min-width:140px">
+        <select id="domainFilter" onchange="setDomain(this.value)" style="padding:7px 12px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:13px;font-family:inherit;outline:none;background:var(--bg);min-width:120px">
+          <option value="all">全部科目</option>
+          ${subjects.map(s => `<option value="${s.id}">${s.name}</option>`).join('')}
+        </select>
+      </div>
+      <div id="teacherStats" style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px;font-size:13px"></div>
+      <div class="table-wrap"><table><thead><tr>
+        <th style="width:40px">#</th><th>姓名</th><th>行政職務</th><th>基本鐘點</th><th>已配節數</th><th>科目專長</th><th style="width:100px">操作</th>
+      </tr></thead><tbody id="teacherTable"></tbody></table></div>
+    </div>
+  </div>
+
+  <div class="page active" id="page-allocation">
+    <div class="stat-grid" id="allocStats"></div>
+    <div class="card">
+      <div class="card-header">
+        <h2>📊 配課表</h2>
+        <div class="card-actions">
+          <div style="display:flex;gap:4px;margin-right:8px;background:var(--surface);padding:3px;border-radius:8px;border:1px solid var(--border-light)">
+            <button class="btn btn-sm" id="viewSingleBtn" onclick="setAllocView('single')" style="background:var(--primary);color:white;border:none;padding:5px 12px;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600">單班</button>
+            <button class="btn btn-sm" id="viewGradeBtn" onclick="setAllocView('grade')" style="background:transparent;color:var(--text-dim);border:none;padding:5px 12px;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600">全年級</button>
+          </div>
+          <div id="allocViewControls">
+            <select id="classSelector" onchange="renderAllocation()" style="padding:7px 12px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:13px;font-family:inherit;outline:none;background:var(--bg);min-width:140px">
+              <option value="">— 選擇班級 —</option>
+            </select>
+          </div>
+          <button class="btn btn-outline btn-sm" onclick="autoAllocate()">🤖 自動配課</button>
+          <button class="btn btn-outline btn-sm" onclick="exportAllocations()">📤 匯出</button>
+          <button class="btn btn-outline btn-sm" onclick="document.getElementById('allocFileInput').click()">📂 匯入</button>
+          <button class="btn btn-outline btn-sm" onclick="showImportTimetable()">📋 匯入配課表</button>
+          <input type="file" id="allocFileInput" accept=".csv" style="display:none" onchange="importAllocationsFromCSV(event)">
+        </div>
+      </div>
+      <div id="allocationGrid"></div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <h3 id="modalTitle"></h3>
+    <div class="modal-sub" id="modalSub"></div>
+    <div id="modalBody"></div>
+    <div class="modal-actions">
+      <button class="btn btn-outline btn-sm" onclick="closeModal()">取消</button>
+      <button class="btn btn-primary btn-sm" id="modalConfirm" onclick="modalConfirm()">確認</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<input type="file" accept=".csv" id="teacherFileInput" style="display:none" onchange="importTeachersFromCSV(this)">
+<input type="file" accept=".csv" id="classFileInput" style="display:none" onchange="importClassesFromCSV(event)">
+
+<script>
+  let teachers = []
+  let subjects = []
+  let classes = []
+  let allocations = {}
+  let allocView = 'single'
+  let modalContext = {}
+  let toastTimer = null
+
+  const STORAGE_KEY = 'opencode_rollcall_allocation'
+  const STORAGE_VER = 3
+
+  function escapeHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;') }
+  function escapeCsv(v) {
+    if (v == null) return ''
+    const s = String(v)
+    if (/^[=+\-@]/.test(s)) return "'" + s
+    if (/[,"\n]/.test(s)) return '"' + s.replace(/"/g, '""') + '"'
+    return s
+  }
+
+  const GRADE_ORDER = '一二三四五六七八九'
+  const SUBJECT_CODE = {
+    '01': '國文', '02': '英文', '03': '數學', '04': '生物', '05': '理化',
+    '06': '歷史', '07': '地理', '08': '公民與社會', '09': '健康', '10': '體育',
+    '11': '家政', '12': '輔導', '13': '童軍', '14': '視覺藝術', '15': '音樂',
+    '16': '表演藝術', '17': '生活科技', '18': '資訊科技', '19': '本土語文', '20': '就勢愛閱讀',
+    '21': '美語生活大小事', '22': '走向國際', '23': '環遊新勢界', '24': '時空饗宴', '25': '社團',
+    '26': '班會', '27': '歌唱學英語', '28': '特殊教育',
+  }
+  function resolveSubjectName(raw) {
+    const trimmed = raw.trim()
+    const byCode = SUBJECT_CODE[trimmed]
+    if (byCode) return byCode
+    const match = trimmed.match(/^(\d{2})/)
+    if (match) {
+      const fromCode = SUBJECT_CODE[match[1]]
+      if (fromCode) return fromCode
+    }
+    const ALIAS = {
+      '英語': '英文', '公民': '公民與社會', '健教': '健康',
+      '視藝': '視覺藝術', '表演': '表演藝術', '科技': '生活科技',
+      '資訊': '資訊科技', '本土': '本土語文', '本土教甄': '本土語文',
+      '特教': '特殊教育',
+    }
+    return ALIAS[trimmed] || trimmed
+  }
+  const ROLE_CONFIG = [
+    { label: '教務主任', cat: 'director', hours: 2 },
+    { label: '學務主任', cat: 'director', hours: 2 },
+    { label: '總務主任', cat: 'director', hours: 2 },
+    { label: '輔導主任', cat: 'director', hours: 2 },
+    { label: '教學組長', cat: 'chief', hours: 6 },
+    { label: '註冊組長', cat: 'chief', hours: 6 },
+    { label: '設備組長', cat: 'chief', hours: 6 },
+    { label: '資訊組長', cat: 'chief', hours: 6 },
+    { label: '生教組長', cat: 'chief', hours: 6 },
+    { label: '訓育組長', cat: 'chief', hours: 6 },
+    { label: '體育組長', cat: 'chief', hours: 6 },
+    { label: '衛生組長', cat: 'chief', hours: 6 },
+    { label: '輔導組長', cat: 'chief', hours: 6 },
+    { label: '適性生涯組長', cat: 'chief', hours: 6 },
+    { label: '特教組長', cat: 'chief', hours: 6 },
+    { label: '701導師', cat: 'homeroom', hours: 14 }, { label: '702導師', cat: 'homeroom', hours: 14 },
+    { label: '703導師', cat: 'homeroom', hours: 14 }, { label: '704導師', cat: 'homeroom', hours: 14 },
+    { label: '705導師', cat: 'homeroom', hours: 14 }, { label: '706導師', cat: 'homeroom', hours: 14 },
+    { label: '707導師', cat: 'homeroom', hours: 14 }, { label: '708導師', cat: 'homeroom', hours: 14 },
+    { label: '709導師', cat: 'homeroom', hours: 14 }, { label: '710導師', cat: 'homeroom', hours: 14 },
+    { label: '711導師', cat: 'homeroom', hours: 14 }, { label: '712導師', cat: 'homeroom', hours: 14 },
+    { label: '801導師', cat: 'homeroom', hours: 14 }, { label: '802導師', cat: 'homeroom', hours: 14 },
+    { label: '803導師', cat: 'homeroom', hours: 14 }, { label: '804導師', cat: 'homeroom', hours: 14 },
+    { label: '805導師', cat: 'homeroom', hours: 14 }, { label: '806導師', cat: 'homeroom', hours: 14 },
+    { label: '807導師', cat: 'homeroom', hours: 14 }, { label: '808導師', cat: 'homeroom', hours: 14 },
+    { label: '809導師', cat: 'homeroom', hours: 14 }, { label: '810導師', cat: 'homeroom', hours: 14 },
+    { label: '811導師', cat: 'homeroom', hours: 14 }, { label: '812導師', cat: 'homeroom', hours: 14 },
+    { label: '專任教師', cat: 'teacher', hours: 18 },
+    { label: '專任代理', cat: 'teacher', hours: 18 },
+    { label: '組創兼課', cat: 'teacher', hours: 18 },
+    { label: '專任增置', cat: 'teacher', hours: 18 },
+    { label: '專輔教師', cat: 'teacher', hours: 18 },
+    { label: '閱推教師', cat: 'teacher', hours: 18 },
+    { label: '特教教師', cat: 'teacher', hours: 18 },
+    { label: '特教代理', cat: 'teacher', hours: 18 },
+    { label: '代課教師', cat: 'teacher', hours: 18 },
+  ]
+  function getBaseHours(t) {
+    if (!t) return 18
+    if (t.hours !== undefined && t.hours !== null) return t.hours
+    if (t.role.includes('主任')) return 2
+    if (t.role.includes('組長')) return 6
+    const hasMandarin = t.specialties.some(sid => {
+      const sub = subjects.find(s => s.id === sid)
+      return sub && sub.name === '國文'
+    })
+    if (t.role.includes('導師')) return hasMandarin ? 12 : 14
+    return hasMandarin ? 16 : 18
+  }
+  function subH(s, grade) {
+    if (grade && s.gradeHours && s.gradeHours[grade] != null) return s.gradeHours[grade]
+    return s.hours != null ? s.hours : 1
+  }
+  function getRoleHours(label) {
+    const r = ROLE_CONFIG.find(x => x.label === label)
+    return r ? r.hours : 18
+  }
+  const DEFAULT_HOURS = {
+    國文: 5, 英文: 3, 數學: 4, 生物: 3, 理化: 3,
+    歷史: 1, 地理: 1, 公民與社會: 1, 健康: 1, 體育: 2,
+    音樂: 1, 視覺藝術: 1, 表演藝術: 1,
+    童軍: 1, 家政: 1, 輔導: 1,
+    生活科技: 1, 資訊科技: 1, 本土語文: 1, 就勢愛閱讀: 1,
+     美語生活大小事: 1, 走向國際: 0.5, 環遊新勢界: 1, 時空饗宴: 1, 社團: 1, 班會: 0, 歌唱學英語: 1, 特殊教育: 1
+  }
+
+  const SUBJECT_BUNDLES = {
+    '七': [
+      { primary: '國文', bundled: ['就勢愛閱讀'] },
+      { primary: '英文', bundled: ['美語生活大小事', '走向國際'] },
+      { primary: '數學', bundled: ['環遊新勢界'] },
+    ],
+    '八': [
+      { primary: '國文', bundled: ['就勢愛閱讀'] },
+      { primary: '英文', bundled: ['歌唱學英語'] },
+      { primary: '歷史', bundled: ['時空饗宴'] },
+    ]
+  }
+  function getBundle(subName, grade) {
+    const bundles = SUBJECT_BUNDLES[grade]
+    if (!bundles) return null
+    for (const b of bundles) {
+      if (b.primary === subName) return b
+      if (b.bundled.includes(subName)) return b
+    }
+    return null
+  }
+
+  function save() {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify({ ver: STORAGE_VER, teachers, subjects, classes, allocations })) } catch(e) {}
+  }
+
+  function load() {
+    try {
+      const d = JSON.parse(localStorage.getItem(STORAGE_KEY))
+      if (d && d.ver === STORAGE_VER) {
+        teachers = d.teachers || []; subjects = d.subjects || []; classes = d.classes || []; allocations = d.allocations || {}
+        for (const key in allocations) {
+          const [clsId, subId] = key.split('-')
+          const cls = classes.find(c => c.id === clsId)
+          const sub = subjects.find(s => s.id === subId)
+          if (cls && sub && !isSubjectForGrade(sub, cls.grade)) delete allocations[key]
+        }
+      } else if (d) {
+        localStorage.removeItem(STORAGE_KEY)
+      }
+    } catch(e) {}
+  }
+
+  function initDemo() {
+    if (teachers.length || subjects.length || classes.length) return
+    const subList = [
+      { name: '國文', color: '#3D8B7E' },
+      { name: '英文', color: '#2E86DE' },
+      { name: '數學', color: '#D9655B' },
+      { name: '生物', color: '#27AE60' },
+      { name: '理化', color: '#1ABC9C' },
+      { name: '歷史', color: '#8E44AD' },
+      { name: '地理', color: '#E67E22' },
+      { name: '公民與社會', color: '#F39C12' },
+      { name: '健康', color: '#E74C3C' },
+      { name: '體育', color: '#FF6B6B' },
+      { name: '家政', color: '#D4A574' },
+      { name: '輔導', color: '#6C5CE7' },
+      { name: '童軍', color: '#2D6A4F' },
+      { name: '視覺藝術', color: '#9B59B6' },
+      { name: '音樂', color: '#FF6B6B' },
+      { name: '表演藝術', color: '#FD79A8' },
+      { name: '生活科技', color: '#00B894' },
+      { name: '資訊科技', color: '#0984E3' },
+      { name: '本土語文', color: '#8E44AD' },
+      { name: '就勢愛閱讀', color: '#E17055' },
+      { name: '美語生活大小事', color: '#00CEC9' },
+      { name: '走向國際', color: '#6C5CE7' },
+      { name: '環遊新勢界', color: '#FDCB6E' },
+      { name: '時空饗宴', color: '#E84393' },
+      { name: '社團', color: '#636E72' },
+      { name: '班會', color: '#B2BEC3' },
+      { name: '歌唱學英語', color: '#00B894' },
+      { name: '特殊教育', color: '#E74C3C' },
+    ]
+    subjects = subList.map(s => ({ id: genId(), hours: DEFAULT_HOURS[s.name] ?? 1, ...s }))
+    classes = []
+    for (const g of ['七', '八']) {
+      for (let i = 1; i <= 12; i++) {
+        classes.push({ id: genId(), grade: g, name: `${i}`.padStart(2, '0') })
+      }
+    }
+    allocations = {}
+    for (const cls of classes) {
+      for (const sub of subjects) {
+        if (!isSubjectForGrade(sub, cls.grade)) continue
+        allocations[`${cls.id}-${sub.id}`] = null
+      }
+    }
+    save()
+  }
+
+  function genId() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 6) }
+
+  function load108Subjects() {
+    if (subjects.length && !confirm('此操作將取代現有科目列表（不影響已建立之班級與教師），確定繼續？')) return
+    const list = [
+      { name: '國文', color: '#3D8B7E' },
+      { name: '英文', color: '#2E86DE' },
+      { name: '數學', color: '#D9655B' },
+      { name: '生物', color: '#27AE60' },
+      { name: '理化', color: '#1ABC9C' },
+      { name: '歷史', color: '#8E44AD' },
+      { name: '地理', color: '#E67E22' },
+      { name: '公民與社會', color: '#F39C12' },
+      { name: '健康', color: '#E74C3C' },
+      { name: '體育', color: '#FF6B6B' },
+      { name: '家政', color: '#D4A574' },
+      { name: '輔導', color: '#6C5CE7' },
+      { name: '童軍', color: '#2D6A4F' },
+      { name: '視覺藝術', color: '#9B59B6' },
+      { name: '音樂', color: '#FF6B6B' },
+      { name: '表演藝術', color: '#FD79A8' },
+      { name: '生活科技', color: '#00B894' },
+      { name: '資訊科技', color: '#0984E3' },
+      { name: '本土語文', color: '#8E44AD' },
+      { name: '就勢愛閱讀', color: '#E17055' },
+      { name: '美語生活大小事', color: '#00CEC9' },
+      { name: '走向國際', color: '#6C5CE7' },
+      { name: '環遊新勢界', color: '#FDCB6E' },
+      { name: '時空饗宴', color: '#E84393' },
+      { name: '社團', color: '#636E72' },
+      { name: '班會', color: '#B2BEC3' },
+      { name: '歌唱學英語', color: '#00B894' },
+      { name: '特殊教育', color: '#E74C3C' },
+    ]
+    subjects = list.map(s => {
+      const sub = { id: genId(), hours: DEFAULT_HOURS[s.name] ?? 1, ...s }
+      if (sub.name === '就勢愛閱讀') sub.gradeHours = { '七': 0.5 }
+      return sub
+    })
+    const validIds = new Set(subjects.map(s => s.id))
+    for (const t of teachers) {
+      t.specialties = t.specialties.filter(id => validIds.has(id))
+    }
+    allocations = {}
+    for (const cls of classes) {
+      for (const sub of subjects) {
+        if (!isSubjectForGrade(sub, cls.grade)) continue
+        allocations[`${cls.id}-${sub.id}`] = null
+      }
+    }
+    save(); renderSubjects(); renderAllocation()
+    showToast(`✅ 已載入 ${subjects.length} 個108課綱科目`)
+  }
+
+  function switchPage(name) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'))
+    document.querySelectorAll('.nav-tabs button').forEach(b => b.classList.toggle('active', b.dataset.page === name))
+    document.getElementById(`page-${name}`).classList.add('active')
+    if (name === 'allocation') renderAllocation()
+    else if (name === 'teachers') renderTeachers()
+    else if (name === 'subjects') renderSubjects()
+    else if (name === 'classes') renderClasses()
+  }
+
+  function showToast(msg) {
+    const el = document.getElementById('toast')
+    el.textContent = msg; el.classList.add('show')
+    clearTimeout(toastTimer); toastTimer = setTimeout(() => el.classList.remove('show'), 2000)
+  }
+
+  function showModal(type, data) {
+    modalContext = { type, data }
+    const m = document.getElementById('modal')
+    const title = document.getElementById('modalTitle')
+    const sub = document.getElementById('modalSub')
+    const body = document.getElementById('modalBody')
+    document.getElementById('modalConfirm').style.display = ''
+    document.querySelector('.modal').classList.remove('modal-wide')
+    document.querySelector('#modal .modal-actions .btn-outline').textContent = '取消'
+
+    if (type === 'teacher') {
+      title.textContent = data ? '編輯教師' : '新增教師'
+      sub.textContent = data ? '修改教師資料' : '輸入新教師資訊'
+      const specs = subjects.map(s => `<label style="display:inline-flex;align-items:center;gap:4px;margin:3px 6px 3px 0;font-size:13px;font-weight:400;cursor:pointer"><input type="checkbox" value="${s.id}" ${data && data.specialties.includes(s.id) ? 'checked' : ''} onchange="updateTeacherHours()"> ${escapeHtml(s.name)}</label>`).join('')
+      const roleVal = data ? data.role : '專任教師'
+      const hoursVal = data ? data.hours : getBaseHours({ specialties: [], role: roleVal })
+      body.innerHTML = `
+        <div class="form-group"><label>教師姓名</label><input id="modalTeacherName" value="${data ? escapeHtml(data.name) : ''}" placeholder="請輸入姓名"></div>
+        <div class="form-group"><label>行政職務</label><select id="modalTeacherRole" onchange="updateTeacherHours()" style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:13px;font-family:inherit;outline:none;background:var(--bg)">${ROLE_CONFIG.map(r => `<option value="${r.label}" ${roleVal === r.label ? 'selected' : ''}>${r.label}</option>`).join('')}</select></div>
+        <div class="form-group"><label>基本鐘點（每週應授節數）</label><input type="number" id="modalTeacherHours" value="${hoursVal}" min="0" max="30" step="0.5" style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:14px;font-family:inherit;outline:none;background:var(--bg)"></div>
+        <div class="form-group"><label>科目專長（可複選）</label><div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:4px">${specs || '<span style="font-size:12px;color:var(--text-muted)">尚無科目，請先新增科目</span>'}</div></div>`
+    } else if (type === 'subject') {
+      title.textContent = data ? '編輯科目' : '新增科目'
+      sub.textContent = data ? '修改科目資料' : '輸入新科目資訊'
+      body.innerHTML = `
+        <div class="form-group"><label>科目名稱</label><input id="modalSubjectName" value="${data ? escapeHtml(data.name) : ''}" placeholder="請輸入科目名稱"></div>
+        <div class="form-group"><label>顏色標記</label><input type="color" id="modalSubjectColor" value="${data ? data.color : '#3D8B7E'}"></div>
+        <div class="form-group"><label>每週節數（基本鐘點）</label><input type="number" id="modalSubjectHours" value="${data ? data.hours : 1}" min="0.5" max="10" step="0.5" style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:14px;font-family:inherit;outline:none;background:var(--bg)"></div>`
+    } else if (type === 'class') {
+      title.textContent = data ? '編輯班級' : '新增班級'
+      sub.textContent = data ? '修改班級資料' : '輸入新班級資訊'
+      body.innerHTML = `
+        <div class="form-group"><label>年級</label><select id="modalClassGrade">${'一二三四五六七八九'.split('').map(g => `<option value="${g}" ${data && data.grade === g ? 'selected' : ''}>${g}年級</option>`).join('')}</select></div>
+        <div class="form-group"><label>班級名稱</label><input id="modalClassName" value="${data ? escapeHtml(data.name) : ''}" placeholder="請輸入班級名稱（如：甲、乙、1班）"></div>`
+    } else if (type === 'allocate') {
+      title.textContent = '配課設定'
+      sub.textContent = `${data.classDisplay} — ${data.subjectName}（${data.subjectHours}節/週）`
+      const assigned = allocations[data.key]
+      const opts = `<option value="">-- 未指派 --</option>${[...teachers].sort(teacherSort).map(t => {
+        const load = calcTeacherAssignedHours(t.id)
+        const basic = getBaseHours(t)
+        const status = load >= basic ? ' ⚠️' : ''
+        return `<option value="${t.id}" ${assigned === t.id ? 'selected' : ''}>${escapeHtml(t.name)}（${load}/${basic}節${status}）</option>`
+      }).join('')}`;
+      body.innerHTML = `<div class="form-group"><label>授課教師</label><select id="modalAllocateTeacher">${opts}</select></div>`
+    } else if (type === 'batchClass') {
+      title.textContent = '批次新增班級'
+      sub.textContent = '一次建立多個班級'
+      const gradeOpts = ['七','八','九'].map(g => `<label style="display:inline-flex;align-items:center;gap:4px;margin:3px 8px 3px 0;font-size:13px;font-weight:400;cursor:pointer"><input type="checkbox" class="batch-grade" value="${g}" ${g === '九' ? '' : 'checked'}> ${g}年級</label>`).join('')
+      body.innerHTML = `
+        <div class="form-group"><label>選擇年級</label><div>${gradeOpts}</div></div>
+        <div class="form-group"><label>每年級班級數</label><input type="number" id="batchClassCount" value="12" min="1" max="30" style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:14px;font-family:inherit;outline:none;background:var(--bg)"></div>
+        <div class="form-group"><label>班級命名方式</label><select id="batchClassNaming" style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:14px;font-family:inherit;outline:none;background:var(--bg)">
+          <option value="number">數字（1, 2, 3...）</option>
+          <option value="alpha">天干（甲, 乙, 丙...）</option>
+        </select></div>
+        <div style="font-size:12px;color:var(--text-dim);margin-top:8px;padding:8px 12px;background:var(--bg);border-radius:6px">預計建立：<strong id="batchPreview">24</strong> 個班級</div>`
+      setTimeout(() => {
+        document.querySelectorAll('.batch-grade').forEach(cb => cb.addEventListener('change', updateBatchPreview))
+        document.getElementById('batchClassCount').addEventListener('input', updateBatchPreview)
+      }, 0)
+    }
+    m.classList.add('show')
+  }
+
+  function updateTeacherHours() {
+    const role = document.getElementById('modalTeacherRole').value
+    const specs = [...document.querySelectorAll('#modalBody input[type="checkbox"]:checked')].map(c => c.value)
+    document.getElementById('modalTeacherHours').value = getBaseHours({ specialties: specs, role: role })
+  }
+
+  function modalConfirm() {
+    const { type, data } = modalContext
+    if (type === 'teacher') {
+      const name = document.getElementById('modalTeacherName').value.trim()
+      if (!name) return showToast('請輸入教師姓名')
+      const dup = data
+        ? teachers.find(t => t.name === name && t.id !== data.id)
+        : teachers.find(t => t.name === name)
+      if (dup) return showToast('⚠️ 已有同名教師「' + name + '」')
+      const specs = [...document.querySelectorAll('#modalBody input[type="checkbox"]:checked')].map(c => c.value)
+      const role = document.getElementById('modalTeacherRole').value
+      const hours = parseFloat(document.getElementById('modalTeacherHours').value)
+      if (isNaN(hours) || hours < 0) return showToast('請輸入有效的鐘點數')
+      if (data) {
+        const t = teachers.find(t => t.id === data.id)
+        if (t) { t.name = name; t.specialties = specs; t.role = role; t.hours = hours }
+      } else {
+        teachers.push({ id: genId(), name, specialties: specs, role, hours })
+      }
+      save(); renderTeachers(); closeModal(); showToast(`已${data ? '更新' : '新增'}教師`)
+    } else if (type === 'subject') {
+      const name = document.getElementById('modalSubjectName').value.trim()
+      if (!name) return showToast('請輸入科目名稱')
+      const color = document.getElementById('modalSubjectColor').value
+      const hours = parseFloat(document.getElementById('modalSubjectHours').value) || 1
+      if (data) {
+        const s = subjects.find(s => s.id === data.id)
+        if (s) { s.name = name; s.color = color; s.hours = hours }
+      } else {
+        subjects.push({ id: genId(), name, color, hours })
+        for (const cls of classes) { allocations[`${cls.id}-${subjects[subjects.length-1].id}`] = null }
+      }
+      save(); renderSubjects(); renderAllocation(); closeModal(); showToast(`已${data ? '更新' : '新增'}科目`)
+    } else if (type === 'class') {
+      const grade = document.getElementById('modalClassGrade').value
+      const name = document.getElementById('modalClassName').value.trim()
+      if (!name) return showToast('請輸入班級名稱')
+      if (data) {
+        const c = classes.find(c => c.id === data.id)
+        if (c) { c.grade = grade; c.name = name }
+      } else {
+        const cls = { id: genId(), grade, name }
+        classes.push(cls)
+        for (const sub of subjects) { allocations[`${cls.id}-${sub.id}`] = null }
+      }
+      save(); renderClasses(); renderAllocation(); closeModal(); showToast(`已${data ? '更新' : '新增'}班級`)
+    } else if (type === 'allocate') {
+      const teacherId = document.getElementById('modalAllocateTeacher').value
+      allocations[data.key] = teacherId || null
+      save(); renderAllocation(); closeModal(); showToast(teacherId ? '已指派教師' : '已清除指派')
+    } else if (type === 'batchClass') {
+      const grades = [...document.querySelectorAll('.batch-grade:checked')].map(c => c.value)
+      if (!grades.length) return showToast('請至少選擇一個年級')
+      const count = parseInt(document.getElementById('batchClassCount').value)
+      if (!count || count < 1) return showToast('請輸入有效的班級數')
+      const naming = document.getElementById('batchClassNaming').value
+      const tianGan = '甲乙丙丁戊己庚辛壬癸'.split('')
+      let added = 0
+      for (const g of grades) {
+        for (let i = 1; i <= count; i++) {
+          const name = naming === 'alpha' ? tianGan[i - 1] || `班${i}` : `${i}`.padStart(2, '0')
+          const cls = { id: genId(), grade: g, name }
+          classes.push(cls)
+          for (const sub of subjects) allocations[`${cls.id}-${sub.id}`] = null
+          added++
+        }
+      }
+      save(); renderClasses(); renderAllocation(); closeModal(); showToast(`✅ 已新增 ${added} 個班級`)
+    } else if (type === 'importTimetable') {
+      const text = document.getElementById('importTimetableData').value.trim()
+      if (!text) return showToast('請貼入配課表資料')
+      document.querySelector('.modal').classList.remove('modal-wide')
+      closeModal()
+      importTimetableFromText(text)
+    }
+  }
+
+  function updateBatchPreview() {
+    const grades = document.querySelectorAll('.batch-grade:checked').length
+    const count = parseInt(document.getElementById('batchClassCount').value) || 0
+    document.getElementById('batchPreview').textContent = grades * count
+  }
+
+  function deleteItem(type, id) {
+    if (!confirm('確定刪除？')) return
+    if (type === 'teacher') {
+      teachers = teachers.filter(t => t.id !== id)
+      for (const key in allocations) { if (allocations[key] === id) allocations[key] = null }
+      renderTeachers()
+    } else if (type === 'subject') {
+      subjects = subjects.filter(s => s.id !== id)
+      for (const key in allocations) {
+        if (key.endsWith(`-${id}`)) delete allocations[key]
+      }
+      renderSubjects(); renderAllocation()
+    } else if (type === 'class') {
+      classes = classes.filter(c => c.id !== id)
+      for (const key in allocations) {
+        if (key.startsWith(`${id}-`)) delete allocations[key]
+      }
+      renderClasses(); renderAllocation()
+    }
+    save(); showToast('已刪除')
+  }
+
+  function clearAllTeachers() {
+    if (!teachers.length) return showToast('尚無教師可清除')
+    if (!confirm('確定清除所有教師？已配課資料也將一併清除！')) return
+    for (const key in allocations) allocations[key] = null
+    teachers = []
+    save(); renderTeachers(); renderAllocation()
+    showToast('已清除所有教師')
+  }
+
+  function importTeachersFromCSV(input) {
+    const file = input.files[0]
+    if (!file) return
+    const reader = new FileReader()
+    reader.onload = function(e) {
+      const buf = e.target.result
+      let text
+      for (const enc of ['utf-8', 'big5']) {
+        try {
+          const dec = new TextDecoder(enc, { fatal: false })
+          const t = dec.decode(buf)
+          const firstLine = t.split('\n')[0]
+          if (firstLine.includes('師') || firstLine.includes('任') || firstLine.includes('姓')) {
+            text = t; break
+          }
+        } catch(_) {}
+      }
+      if (!text) { try { text = new TextDecoder('utf-8', { fatal: false }).decode(buf) } catch(_) { text = '' } }
+      const raw = text.replace(/^\uFEFF/, '')
+      const lines = raw.split(/\r?\n/).filter(l => l.trim())
+      if (!lines.length) return showToast('CSV 檔案為空')
+      const headerRow = lines[0].toLowerCase()
+      const hasHeader = headerRow.includes('姓名') || headerRow.includes('name')
+      const dataLines = hasHeader ? lines.slice(1) : lines
+      let imported = 0, updated = 0
+      for (const line of dataLines) {
+        const parts = line.split(',').map(p => p.trim().replace(/^"|"$/g, ''))
+        const name = parts[0]
+        if (!name) continue
+        const roleLabel = parts[1] || '專任教師'
+        const role = roleLabel
+        const hours = parts[2] ? parseFloat(parts[2]) : getRoleHours(role)
+        const specStr = parts.length > 3 ? parts.slice(3).join(',').trim() : (parts[3] || '')
+        const specs = specStr ? specStr.split(/[;；、]/).map(sn => {
+          const found = subjects.find(s => s.name === resolveSubjectName(sn))
+          return found ? found.id : null
+        }).filter(Boolean) : []
+        const exist = teachers.find(t => t.name === name)
+        if (exist) {
+          exist.role = role; exist.hours = getBaseHours({ specialties: specs, role: role }); exist.specialties = specs
+          updated++
+        } else {
+        teachers.push({ id: genId(), name, specialties: specs, role, hours: getBaseHours({ specialties: specs, role: role }) })
+          imported++
+        }
+      }
+      save(); renderTeachers()
+      const msgs = []
+      if (imported) msgs.push(`${imported} 位新增`)
+      if (updated) msgs.push(`${updated} 位更新`)
+      showToast(`✅ ${msgs.join('，')}`)
+    }
+    reader.readAsArrayBuffer(file)
+    input.value = ''
+  }
+
+  function downloadTeacherTemplate() {
+    const sampleSubjects = subjects.slice(0, 5).map(s => s.name).join(';')
+    const csv = `姓名,行政職務,基本鐘點,科目專長
+王小明,教務主任,2,${sampleSubjects}
+李小華,專任教師,18,
+ 張大中,教學組長,6,數學;資訊科技
+陳慧君,701導師,14,音樂`
+    const BOM = '\uFEFF'
+    const blob = new Blob([BOM + csv], { type: 'text/csv;charset=utf-8;' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url; a.download = '教師匯入範本.csv'
+    document.body.appendChild(a); a.click()
+    document.body.removeChild(a); URL.revokeObjectURL(url)
+  }
+
+  function exportTeachers() {
+    if (!teachers.length) return showToast('尚無教師資料可匯出')
+    const header = '姓名,行政職務,基本鐘點,科目專長'
+    const rows = teachers.map(t => {
+      const specs = t.specialties.map(sid => {
+        const sub = subjects.find(s => s.id === sid)
+        return sub ? sub.name : ''
+      }).filter(Boolean).join(';')
+      return `${escapeCsv(t.name)},${escapeCsv(t.role)},${escapeCsv(getBaseHours(t))},${escapeCsv(specs)}`
+    })
+    const csv = [header, ...rows].join('\n')
+    const BOM = '\uFEFF'
+    const blob = new Blob([BOM + csv], { type: 'text/csv;charset=utf-8;' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url; a.download = '教師資料.csv'
+    document.body.appendChild(a); a.click()
+    document.body.removeChild(a); URL.revokeObjectURL(url)
+    showToast(`✅ 已匯出 ${teachers.length} 位教師`)
+  }
+
+  function calcTeacherAssignedHours(teacherId) {
+    let total = 0
+    for (const key in allocations) {
+      if (allocations[key] === teacherId) {
+        const [clsId, subId] = key.split('-')
+        const sub = subjects.find(s => s.id === subId)
+        if (sub) {
+          const cls = classes.find(c => c.id === clsId)
+          total += subH(sub, cls ? cls.grade : null)
+        }
+      }
+    }
+    return total
+  }
+
+  function roleOrder(role) {
+    if (role.includes('主任')) return 0
+    if (role.includes('組長')) return 1
+    if (role.includes('導師')) return 2
+    if (role.includes('代理')) return 4
+    if (role.includes('代課')) return 5
+    return 3
+  }
+
+  function teacherSort(a, b) {
+    const firstSpecIdx = t => t.specialties.length ? Math.min(...t.specialties.map(sid => subjects.findIndex(s => s.id === sid))) : Infinity
+    const sa = firstSpecIdx(a), sb = firstSpecIdx(b)
+    if (sa !== sb) return sa - sb
+    const ra = roleOrder(a.role), rb = roleOrder(b.role)
+    if (ra !== rb) return ra - rb
+    return a.name.localeCompare(b.name, 'zh-TW')
+  }
+
+  const GRADE_NUM = { '七': '7', '八': '8', '九': '9' }
+  function fmtClass(c) { return `${GRADE_NUM[c.grade] || c.grade}年${c.name.padStart(2, '0')}班` }
+
+  let teacherDomain = 'all'
+
+  function setDomain(domain) {
+    teacherDomain = domain
+    document.getElementById('domainFilter').value = domain
+    renderTeachers()
+  }
+
+  function renderTeachers() {
+    const sel = document.getElementById('domainFilter')
+    const currentVal = sel.value
+    sel.innerHTML = `<option value="all">全部科目</option>${subjects.map(s => `<option value="${s.id}" ${s.id === currentVal ? 'selected' : ''}>${escapeHtml(s.name)}</option>`).join('')}`
+
+    const q = document.getElementById('teacherSearch').value.trim()
+    let list = q ? teachers.filter(t => t.name.includes(q)) : [...teachers]
+    if (teacherDomain !== 'all') {
+      list = list.filter(t => t.specialties.includes(teacherDomain))
+    }
+    list.sort(teacherSort)
+    const tbody = document.getElementById('teacherTable')
+    const totalBasic = teachers.reduce((s, t) => s + getBaseHours(t), 0)
+    const totalAssigned = teachers.reduce((s, t) => s + calcTeacherAssignedHours(t.id), 0)
+    const overloaded = teachers.filter(t => calcTeacherAssignedHours(t.id) > getBaseHours(t)).length
+    document.getElementById('teacherStats').innerHTML = `
+      <span>👤 ${teachers.length} 人</span>
+      <span>📋 應授 ${totalBasic} 節</span>
+      <span>✅ 已配 ${totalAssigned} 節</span>
+      ${overloaded ? `<span style="color:var(--error);font-weight:600">⚠️ ${overloaded} 人超鐘點</span>` : ''}
+    `
+    if (!list.length) {
+      tbody.innerHTML = `<tr><td colspan="7" class="empty"><div class="icon">👤</div>${teachers.length ? '無符合的教師' : '尚無教師，點擊右上角新增'}</td></tr>`
+      return
+    }
+    tbody.innerHTML = list.map((t, i) => {
+      const assigned = calcTeacherAssignedHours(t.id)
+      const basic = getBaseHours(t)
+      const diff = assigned - basic
+      const diffHtml = diff > 0 ? `<span style="color:var(--error);font-weight:600">超 ${diff} 節</span>` : diff < 0 ? `<span style="color:var(--text-muted)">差 ${-diff} 節</span>` : `<span style="color:var(--success)">✓ 滿</span>`
+      const specs = t.specialties.map(sid => { const s = subjects.find(x => x.id === sid); return s ? `<span class="tag" style="background:${s.color}15;color:${s.color}">${escapeHtml(s.name)}</span>` : '' }).join('')
+      return `<tr><td>${i+1}</td><td><strong>${escapeHtml(t.name)}</strong></td><td><span style="font-size:12px;color:var(--text-dim)">${escapeHtml(t.role)}</span></td><td style="text-align:center;font-weight:600">${basic} 節</td><td style="text-align:center">${assigned} 節 ${diffHtml}</td><td>${specs || '<span style="color:var(--text-muted);font-size:12px">未設定</span>'}</td><td><div class="card-actions" style="gap:4px"><button class="btn btn-sm" style="background:var(--primary-surface);color:var(--primary);padding:4px 10px;border:none;border-radius:4px;font-size:11px;font-weight:600;cursor:pointer" onclick='showModal("teacher", ${JSON.stringify(t).replace(/'/g,"&#39;")})'>編輯</button><button class="btn btn-sm" style="background:var(--bg-secondary);color:var(--text-dim);padding:4px 10px;border:none;border-radius:4px;font-size:11px;font-weight:600;cursor:pointer" onclick='showTeacherClasses("${t.id}")'>📋 班級</button><button class="btn btn-sm btn-danger" style="padding:4px 10px;font-size:11px" onclick="deleteItem('teacher','${t.id}')">刪除</button></div></td></tr>`
+    }).join('')
+  }
+
+  function showTeacherClasses(teacherId) {
+    const t = teachers.find(x => x.id === teacherId)
+    if (!t) return
+    const entries = []
+    for (const key in allocations) {
+      if (allocations[key] !== teacherId) continue
+      const [clsId, subId] = key.split('-')
+      const cls = classes.find(c => c.id === clsId)
+      const sub = subjects.find(s => s.id === subId)
+      if (cls && sub) entries.push({ cls, sub })
+    }
+    entries.sort((a, b) => a.cls.grade !== b.cls.grade ? a.cls.grade.localeCompare(b.cls.grade) : a.cls.name.localeCompare(b.cls.name))
+    const m = document.getElementById('modal')
+    document.getElementById('modalTitle').textContent = `📋 ${t.name} 授課班級`
+    document.getElementById('modalSub').textContent = `共 ${entries.length} 科`
+    if (!entries.length) {
+      document.getElementById('modalBody').innerHTML = `<div class="empty" style="padding:40px 0;text-align:center;color:var(--text-muted)">尚無授課班級</div>`
+    } else {
+      document.getElementById('modalBody').innerHTML = entries.map(e =>
+        `<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 12px;border-bottom:1px solid var(--border-light);font-size:14px">
+          <span style="font-weight:600">${escapeHtml(fmtClass(e.cls))}</span>
+          <span style="color:var(--text-dim)">${escapeHtml(e.sub.name)}（${subH(e.sub, e.cls.grade)}節）</span>
+        </div>`
+      ).join('')
+    }
+    document.getElementById('modalConfirm').style.display = 'none'
+    document.querySelector('#modal .modal-actions .btn-outline').textContent = '關閉'
+    document.querySelector('.modal').classList.add('modal-wide')
+    m.classList.add('show')
+  }
+
+  function renderSubjects() {
+    const tbody = document.getElementById('subjectTable')
+    if (!subjects.length) {
+      tbody.innerHTML = `<tr><td colspan="4" class="empty"><div class="icon">📖</div>尚無科目，點擊右上角新增</td></tr>`
+      return
+    }
+    tbody.innerHTML = subjects.map((s, i) => {
+      return `<tr><td>${i+1}</td><td><strong>${escapeHtml(s.name)}</strong></td><td><span style="display:inline-flex;align-items:center;gap:6px"><span style="display:inline-block;width:20px;height:20px;border-radius:4px;background:${s.color}"></span> ${s.color}</span></td><td style="text-align:center;font-weight:600">${subH(s)} 節</td><td><div class="card-actions" style="gap:4px"><button class="btn btn-sm" style="background:var(--primary-surface);color:var(--primary);padding:4px 10px;border:none;border-radius:4px;font-size:11px;font-weight:600;cursor:pointer" onclick='showModal("subject", ${JSON.stringify(s).replace(/'/g,"&#39;")})'>編輯</button><button class="btn btn-sm btn-danger" style="padding:4px 10px;font-size:11px" onclick="deleteItem('subject','${s.id}')">刪除</button></div></td></tr>`
+    }).join('')
+  }
+
+  function mergeDuplicateClasses() {
+    const groups = {}
+    let removed = 0
+    for (const c of classes) {
+      const key = `${c.grade}-${c.name.padStart(2, '0')}`
+      if (!groups[key]) groups[key] = []
+      groups[key].push(c)
+    }
+    const toRemove = []
+    for (const [key, list] of Object.entries(groups)) {
+      if (list.length <= 1) continue
+      const keep = list[0]
+      for (let i = 1; i < list.length; i++) {
+        const dup = list[i]
+        for (const allocKey in allocations) {
+          const [clsId, subId] = allocKey.split('-')
+          if (clsId === dup.id && allocations[allocKey]) {
+            allocations[`${keep.id}-${subId}`] = allocations[allocKey]
+          }
+        }
+        toRemove.push(dup.id)
+        removed++
+      }
+    }
+    if (!removed) return showToast('✅ 無重複班級')
+    classes = classes.filter(c => !toRemove.includes(c.id))
+    for (const id of toRemove) {
+      for (const key in allocations) {
+        if (key.startsWith(id + '-')) delete allocations[key]
+      }
+    }
+    save(); renderClasses(); renderAllocation()
+    showToast(`✅ 已合併 ${removed} 個重複班級，現有 ${classes.length} 班`)
+  }
+
+  function exportClasses() {
+    if (!classes.length) return showToast('尚無班級資料可匯出')
+    const header = '年級,班級名稱'
+    const rows = classes.map(c => `${escapeCsv(c.grade)},${escapeCsv(c.name)}`)
+    const csv = [header, ...rows].join('\n')
+    const BOM = '\uFEFF'
+    const blob = new Blob([BOM + csv], { type: 'text/csv;charset=utf-8;' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url; a.download = '班級資料.csv'
+    document.body.appendChild(a); a.click()
+    document.body.removeChild(a); URL.revokeObjectURL(url)
+    showToast(`✅ 已匯出 ${classes.length} 個班級`)
+  }
+
+  function importClassesFromCSV(evt) {
+    const file = evt.target.files[0]
+    if (!file) return
+    const reader = new FileReader()
+    reader.onload = function(e) {
+      let text = e.target.result
+      for (const enc of ['utf-8', 'big5']) {
+        try {
+          const dec = new TextDecoder(enc, { fatal: false })
+          text = dec.decode(new Uint8Array(e.target.result))
+          break
+        } catch(_) {}
+      }
+      const lines = text.split(/\r?\n/).map(l => l.trim()).filter(l => l && !l.startsWith('年級'))
+      let added = 0
+      for (const line of lines) {
+        const parts = line.split(',')
+        if (parts.length < 2) continue
+        const grade = parts[0].trim().replace('年級', '').replace('年', '')
+        const name = parts[1].trim().padStart(2, '0')
+        if (!grade || !name) continue
+        if (classes.find(c => c.grade === grade && c.name === name)) continue
+        classes.push({ id: genId(), grade, name })
+        for (const sub of subjects) allocations[`${classes[classes.length-1].id}-${sub.id}`] = null
+        added++
+      }
+      save(); renderClasses(); renderAllocation()
+      showToast(`✅ 已匯入 ${added} 個班級`)
+    }
+    reader.readAsArrayBuffer(file)
+    evt.target.value = ''
+  }
+
+  function renderClasses() {
+    const tbody = document.getElementById('classTable')
+    if (!classes.length) {
+      tbody.innerHTML = `<tr><td colspan="5" class="empty"><div class="icon">🏫</div>尚無班級，點擊右上角新增</td></tr>`
+      return
+    }
+    tbody.innerHTML = classes.map((c, i) => {
+      return `<tr><td>${i+1}</td><td>${escapeHtml(c.grade)}年級</td><td>${escapeHtml(c.name)}</td><td><strong>${escapeHtml(fmtClass(c))}</strong></td><td><div class="card-actions" style="gap:4px"><button class="btn btn-sm" style="background:var(--primary-surface);color:var(--primary);padding:4px 10px;border:none;border-radius:4px;font-size:11px;font-weight:600;cursor:pointer" onclick="showClassDetail('${c.id}')">🔍 檢視</button><button class="btn btn-sm" style="background:var(--primary-surface);color:var(--primary);padding:4px 10px;border:none;border-radius:4px;font-size:11px;font-weight:600;cursor:pointer" onclick='showModal("class", ${JSON.stringify(c).replace(/'/g,"&#39;")})'>編輯</button><button class="btn btn-sm btn-danger" style="padding:4px 10px;font-size:11px" onclick="deleteItem('class','${c.id}')">刪除</button></div></td></tr>`
+    }).join('')
+  }
+
+  const GRADE_ONLY_SUBJECTS = {
+    '生物': ['七'],
+    '理化': ['八'],
+    '美語生活大小事': ['七'],
+    '走向國際': ['七'],
+    '環遊新勢界': ['七'],
+    '歌唱學英語': ['八'],
+    '時空饗宴': ['八'],
+  }
+  const RESOURCE_SUBJECT_NAMES = ['特殊教育']
+  function isSubjectForGrade(sub, grade) {
+    const only = GRADE_ONLY_SUBJECTS[sub.name]
+    return !only || only.includes(grade)
+  }
+
+  function getGradeSubjects(grade) {
+    const gradeClasses = classes.filter(c => c.grade === grade).map(c => c.id)
+    const used = new Set()
+    for (const key in allocations) {
+      if (!allocations[key]) continue
+      const [clsId, subId] = key.split('-')
+      if (gradeClasses.includes(clsId)) used.add(subId)
+    }
+    const candidates = used.size > 0 ? subjects.filter(s => used.has(s.id)) : subjects
+    return candidates.filter(s => isSubjectForGrade(s, grade))
+  }
+
+  function showClassDetail(clsId) {
+    const cls = classes.find(c => c.id === clsId)
+    if (!cls) return
+    const gradeSubs = getGradeSubjects(cls.grade)
+    if (!gradeSubs.length) return showToast('該年級尚無科目資料')
+
+    document.getElementById('modalTitle').textContent = `🔍 ${fmtClass(cls)}`
+    document.getElementById('modalSub').textContent = `${gradeSubs.length} 科 · 檢視各班配課`
+
+    const rows = gradeSubs.map(s => {
+      const key = `${cls.id}-${s.id}`
+      const tId = allocations[key]
+      const t = tId ? teachers.find(x => x.id === tId) : null
+      const hours = subH(s, cls.grade)
+      const loadTd = t ? `<td>${escapeHtml(t.name)}</td>` : `<td style="color:var(--text-muted)">—</td>`
+      return `<tr><td><span class="tag" style="background:${s.color}15;color:${s.color}">${escapeHtml(s.name)}</span></td><td class="num">${hours}</td>${loadTd}</tr>`
+    }).join('')
+
+    // Add navigation buttons for prev/next class
+    const gradeClasses = classes.filter(c => c.grade === cls.grade).sort((a, b) => a.name.localeCompare(b.name, 'zh-TW'))
+    const idx = gradeClasses.findIndex(c => c.id === clsId)
+
+    let navHtml = ''
+    if (gradeClasses.length > 1) {
+      const prev = idx > 0 ? gradeClasses[idx - 1] : gradeClasses[gradeClasses.length - 1]
+      const next = idx < gradeClasses.length - 1 ? gradeClasses[idx + 1] : gradeClasses[0]
+      navHtml = `<div style="display:flex;gap:8px;margin-bottom:14px">
+        <button class="btn btn-outline btn-sm" onclick="closeModal();showClassDetail('${prev.id}')">◀ ${escapeHtml(fmtClass(prev))}</button>
+        <span style="flex:1;text-align:center;font-size:13px;color:var(--text-dim);align-self:center">${idx+1} / ${gradeClasses.length}</span>
+        <button class="btn btn-outline btn-sm" onclick="closeModal();showClassDetail('${next.id}')">${escapeHtml(fmtClass(next))} ▶</button>
+      </div>`
+    }
+
+    document.getElementById('modalBody').innerHTML = navHtml + `
+    <div class="report-table-wrap"><table class="report-table" style="min-width:auto">
+      <thead><tr><th>科目</th><th class="num">節數</th><th>授課教師</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table></div>`
+
+    document.getElementById('modalConfirm').style.display = 'none'
+    document.querySelector('.modal').classList.add('modal-wide')
+    document.getElementById('modal').classList.add('show')
+    const closeBtn = document.querySelector('#modal .modal-actions .btn-outline')
+    if (closeBtn) closeBtn.textContent = '關閉'
+  }
+
+  function renderAllocation() {
+    if (allocView === 'grade') return renderAllocationGrade()
+    renderAllocationSingle()
+  }
+
+  function setAllocView(view) {
+    allocView = view
+    document.getElementById('viewSingleBtn').style.background = view === 'single' ? 'var(--primary)' : 'transparent'
+    document.getElementById('viewSingleBtn').style.color = view === 'single' ? 'white' : 'var(--text-dim)'
+    document.getElementById('viewGradeBtn').style.background = view === 'grade' ? 'var(--primary)' : 'transparent'
+    document.getElementById('viewGradeBtn').style.color = view === 'grade' ? 'white' : 'var(--text-dim)'
+
+    const controls = document.getElementById('allocViewControls')
+    if (view === 'single') {
+      controls.innerHTML = `<select id="classSelector" onchange="renderAllocation()" style="padding:7px 12px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:13px;font-family:inherit;outline:none;background:var(--bg);min-width:140px"><option value="">— 選擇班級 —</option></select>`
+    } else {
+      const grades = [...new Set(classes.map(c => c.grade))].sort((a,b) => GRADE_ORDER.indexOf(a) - GRADE_ORDER.indexOf(b))
+      controls.innerHTML = `<select id="gradeSelector" onchange="renderAllocation()" style="padding:7px 12px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:13px;font-family:inherit;outline:none;background:var(--bg);min-width:120px">${grades.map(g => `<option value="${escapeHtml(g)}">${escapeHtml(g)}年級</option>`).join('')}</select>`
+    }
+    renderAllocation()
+  }
+
+  function renderAllocationSingle() {
+    const sel = document.getElementById('classSelector')
+    const prevVal = sel.value
+
+    const sorted = [...classes].sort((a, b) => {
+      const ga = GRADE_ORDER.indexOf(a.grade), gb = GRADE_ORDER.indexOf(b.grade)
+      if (ga !== gb) return ga - gb
+      return a.name.localeCompare(b.name, 'zh-TW')
+    })
+    sel.innerHTML = '<option value="">— 選擇班級 —</option>' +
+      sorted.map(c => `<option value="${c.id}">${escapeHtml(fmtClass(c))}</option>`).join('')
+    if (prevVal && sorted.some(c => c.id === prevVal)) sel.value = prevVal
+
+    const grid = document.getElementById('allocationGrid')
+    if (!classes.length || !subjects.length) {
+      grid.innerHTML = `<div class="table-empty" style="text-align:center;padding:40px 0;color:var(--text-dim)"><div style="font-size:36px;margin-bottom:8px;opacity:.3">📊</div><div>請先新增班級與科目</div></div>`
+      updateAllocStats(); return
+    }
+
+    const cls = classes.find(c => c.id === sel.value)
+    if (!cls) {
+      grid.innerHTML = `<div class="table-empty" style="text-align:center;padding:40px 0;color:var(--text-dim)"><div style="font-size:36px;margin-bottom:8px;opacity:.5">🏫</div><div style="font-size:15px;font-weight:600;margin-bottom:4px">請選擇班級</div><div style="font-size:12px">從上方下拉選單選擇一個班級來設定配課</div></div>`
+      updateAllocStats(); return
+    }
+
+    const gradeSubs = getGradeSubjects(cls.grade)
+    const idx = sorted.findIndex(c => c.id === cls.id)
+    const prev = idx > 0 ? sorted[idx - 1] : sorted[sorted.length - 1]
+    const next = idx < sorted.length - 1 ? sorted[idx + 1] : sorted[0]
+
+    const rows = gradeSubs.map(s => {
+      const key = `${cls.id}-${s.id}`
+      const tId = allocations[key]
+      const t = tId ? teachers.find(x => x.id === tId) : null
+      const load = t ? calcTeacherAssignedHours(t.id) : 0
+      const basic = t ? getBaseHours(t) : 0
+      const status = t && load > basic ? '⚠️' : ''
+      const bundle = getBundle(s.name, cls.grade)
+      const bundleIcon = bundle ? (bundle.primary === s.name ? '★' : '◇') : ''
+      const bundleTitle = bundle ? `同捆：${escapeHtml(bundle.primary)} + ${bundle.bundled.map(b => escapeHtml(b)).join(' + ')}` : ''
+      const sortedTeachers = [...teachers].sort(teacherSort)
+      const opts = `<option value="">-- 未指派 --</option>${sortedTeachers.map(t2 => {
+        const l2 = calcTeacherAssignedHours(t2.id)
+        const b2 = getBaseHours(t2)
+        const specMatch = t2.specialties.includes(s.id)
+        const sel2 = tId === t2.id ? 'selected' : ''
+        return `<option value="${t2.id}" ${sel2}>${escapeHtml(t2.name)}（${l2}/${b2}節${l2 >= b2 ? ' ⚠️' : ''}${specMatch ? ' ★' : ''}）</option>`
+      }).join('')}`
+      return `<tr>
+        <td><span class="tag" style="background:${s.color}15;color:${s.color};font-size:13px" title="${bundleTitle}">${escapeHtml(s.name)}${bundleIcon ? ` <span style="font-size:10px;opacity:.7">${bundleIcon}</span>` : ''}</span></td>
+        <td class="num" style="font-weight:600">${subH(s, cls.grade)}</td>
+        <td><select onchange="setAlloc('${cls.id}','${s.id}',this.value)" style="width:100%;padding:8px 10px;border:1.5px solid var(--border);border-radius:6px;font-size:13px;font-family:inherit;outline:none;background:var(--bg);cursor:pointer">${opts}</select></td>
+        <td class="num" style="font-size:12px;color:${t ? 'var(--text-dim)' : 'var(--text-muted)'}">${t ? `${load}/${basic}${status ? ' ⚠️' : ''}` : '—'}</td>
+      </tr>`
+    }).join('')
+
+    const navHtml = `<div style="display:flex;gap:8px;align-items:center;margin-bottom:16px">
+      <button class="btn btn-outline btn-sm" onclick="switchClass('${prev.id}')">◀ ${escapeHtml(fmtClass(prev))}</button>
+      <span style="flex:1;text-align:center;font-size:13px;color:var(--text-dim)">${idx+1} / ${sorted.length}</span>
+      <button class="btn btn-outline btn-sm" onclick="switchClass('${next.id}')">${escapeHtml(fmtClass(next))} ▶</button>
+    </div>`
+
+    grid.innerHTML = navHtml + `<div class="report-table-wrap"><table class="report-table" style="min-width:auto">
+      <thead><tr><th style="min-width:100px">科目</th><th class="num" style="width:60px">節數</th><th>授課教師</th><th class="num" style="width:80px">教師負擔</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table></div>`
+    updateAllocStats()
+  }
+
+  function renderAllocationGrade() {
+    const sel = document.getElementById('gradeSelector')
+    const grid = document.getElementById('allocationGrid')
+
+    if (!classes.length || !subjects.length) {
+      grid.innerHTML = `<div class="table-empty" style="text-align:center;padding:40px 0;color:var(--text-dim)"><div style="font-size:36px;margin-bottom:8px;opacity:.3">📊</div><div>請先新增班級與科目</div></div>`
+      updateAllocStats(); return
+    }
+
+    const grade = sel.value
+    if (!grade) {
+      grid.innerHTML = `<div class="table-empty" style="text-align:center;padding:40px 0;color:var(--text-dim)"><div style="font-size:36px;margin-bottom:8px;opacity:.5">📋</div><div style="font-size:15px;font-weight:600;margin-bottom:4px">請選擇年級</div><div style="font-size:12px">從上方下拉選單選擇年級來檢視全年級配課表</div></div>`
+      updateAllocStats(); return
+    }
+
+    const gradeClasses = classes.filter(c => c.grade === grade).sort((a, b) => a.name.localeCompare(b.name, 'zh-TW'))
+    const gradeSubs = getGradeSubjects(grade)
+
+    const header = `<thead><tr><th style="position:sticky;left:0;background:var(--bg);z-index:2;min-width:90px">班級</th>${gradeSubs.map(s => `<th style="text-align:center;min-width:80px"><span class="tag" style="background:${s.color}15;color:${s.color}">${escapeHtml(s.name)}</span><br><span style="font-size:10px;color:var(--text-muted);font-weight:400">${subH(s, grade)}節/週</span></th>`).join('')}</tr></thead>`
+    const rows = gradeClasses.map(c => {
+      const cells = gradeSubs.map(s => {
+        const key = `${c.id}-${s.id}`
+        const tid = allocations[key]
+        const t = tid ? teachers.find(x => x.id === tid) : null
+        const has = !!t
+        return `<td style="text-align:center;padding:6px;min-width:80px" onclick='switchClassAndView("${c.id}")'>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 4px;border-radius:8px;border:1.5px solid ${has ? s.color + '30' : 'var(--border-light)'};background:${has ? s.color + '06' : 'transparent'};transition:all .2s;min-height:44px;justify-content:center;cursor:pointer" class="alloc-hover">
+            ${has ? `<span style="font-size:12px;font-weight:600;color:${s.color}">${escapeHtml(t.name)}</span>` : `<span style="font-size:11px;color:var(--text-muted)">─</span>`}
+          </div>
+        </td>`
+      }).join('')
+      return `<tr><td style="position:sticky;left:0;background:var(--surface);z-index:1;font-weight:600;font-size:13px;border-right:1px solid var(--border-light)">${escapeHtml(fmtClass(c))}</td>${cells}</tr>`
+    }).join('')
+
+    grid.innerHTML = `<div class="table-wrap"><table style="min-width:100%">${header}<tbody>${rows}</tbody></table></div>`
+    updateAllocStats()
+
+    document.querySelectorAll('.alloc-hover').forEach(el => {
+      el.addEventListener('mouseenter', function() {
+        this.style.borderColor = 'var(--primary-light)'
+        this.style.boxShadow = '0 2px 8px rgba(61,139,126,0.08)'
+      })
+      el.addEventListener('mouseleave', function() {
+        this.style.borderColor = ''
+        this.style.boxShadow = ''
+      })
+    })
+  }
+
+  function switchClass(clsId) {
+    document.getElementById('classSelector').value = clsId
+    renderAllocation()
+  }
+
+  function switchClassAndView(clsId) {
+    setAllocView('single')
+    setTimeout(() => {
+      document.getElementById('classSelector').value = clsId
+      renderAllocation()
+    }, 0)
+  }
+
+  function setAlloc(clsId, subId, teacherId) {
+    const cls = classes.find(c => c.id === clsId)
+    const sub = subjects.find(s => s.id === subId)
+    if (!sub || !cls) return
+
+    const bundle = getBundle(sub.name, cls.grade)
+    let affected = [{ subId }]
+    if (bundle && teacherId) {
+      const names = [bundle.primary, ...bundle.bundled]
+      affected = names.map(n => {
+        const s = subjects.find(x => x.name === n)
+        return s ? { subId: s.id } : null
+      }).filter(Boolean)
+    }
+
+    for (const a of affected) {
+      allocations[`${clsId}-${a.subId}`] = teacherId || null
+    }
+    save(); renderAllocation()
+    showToast(affected.length > 1 ? `✅ 已指派 ${affected.length} 科給同一位教師` : (teacherId ? '已指派教師' : '已清除指派'))
+  }
+
+  function exportAllocations() {
+    if (!classes.length || !subjects.length) return showToast('尚無資料可匯出')
+    const exportSubs = subjects.filter(s => !RESOURCE_SUBJECT_NAMES.includes(s.name))
+    const header = ['班級', '年級', ...exportSubs.map(s => escapeCsv(s.name))].join(',')
+    const rows = classes.map(c => {
+      const cells = exportSubs.map(s => {
+        const tid = allocations[`${c.id}-${s.id}`]
+        const t = tid ? teachers.find(x => x.id === tid) : null
+        return t ? escapeCsv(t.name) : ''
+      })
+      return [escapeCsv(fmtClass(c)), escapeCsv(c.grade), ...cells].join(',')
+    })
+    const BOM = '\uFEFF'
+    const blob = new Blob([BOM + [header, ...rows].join('\n')], { type: 'text/csv;charset=utf-8;' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url; a.download = '配課表.csv'
+    document.body.appendChild(a); a.click()
+    document.body.removeChild(a); URL.revokeObjectURL(url)
+    showToast('✅ 已匯出配課表')
+  }
+
+  function importAllocationsFromCSV(evt) {
+    const file = evt.target.files[0]
+    if (!file) return
+    const reader = new FileReader()
+    reader.onload = function(e) {
+      let text = e.target.result
+      for (const enc of ['utf-8', 'big5']) {
+        try {
+          const dec = new TextDecoder(enc, { fatal: false })
+          text = dec.decode(new Uint8Array(e.target.result))
+          break
+        } catch(_) {}
+      }
+      const lines = text.split(/\r?\n/).map(l => l.trim()).filter(l => l)
+      if (lines.length < 2) return showToast('⚠️ 檔案無資料')
+      const headers = lines[0].split(',')
+      let count = 0
+      for (let r = 1; r < lines.length; r++) {
+        const cells = lines[r].split(',')
+        const classDisplay = cells[0]
+        const grade = cells[1]
+        const className = classDisplay.replace(/^\d年/, '').replace('班', '')
+        const cls = classes.find(c => c.grade === grade && (c.name === className || c.name === className.padStart(2, '0')))
+        if (!cls) continue
+        for (let c = 2; c < Math.min(cells.length, headers.length); c++) {
+          const subName = headers[c]
+          const sub = subjects.find(s => s.name === subName)
+          if (!sub) continue
+          const teacherName = cells[c].trim()
+          if (!teacherName) {
+            delete allocations[`${cls.id}-${sub.id}`]
+            continue
+          }
+          const t = teachers.find(x => x.name === teacherName)
+          if (!t) continue
+          allocations[`${cls.id}-${sub.id}`] = t.id
+          count++
+        }
+      }
+      save(); renderAllocation()
+      showToast(`✅ 已匯入 ${count} 筆配課`)
+    }
+    reader.readAsArrayBuffer(file)
+    evt.target.value = ''
+  }
+
+  function updateAllocStats() {
+    const assigned = Object.values(allocations).filter(v => v !== null && v !== undefined).length
+    let totalSlots = 0, totalHoursPerWeek = 0
+    for (const cls of classes) {
+      for (const sub of subjects) {
+        if (!isSubjectForGrade(sub, cls.grade) || RESOURCE_SUBJECT_NAMES.includes(sub.name)) continue
+        totalSlots++
+        totalHoursPerWeek += subH(sub, cls.grade)
+      }
+    }
+    document.getElementById('allocStats').innerHTML = `
+      <div class="stat-item"><div class="num">${teachers.length}</div><div class="label">👤 教師人數</div></div>
+      <div class="stat-item"><div class="num">${subjects.length}</div><div class="label">📖 科目數</div></div>
+      <div class="stat-item"><div class="num">${classes.length}</div><div class="label">🏫 班級數</div></div>
+      <div class="stat-item"><div class="num">${totalHoursPerWeek}</div><div class="label">⏰ 每週總節數</div></div>
+      <div class="stat-item"><div class="num">${assigned}/${totalSlots}</div><div class="label">✅ 已配課</div></div>`
+  }
+
+  function exportData() {
+    const lines = ['📚 配課表', `━━━━━━━━━━━━━━━━`, '']
+    const grades = [...new Set(classes.map(c => c.grade))].sort((a,b) => GRADE_ORDER.indexOf(a) - GRADE_ORDER.indexOf(b))
+    for (const g of grades) {
+      const cls = classes.filter(c => c.grade === g)
+      for (const c of cls) {
+        const parts = subjects.filter(s => isSubjectForGrade(s, g) && !RESOURCE_SUBJECT_NAMES.includes(s.name)).map(s => {
+          const key = `${c.id}-${s.id}`
+          const tid = allocations[key]
+          const t = tid ? teachers.find(x => x.id === tid) : null
+          return `${escapeHtml(s.name)}(${subH(s, g)}節) ${t ? escapeHtml(t.name) : '─'}`
+        })
+        lines.push(`【${escapeHtml(fmtClass(c))}】 ${parts.join(' │ ')}`)
+      }
+    }
+    const assigned = Object.values(allocations).filter(v => v !== null && v !== undefined).length
+    let totalSlots = 0
+    for (const cls of classes) {
+      for (const sub of subjects) {
+        if (!isSubjectForGrade(sub, cls.grade) || RESOURCE_SUBJECT_NAMES.includes(sub.name)) continue
+        totalSlots++
+      }
+    }
+    lines.push(``, `━━━━━━━━━━━━━━━━`, `✅ 已配課：${assigned}/${totalSlots}`)
+    navigator.clipboard.writeText(lines.join('\n')).then(() => showToast('📋 已複製到剪貼簿！'))
+      .catch(() => prompt('請手動複製：', lines.join('\n')))
+  }
+
+  function resetAllData() {
+    if (!confirm('確定清除所有資料？此操作無法復原！')) return
+    teachers = []; subjects = []; classes = []; allocations = {}
+    save()
+    switchPage('allocation')
+    showToast('已清除所有資料')
+  }
+
+  function showWorkforceAnalysis() {
+    if (!classes.length || !subjects.length) return showToast('請先建立班級與科目')
+    document.getElementById('modalTitle').textContent = '📈 人力資源分析'
+    document.getElementById('modalSub').textContent = `基準：${classes.length} 班 · ${subjects.length} 科 · ${teachers.length} 位教師`
+
+    const assignedHours = {}
+    for (const key in allocations) {
+      const tId = allocations[key]
+      if (!tId) continue
+      const [clsId, subId] = key.split('-')
+      const sub = subjects.find(s => s.id === subId)
+      if (sub) {
+        const cls = classes.find(c => c.id === clsId)
+        assignedHours[tId] = (assignedHours[tId] || 0) + subH(sub, cls ? cls.grade : null)
+      }
+    }
+
+    const assignedTotal = Object.values(assignedHours).reduce((s, v) => s + v, 0)
+    const capacityTotal = teachers.reduce((s, t) => s + getBaseHours(t), 0)
+    const requiredTotal = subjects.reduce((sum, sub) => {
+      if (RESOURCE_SUBJECT_NAMES.includes(sub.name)) return sum
+      let subTotal = 0
+      for (const c of classes) if (isSubjectForGrade(sub, c.grade)) subTotal += subH(sub, c.grade)
+      return sum + subTotal
+    }, 0)
+    const unassigned = requiredTotal - assignedTotal
+
+    const requiredBySub = subjects.map(s => {
+      const gradeBreakdown = {}
+      let totalHours = 0
+      if (!RESOURCE_SUBJECT_NAMES.includes(s.name)) {
+        for (const c of classes) {
+          if (!isSubjectForGrade(s, c.grade)) continue
+          const h = subH(s, c.grade)
+          gradeBreakdown[c.grade] = (gradeBreakdown[c.grade] || 0) + h
+          totalHours += h
+        }
+      }
+      const detail = Object.entries(gradeBreakdown).length
+        ? Object.entries(gradeBreakdown).map(([g, h]) => `${g}年級 ${h}節`).join(' · ')
+        : '七年級 0節 · 八年級 0節'
+      return {
+        name: s.name, color: s.color, hours: totalHours / (classes.length || 1),
+        total: totalHours,
+        detail,
+        assigned: teachers.reduce((sum, t) => {
+          let count = 0
+          for (const key in allocations) {
+            if (allocations[key] === t.id && key.endsWith(`-${s.id}`)) {
+              const clsId = key.split('-')[0]
+              const cls = classes.find(c => c.id === clsId)
+              if (!cls || !isSubjectForGrade(s, cls.grade)) continue
+              count += subH(s, cls.grade)
+            }
+          }
+          return sum + count
+        }, 0)
+      }
+    })
+
+    let body = `
+    <div style="margin-bottom:16px">
+      <div style="font-weight:700;font-size:15px;color:var(--primary);margin-bottom:10px">📊 總體統計</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:8px">
+        <div style="padding:12px;border-radius:8px;background:var(--bg);border:1.5px solid var(--border-light);text-align:center">
+          <div style="font-size:20px;font-weight:800;color:var(--primary)">${requiredTotal}</div>
+          <div style="font-size:11px;color:var(--text-dim);margin-top:2px">📋 應授總節數</div>
+        </div>
+        <div style="padding:12px;border-radius:8px;background:var(--bg);border:1.5px solid var(--border-light);text-align:center">
+          <div style="font-size:20px;font-weight:800;color:var(--primary)">${assignedTotal}</div>
+          <div style="font-size:11px;color:var(--text-dim);margin-top:2px">✅ 已指派節數</div>
+        </div>
+        <div style="padding:12px;border-radius:8px;background:var(--bg);border:1.5px solid var(--border-light);text-align:center">
+          <div style="font-size:20px;font-weight:800;color:${unassigned > 0 ? 'var(--error)' : 'var(--success)'}">${unassigned}</div>
+          <div style="font-size:11px;color:var(--text-dim);margin-top:2px">❌ 未指派節數</div>
+        </div>
+        <div style="padding:12px;border-radius:8px;background:var(--bg);border:1.5px solid var(--border-light);text-align:center">
+          <div style="font-size:20px;font-weight:800;color:var(--primary)">${capacityTotal}</div>
+          <div style="font-size:11px;color:var(--text-dim);margin-top:2px">👤 教師總容量</div>
+        </div>
+      </div>
+    </div>`
+
+    // Teacher workload table
+    const teacherLoads = teachers.map(t => {
+      const loaded = assignedHours[t.id] || 0
+      return { name: t.name, role: t.role, hours: getBaseHours(t), loaded, diff: loaded - getBaseHours(t), id: t.id }
+    })
+    teacherLoads.sort((a, b) => Math.abs(b.diff) - Math.abs(a.diff) || roleOrder(a.role) - roleOrder(b.role) || a.name.localeCompare(b.name, 'zh-TW'))
+
+    body += `
+    <hr style="border:none;border-top:1.5px dashed var(--border-light);margin:16px 0">
+    <div style="font-weight:700;font-size:15px;color:var(--primary);margin-bottom:10px">👤 教師授課負擔</div>
+    <div class="report-table-wrap"><table class="report-table">
+      <thead><tr><th>教師</th><th>職務</th><th class="num">基本鐘點</th><th class="num">已配節數</th><th class="num">差額</th></tr></thead>
+      <tbody>${teacherLoads.map(t => `<tr>
+        <td>${escapeHtml(t.name)}</td>
+        <td><span style="font-size:11px;color:var(--text-dim)">${escapeHtml(t.role)}</span></td>
+        <td class="num">${t.hours}</td>
+        <td class="num">${t.loaded}</td>
+        <td class="num" style="font-weight:600;color:${t.diff > 0 ? 'var(--error)' : t.diff < 0 ? 'var(--warning)' : 'var(--text-dim)'}">${t.diff > 0 ? '+' : ''}${t.diff}</td>
+      </tr>`).join('')}</tbody>
+    </table></div>`
+
+    // Subject analysis
+    body += `
+    <hr style="border:none;border-top:1.5px dashed var(--border-light);margin:16px 0">
+    <div style="font-weight:700;font-size:15px;color:var(--primary);margin-bottom:10px">📖 各科目人力分析</div>
+    <div class="report-table-wrap"><table class="report-table">
+      <thead><tr><th>科目</th><th class="num">每班節數</th><th class="num">應授總計</th><th class="num">已指派</th><th class="num">短缺</th><th>各年級配置</th></tr></thead>
+      <tbody>${requiredBySub.map(r => `<tr>
+        <td><span class="tag" style="background:${r.color}15;color:${r.color}">${escapeHtml(r.name)}</span></td>
+        <td class="num">${r.hours}</td>
+        <td class="num">${r.total}</td>
+        <td class="num">${r.assigned}</td>
+        <td class="num" style="font-weight:600;color:${r.total - r.assigned > 0 ? 'var(--error)' : 'var(--success)'}">${r.total - r.assigned}</td>
+        <td style="font-size:11px;color:var(--text-dim)">${r.detail}</td>
+      </tr>`).join('')}</tbody>
+    </table></div>`
+
+    // Recommendation
+    if (unassigned > 0) {
+      body += `<hr style="border:none;border-top:1.5px dashed var(--border-light);margin:16px 0">
+      <div style="font-weight:700;font-size:15px;color:var(--primary);margin-bottom:10px">💡 建議</div>
+      <div style="padding:12px 16px;background:#FFF3E0;border-radius:8px;font-size:13px;line-height:1.6;color:#E65100">
+        ⚠️ 尚有 <strong>${unassigned}</strong> 節未指派教師。
+        ${unassigned > 0 && teachers.length > 0 ? '請至配課表手動指派，或使用「自動配課」功能依教師專長分配。' : ''}
+        ${teachers.length === 0 ? '請先建立教師資料（含職務、基本鐘點與科目專長）。' : ''}
+      </div>`
+    } else {
+      const surplus = capacityTotal - requiredTotal
+      if (surplus >= 0) {
+        body += `<hr style="border:none;border-top:1.5px dashed var(--border-light);margin:16px 0">
+        <div style="font-weight:700;font-size:15px;color:var(--primary);margin-bottom:10px">💡 建議</div>
+        <div style="padding:12px 16px;background:#E8F5E9;border-radius:8px;font-size:13px;line-height:1.6;color:#2E7D32">
+          ✅ 所有配課均已指派完成，教師總容量 ${surplus >= 0 ? `多出 <strong>${surplus}</strong> 節` : ''}。
+          ${surplus > 48 ? `<br>📌 若有多餘人力，可考慮減課或調整教師基本鐘點。` : ''}
+          ${surplus >= 0 && surplus <= 48 ? `<br>📌 人力大致平衡，無需增聘代理或代課教師。` : ''}
+        </div>`
+      } else {
+        const need = -surplus
+        const agentFull = Math.floor(need / 16)
+        const remainder = need % 16
+        const subCount = Math.ceil(remainder / 4)
+        body += `<hr style="border:none;border-top:1.5px dashed var(--border-light);margin:16px 0">
+        <div style="font-weight:700;font-size:15px;color:var(--primary);margin-bottom:10px">💡 建議增聘</div>
+        <div style="padding:12px 16px;background:#FFF3E0;border-radius:8px;font-size:13px;line-height:1.6;color:#E65100">
+          ⏰ 總短缺 <strong>${need}</strong> 節。<br>
+          👨‍🏫 建議增聘 <strong>${agentFull}</strong> 位代理教師（每人 16 節/週）${remainder > 0 ? `，再徵 <strong>${subCount}</strong> 位代課教師填補 ${remainder} 節（每人 4 節/週）` : ''}。<br>
+          <span style="font-size:11px">* 實際聘用數額請依人事預算及教師專長調整。</span>
+        </div>`
+      }
+    }
+
+    document.getElementById('modalBody').innerHTML = body
+    document.getElementById('modalConfirm').style.display = 'none'
+    document.querySelector('.modal').classList.add('modal-wide')
+    document.getElementById('modal').classList.add('show')
+    const closeBtn = document.querySelector('#modal .modal-actions .btn-outline')
+    if (closeBtn) closeBtn.textContent = '關閉'
+    const exportBtn = document.querySelector('#modal .modal-actions .btn-export')
+    if (!exportBtn) {
+      const btn = document.createElement('button')
+      btn.className = 'btn btn-outline btn-sm btn-export'
+      btn.textContent = '📤 匯出分析'
+      btn.onclick = exportWorkforceAnalysis
+      document.querySelector('#modal .modal-actions').insertBefore(btn, closeBtn)
+    }
+  }
+
+  function exportWorkforceAnalysis() {
+    const assignedHours = {}
+    for (const key in allocations) {
+      const tId = allocations[key]
+      if (!tId) continue
+      const [clsId, subId] = key.split('-')
+      const sub = subjects.find(s => s.id === subId)
+      if (sub) {
+        const cls = classes.find(c => c.id === clsId)
+        assignedHours[tId] = (assignedHours[tId] || 0) + subH(sub, cls ? cls.grade : null)
+      }
+    }
+    const assignedTotal = Object.values(assignedHours).reduce((s, v) => s + v, 0)
+    const capacityTotal = teachers.reduce((s, t) => s + getBaseHours(t), 0)
+    let requiredTotal = 0
+    for (const sub of subjects) {
+      if (RESOURCE_SUBJECT_NAMES.includes(sub.name)) continue
+      for (const c of classes) {
+        if (isSubjectForGrade(sub, c.grade)) requiredTotal += subH(sub, c.grade)
+      }
+    }
+    const unassigned = requiredTotal - assignedTotal
+    const teacherLoads = teachers.map(t => {
+      const loaded = assignedHours[t.id] || 0
+      return { name: t.name, role: t.role, hours: getBaseHours(t), loaded, diff: loaded - getBaseHours(t) }
+    })
+    teacherLoads.sort((a, b) => Math.abs(b.diff) - Math.abs(a.diff) || roleOrder(a.role) - roleOrder(b.role) || a.name.localeCompare(b.name, 'zh-TW'))
+
+    const overloaded = teacherLoads.filter(t => t.diff > 0)
+    const underloaded = teacherLoads.filter(t => t.diff < 0)
+    const suggestions = []
+    if (overloaded.length) {
+      suggestions.push('🏷️ 超鐘點教師（差額 > 0）處理建議：')
+      for (const t of overloaded) {
+        suggestions.push(`  【${t.name}】超 ${t.diff} 節／已配 ${t.loaded} 節（基本 ${t.hours} 節）`)
+        suggestions.push(`    → 建議酌減 ${Math.min(t.diff, 2)} 節，將其課程移轉給尚有容量之教師`)
+      }
+    }
+    if (underloaded.length) {
+      suggestions.push('🏷️ 不足鐘點教師（差額 < 0）處理建議：')
+      for (const t of underloaded) {
+        const shortage = -t.diff
+        suggestions.push(`  【${t.name}】差 ${shortage} 節／已配 ${t.loaded} 節（基本 ${t.hours} 節）`)
+        suggestions.push(`    → 尚有 ${shortage} 節容量，可承接 ${Math.floor(shortage / 4)}~${Math.ceil(shortage / 2)} 科課程`)
+      }
+    }
+    if (!overloaded.length && !underloaded.length) {
+      suggestions.push('✅ 所有教師鐘點平衡，無需調整。')
+    }
+    if (unassigned > 0) {
+      suggestions.push(`📌 尚有 ${unassigned} 節未指派，可優先分配給${underloaded.length ? '不足鐘點之教師' : '教師容量充足者'}。`)
+    }
+
+    const lines = [
+      '📈 人力資源分析報告',
+      `產生日期：${new Date().toLocaleDateString('zh-TW')}`,
+      `基準：${classes.length} 班 · ${subjects.length} 科 · ${teachers.length} 位教師`,
+      '',
+      '📊 總體統計',
+      `  應授總節數：${requiredTotal}`,
+      `  已指派節數：${assignedTotal}`,
+      `  未指派節數：${unassigned}`,
+      `  教師總容量：${capacityTotal}`,
+      '',
+      '👤 教師授課負擔（依差額降序）',
+      '  教師\t職務\t基本鐘點\t已配節數\t差額',
+      ...teacherLoads.map(t =>
+        `  ${t.name}\t${t.role}\t${t.hours}\t${t.loaded}\t${t.diff > 0 ? '+' : ''}${t.diff}`
+      ),
+      '',
+      '💡 差額較大教師處理建議',
+      ...suggestions,
+      '',
+      '━━━ 本報告由配課系統自動產生 ━━━',
+    ]
+    const text = lines.join('\n')
+    navigator.clipboard.writeText(text).then(() => showToast('📋 分析報告已複製到剪貼簿！'))
+  }
+
+  function autoAllocate() {
+    if (!teachers.length) return showToast('請先新增教師')
+    if (!subjects.length || !classes.length) return showToast('請先建立科目與班級')
+    const unassigned = Object.keys(allocations).filter(k => !allocations[k])
+    if (!unassigned.length) return showToast('✅ 所有配課均已指派完畢')
+    const capacity = {}
+    for (const t of teachers) capacity[t.id] = getBaseHours(t) - calcTeacherAssignedHours(t.id)
+    const canTake = () => Object.values(capacity).some(v => v > 0)
+    if (!canTake()) return showToast('⚠️ 所有教師已達基本鐘點上限，無法再分配')
+    const slots = unassigned.map(key => {
+      const [clsId, subId] = key.split('-')
+      const cls = classes.find(c => c.id === clsId)
+      const sub = subjects.find(s => s.id === subId)
+      if (!cls || !sub || !isSubjectForGrade(sub, cls.grade) || RESOURCE_SUBJECT_NAMES.includes(sub.name)) return null
+      return { key, clsId, subId, hours: subH(sub, cls.grade) }
+    }).filter(Boolean)
+    slots.sort((a, b) => {
+      const specA = teachers.filter(t => t.specialties.includes(a.subId)).length
+      const specB = teachers.filter(t => t.specialties.includes(b.subId)).length
+      return specA - specB
+    })
+    let assigned = 0
+    for (const slot of slots) {
+      const subId = slot.subId; const hrs = slot.hours
+      const candidates = teachers.filter(t => t.specialties.includes(subId) && capacity[t.id] >= hrs)
+      if (!candidates.length) continue
+      candidates.sort((a, b) => capacity[b.id] - capacity[a.id])
+      const best = candidates[0]
+      allocations[slot.key] = best.id
+      capacity[best.id] -= hrs; assigned++
+    }
+    save(); renderAllocation()
+    showToast(`✅ 已完成 ${assigned} 個配課${unassigned.length - assigned > 0 ? `，${unassigned.length - assigned} 個因教師容量不足略過` : ''}`)
+  }
+
+  function showImportTimetable() {
+    const m = document.getElementById('modal')
+    document.getElementById('modalTitle').textContent = '📋 匯入配課表'
+    document.getElementById('modalSub').textContent = '貼上 Excel 配課表（含標題列），系統自動建立科目、教師與配課'
+    document.getElementById('modalBody').innerHTML = `
+      <div class="form-group"><label style="font-size:13px;color:var(--text-dim);margin-bottom:8px">請貼上以 TAB 分隔的配課資料（第一列為科目名稱，第一欄為班級名稱）：</label>
+      <textarea id="importTimetableData" style="width:100%;height:300px;padding:12px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:13px;font-family:monospace;outline:none;background:var(--bg);resize:vertical" placeholder="將 Excel 資料貼上於此..."></textarea></div>
+      <div style="font-size:12px;color:var(--text-muted);line-height:1.6">⚠️ 已存在的同名教師不會重複新增；已存在的同名科目會略過；已存在的班級會更新配課。</div>`
+    document.getElementById('modalConfirm').style.display = ''
+    document.querySelector('.modal').classList.add('modal-wide')
+    document.querySelector('#modal .modal-actions .btn-outline').textContent = '取消'
+    document.getElementById('modalConfirm').textContent = '開始匯入'
+    modalContext = { type: 'importTimetable' }
+    m.classList.add('show')
+  }
+
+  function importTimetableFromText(text) {
+    const lines = text.split('\n').filter(l => l.trim())
+    if (lines.length < 2) return showToast('資料不足，需含標題列與至少一列班級資料')
+    const headers = lines[0].split('\t').map(h => h.trim())
+    const colCount = headers.length
+    let subCreated = 0, teaCreated = 0, clsCreated = 0, allocSet = 0
+    const subMap = {}
+    const grades = { 七: [], 八: [], 九: [] }
+
+    for (let c = 1; c < colCount; c++) {
+      const raw = headers[c]
+      if (!raw || raw === '＊') continue
+      const m = raw.match(/^(.+?)\((\d+(?:\.\d+)?)\)$/)
+      const name = m ? m[1].trim() : raw.trim()
+      const hours = m ? parseFloat(m[2]) : 1
+      if (!name) continue
+      let sub = subjects.find(s => s.name === name)
+      if (!sub) {
+        sub = { id: genId(), name, hours, color: '#' + Math.floor(Math.random()*0xFFFFFF).toString(16).padStart(6,'0') }
+        subjects.push(sub)
+        subCreated++
+      }
+      subMap[c] = sub.id
+    }
+
+    for (let r = 1; r < lines.length; r++) {
+      const cells = lines[r].split('\t').map(c => c.trim())
+      const className = cells[0]
+      if (!className) continue
+      const gradeMatch = className.match(/^(\d)(\d{2})$/)
+      if (!gradeMatch) continue
+      const g = gradeMatch[1] === '7' ? '七' : gradeMatch[1] === '8' ? '八' : gradeMatch[1] === '9' ? '九' : null
+      if (!g) continue
+      const simpleName = gradeMatch[2]
+      let cls = classes.find(c => c.name === simpleName && c.grade === g)
+      if (!cls) {
+        cls = { id: genId(), grade: g, name: simpleName }
+        classes.push(cls)
+        clsCreated++
+      }
+      for (let c = 1; c < Math.min(cells.length, colCount); c++) {
+        const val = cells[c]
+        if (!val || val === '＊' || val === '') continue
+        const subId = subMap[c]
+        if (!subId) continue
+        let t = teachers.find(x => x.name === val)
+        if (!t) {
+          t = { id: genId(), name: val, specialties: [], role: '專任教師', hours: 18 }
+          teachers.push(t)
+          teaCreated++
+        }
+        const key = `${cls.id}-${subId}`
+        if (!allocations[key]) allocations[key] = t.id
+        else if (allocations[key] !== t.id) allocations[key] = t.id
+        allocSet++
+      }
+    }
+
+    save(); renderAllocation(); renderTeachers(); renderSubjects(); renderClasses()
+    showToast(`✅ 已匯入配課表：${subCreated} 科新增、${teaCreated} 位教師、${clsCreated} 班、${allocSet} 筆配課`)
+  }
+
+  function importCsvParsedData(evt) {
+    const file = evt.target.files[0]
+    if (!file) return
+    const reader = new FileReader()
+    reader.onload = function(e) {
+      try {
+        const data = JSON.parse(e.target.result)
+        if (!data.subjects || !data.teachers || !data.classes) {
+          return showToast('⚠️ JSON 格式錯誤：需包含 subjects, teachers, classes')
+        }
+        const subMap = {}
+        for (const s of data.subjects) {
+          let sub = subjects.find(x => x.name === s.name)
+          if (!sub) {
+            sub = { id: genId(), name: s.name, hours: subH(s), color: '#' + Math.floor(Math.random()*0xFFFFFF).toString(16).padStart(6,'0') }
+            subjects.push(sub)
+          }
+          subMap[s.name] = sub.id
+        }
+        const clsMap = {}
+        for (const c of data.classes) {
+          const gradeMatch = c.match(/^(\d)(\d{2})$/)
+          const simpleName = gradeMatch ? gradeMatch[2] : c.padStart(2, '0')
+          const g = gradeMatch ? (gradeMatch[1] === '7' ? '七' : gradeMatch[1] === '8' ? '八' : '九') : c.startsWith('8') ? '八' : c.startsWith('7') ? '七' : '九'
+          let cls = classes.find(x => x.name === simpleName && x.grade === g)
+          if (!cls) {
+            cls = { id: genId(), grade: g, name: simpleName }
+            classes.push(cls)
+            for (const sub of subjects) allocations[`${cls.id}-${sub.id}`] = null
+          }
+          clsMap[c] = cls.id
+        }
+        for (const t of data.teachers) {
+          let teacher = teachers.find(x => x.name === t.name)
+          if (!teacher) {
+            const specs = (t.specialties || []).map(s => subMap[s]).filter(Boolean)
+            teacher = { id: genId(), name: t.name, specialties: specs, role: t.role || '專任教師', hours: getBaseHours({ specialties: specs, role: t.role || '專任教師' }) }
+            teachers.push(teacher)
+          }
+        }
+        if (data.allocations) {
+          for (const [key, teacherName] of Object.entries(data.allocations)) {
+            const [clsName, subjName] = key.split('|')
+            const subId = subMap[subjName]
+            const clsId = clsMap[clsName]
+            if (subId && clsId) {
+              const t = teachers.find(x => x.name === teacherName)
+              if (t) allocations[`${clsId}-${subId}`] = t.id
+            }
+          }
+        }
+        save(); renderAllocation(); renderTeachers(); renderSubjects(); renderClasses()
+        showToast(`✅ 已載入 ${data.teachers.length} 位教師、${data.classes.length} 班、${Object.keys(data.allocations||{}).length} 筆配課`)
+      } catch(err) {
+        showToast('⚠️ 解析失敗：' + err.message)
+      }
+    }
+    reader.readAsText(file)
+    evt.target.value = ''
+  }
+
+  function closeModal() {
+    document.getElementById('modal').classList.remove('show')
+  }
+
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal() })
+  load(); initDemo(); renderClasses()
+</script>
+</body>
+</html>
