@@ -457,10 +457,69 @@
           const sub = subjects.find(s => s.id === subId)
           if (cls && sub && !isSubjectForGrade(sub, cls.grade)) delete allocations[key]
         }
+        return true
       } else if (d) {
         localStorage.removeItem(STORAGE_KEY)
       }
     } catch(e) {}
+    return false
+  }
+
+  const SUBJECT_COLORS = {
+    '國文':'#3D8B7E','英文':'#2E86DE','數學':'#D9655B','生物':'#27AE60','理化':'#1ABC9C',
+    '歷史':'#8E44AD','地理':'#E67E22','公民與社會':'#F39C12','健康':'#E74C3C','體育':'#FF6B6B',
+    '家政':'#D4A574','輔導':'#6C5CE7','童軍':'#2D6A4F','視覺藝術':'#9B59B6','音樂':'#FF6B6B',
+    '表演藝術':'#FD79A8','生活科技':'#00B894','資訊科技':'#0984E3','本土語文':'#8E44AD',
+    '就勢愛閱讀':'#E17055','美語生活大小事':'#00CEC9','走向國際':'#6C5CE7','環遊新勢界':'#FDCB6E',
+    '時空饗宴':'#E84393','社團':'#636E72','班會':'#B2BEC3','歌唱學英語':'#00B894','特殊教育':'#E74C3C'
+  }
+
+  async function loadFromServer() {
+    try {
+      const res = await fetch('parsed_data.json')
+      if (!res.ok) return false
+      const data = await res.json()
+      if (!data.subjects || !data.classes || !data.teachers) return false
+
+      const subNameToSub = {}
+      subjects = data.subjects.map(s => {
+        const id = genId()
+        const obj = { id, name: s.name, hours: DEFAULT_HOURS[s.name] ?? s.hours, color: SUBJECT_COLORS[s.name] || '#3D8B7E' }
+        subNameToSub[s.name] = obj
+        return obj
+      })
+
+      const nameToCls = {}
+      classes = data.classes.map(code => {
+        const id = genId()
+        const obj = { id, grade: code[0] === '8' ? '八' : '七', name: code.slice(1) }
+        nameToCls[code] = obj
+        return obj
+      })
+
+      const nameToTeacher = {}
+      teachers = data.teachers.map(t => {
+        const id = genId()
+        const specs = (t.specialties || []).map(sn => { const s = subNameToSub[sn]; return s ? s.id : null }).filter(Boolean)
+        const obj = { id, name: t.name, role: t.role, specialties: specs, hours: t.hours }
+        nameToTeacher[t.name] = obj
+        return obj
+      })
+
+      allocations = {}
+      for (const key in data.allocations) {
+        const [clsCode, subName] = key.split('|')
+        const teacherName = data.allocations[key]
+        const cls = nameToCls[clsCode]
+        const sub = subNameToSub[subName]
+        if (!cls || !sub || !isSubjectForGrade(sub, cls.grade)) continue
+        const t = nameToTeacher[teacherName]
+        allocations[`${cls.id}-${sub.id}`] = t ? t.id : null
+      }
+
+      save()
+      return true
+    } catch(e) { return false }
   }
 
   function initDemo() {
@@ -1872,8 +1931,14 @@
     document.getElementById('modal').classList.remove('show')
   }
 
-  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal() })
-  load(); initDemo(); renderClasses()
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal() });
+  (async () => {
+    if (!load()) {
+      const ok = await loadFromServer()
+      if (!ok) initDemo()
+    }
+    renderClasses()
+  })()
 </script>
 </body>
 </html>
