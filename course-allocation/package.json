@@ -1,0 +1,28 @@
+{
+  "name": "course-allocation",
+  "version": "1.0.0",
+  "description": "配課系統 - 班級 × 科目 × 教師管理",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder --win portable"
+  },
+  "devDependencies": {
+    "electron": "^33.0.0",
+    "electron-builder": "^25.0.0"
+  },
+  "build": {
+    "appId": "com.opencode.course-allocation",
+    "productName": "配課系統",
+    "win": {
+      "target": ["portable"],
+      "icon": null
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "allocation.html",
+      "parsed_data.json"
+    ]
+  }
+}
