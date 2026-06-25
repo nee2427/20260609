@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>線上點名系統</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+<style>
+  *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+  :root{
+    --primary:#3D8B7E;--primary-light:#5DA99B;--primary-surface:#E6F3F0;
+    --accent:#E8B84B;--text:#2C3E3A;--text-dim:#7A8F8B;--text-muted:#A9BCB8;
+    --bg:#F5F8F7;--surface:#FFFFFF;--border:#D6E4E0;--border-light:#E8F0ED;
+    --present:#3D8B7E;--absent:#D9655B;--leave:#F39C12;--unmarked:#D6E4E0;
+    --radius:16px;--radius-sm:10px;
+    --shadow:0 2px 8px rgba(61,139,126,0.06),0 8px 32px rgba(61,139,126,0.04)
+  }
+  body{
+    font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;
+    background-image:radial-gradient(ellipse 600px 400px at 10% 20%,rgba(61,139,126,0.04) 0%,transparent 100%);
+    background-attachment:fixed
+  }
+  .header{
+    background:linear-gradient(135deg,var(--primary) 0%,#2D6B60 100%);color:#fff;padding:0 24px;
+    position:sticky;top:0;z-index:100;box-shadow:0 4px 20px rgba(45,107,96,0.15)
+  }
+  .header-inner{
+    max-width:800px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:64px
+  }
+  .header .brand{display:flex;align-items:center;gap:10px}
+  .header .brand-icon{
+    width:32px;height:32px;background:rgba(255,255,255,0.15);border-radius:8px;
+    display:flex;align-items:center;justify-content:center;font-size:18px
+  }
+  .header h1{font-size:18px;font-weight:700;letter-spacing:.5px}
+  .header h1 small{font-weight:300;font-size:12px;opacity:.75;margin-left:6px}
+  .header .header-actions{display:flex;gap:8px}
+  .header .header-btn{
+    padding:6px 14px;border:1px solid rgba(255,255,255,0.25);background:transparent;
+    color:rgba(255,255,255,0.7);border-radius:8px;cursor:pointer;font-size:12px;
+    font-family:inherit;transition:all .25s;text-decoration:none
+  }
+  .header .header-btn:hover{background:rgba(255,255,255,0.1);color:#fff;border-color:rgba(255,255,255,0.4)}
+  .main{max-width:800px;margin:0 auto;padding:32px 24px 60px}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes pop{0%{transform:scale(1)}50%{transform:scale(1.08)}100%{transform:scale(1)}}
+  .rollcall-card{
+    background:var(--surface);border-radius:var(--radius);box-shadow:var(--shadow);
+    padding:28px 32px;margin-bottom:20px;border:1px solid var(--border-light);position:relative;overflow:hidden;animation:fadeUp .4s ease
+  }
+  .rollcall-card::before{
+    content:'';position:absolute;top:0;left:0;right:0;height:3px;
+    background:linear-gradient(90deg,var(--primary),var(--accent),var(--primary));
+    background-size:200% 100%;animation:shimmer 4s ease-in-out infinite
+  }
+  @keyframes shimmer{0%,100%{background-position:0% 0%}50%{background-position:100% 0%}}
+  .card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px}
+  .card-header h2{font-size:20px;font-weight:700;color:var(--primary);display:flex;align-items:center;gap:10px}
+  .card-header .date{font-size:13px;color:var(--text-dim);font-weight:400}
+  .stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:28px}
+  .stat-item{
+    text-align:center;padding:14px 8px;border-radius:var(--radius-sm);
+    background:var(--bg);border:1.5px solid var(--border);transition:all .3s
+  }
+  .stat-item .num{font-size:28px;font-weight:800;line-height:1.2}
+  .stat-item .label{font-size:12px;color:var(--text-dim);margin-top:2px}
+  .stat-item.total .num{color:var(--text)}
+  .stat-item.present .num{color:var(--present)}
+  .stat-item.absent .num{color:var(--absent)}
+  .stat-item.leave .num{color:var(--leave)}
+  .stat-item.highlight{border-color:var(--primary);background:var(--primary-surface)}
+  .grid-container{display:grid;grid-template-columns:repeat(auto-fill,minmax(60px,1fr));gap:10px;margin-bottom:24px}
+  .roll-btn{
+    aspect-ratio:1;border:2px solid var(--border);border-radius:12px;
+    font-size:18px;font-weight:700;font-family:inherit;
+    cursor:pointer;transition:all .2s;position:relative;
+    background:var(--bg);color:var(--text-dim);display:flex;align-items:center;justify-content:center
+  }
+  .roll-btn:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,0.08)}
+  .roll-btn:active{transform:scale(.92)}
+  .roll-btn.present{
+    background:var(--present);color:#fff;border-color:var(--present);
+    box-shadow:0 3px 10px rgba(61,139,126,0.25)
+  }
+  .roll-btn.absent{
+    background:var(--absent);color:#fff;border-color:var(--absent);
+    box-shadow:0 3px 10px rgba(217,101,91,0.25)
+  }
+  .roll-btn.leave{
+    background:var(--leave);color:#fff;border-color:var(--leave);
+    box-shadow:0 3px 10px rgba(243,156,18,0.25)
+  }
+  .roll-btn .badge{
+    position:absolute;top:-6px;right:-6px;width:18px;height:18px;border-radius:50%;
+    font-size:10px;display:flex;align-items:center;justify-content:center;
+    border:2px solid var(--surface);opacity:0;transition:opacity .2s
+  }
+  .roll-btn.present .badge{background:var(--present);opacity:1}
+  .roll-btn.absent .badge{background:var(--absent);opacity:1}
+  .roll-btn.leave .badge{background:var(--leave);opacity:1}
+  .legend{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:4px}
+  .legend-item{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--text-dim)}
+  .legend-dot{width:14px;height:14px;border-radius:4px}
+  .legend-dot.present{background:var(--present)}
+  .legend-dot.absent{background:var(--absent)}
+  .legend-dot.leave{background:var(--leave)}
+  .legend-dot.unmarked{border:2px solid var(--border);background:var(--bg)}
+  .actions{display:flex;gap:10px;flex-wrap:wrap}
+  .btn{
+    padding:10px 24px;border:none;border-radius:var(--radius-sm);font-size:13px;
+    font-weight:600;font-family:inherit;cursor:pointer;transition:all .25s;letter-spacing:.3px
+  }
+  .btn:active{transform:scale(0.96)}
+  .btn-primary{
+    background:linear-gradient(135deg,var(--primary) 0%,var(--primary-light) 100%);
+    color:#fff;box-shadow:0 4px 16px rgba(61,139,126,0.3)
+  }
+  .btn-primary:hover{box-shadow:0 6px 24px rgba(61,139,126,0.4);transform:translateY(-1px)}
+  .btn-outline{background:transparent;color:var(--text-dim);border:1.5px solid var(--border)}
+  .btn-outline:hover{background:var(--bg);color:var(--text)}
+  .btn-danger{
+    background:transparent;color:var(--absent);border:1.5px solid rgba(217,101,91,0.3)
+  }
+  .btn-danger:hover{background:rgba(217,101,91,0.06);border-color:var(--absent)}
+  .btn-success{
+    background:transparent;color:var(--present);border:1.5px solid rgba(61,139,126,0.3)
+  }
+  .btn-success:hover{background:var(--primary-surface);border-color:var(--present)}
+  .toast{
+    position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(100px);
+    background:var(--text);color:#fff;padding:12px 24px;border-radius:12px;
+    font-size:14px;font-weight:500;opacity:0;transition:all .4s ease;z-index:999;
+    box-shadow:0 8px 32px rgba(0,0,0,0.15);pointer-events:none
+  }
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  .modal-overlay{
+    display:none;position:fixed;inset:0;background:rgba(0,0,0,0.3);backdrop-filter:blur(4px);
+    z-index:200;align-items:center;justify-content:center;animation:fadeUp .25s ease
+  }
+  .modal-overlay.show{display:flex}
+  .modal{
+    background:var(--surface);border-radius:var(--radius);padding:32px;
+    max-width:420px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,0.15);
+    border:1px solid var(--border-light);text-align:center
+  }
+  .modal h3{font-size:18px;font-weight:700;color:var(--text);margin-bottom:8px}
+  .modal p{font-size:14px;color:var(--text-dim);margin-bottom:24px;line-height:1.6}
+  .modal .modal-actions{display:flex;gap:10px;justify-content:center}
+  @media(max-width:600px){
+    .stats-row{grid-template-columns:repeat(2,1fr)}
+    .grid-container{grid-template-columns:repeat(auto-fill,minmax(52px,1fr));gap:8px}
+    .roll-btn{font-size:15px;border-radius:10px}
+    .rollcall-card{padding:20px 16px}
+    .main{padding:20px 12px 40px}
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-inner">
+    <div class="brand">
+      <div class="brand-icon">📋</div>
+      <h1>線上點名系統 <small>1 - 34 號</small></h1>
+    </div>
+    <div class="header-actions">
+      <button class="header-btn" onclick="exportResult()">📋 匯出</button>
+      <button class="header-btn" onclick="showResetModal()">⟳ 重置</button>
+    </div>
+  </div>
+</div>
+
+<div class="main">
+  <div class="rollcall-card">
+    <div class="card-header">
+      <h2>
+        <span>📌 點名表</span>
+        <span class="date" id="dateDisplay"></span>
+      </h2>
+    </div>
+
+    <div class="stats-row" id="statsRow">
+      <div class="stat-item total highlight">
+        <div class="num" id="totalCount">34</div>
+        <div class="label">總人數</div>
+      </div>
+      <div class="stat-item present">
+        <div class="num" id="presentCount">0</div>
+        <div class="label">✅ 出席</div>
+      </div>
+      <div class="stat-item absent">
+        <div class="num" id="absentCount">0</div>
+        <div class="label">❌ 缺席</div>
+      </div>
+      <div class="stat-item leave">
+        <div class="num" id="leaveCount">0</div>
+        <div class="label">📝 請假</div>
+      </div>
+    </div>
+
+    <div class="legend">
+      <span class="legend-item"><span class="legend-dot unmarked"></span> 未點名</span>
+      <span class="legend-item"><span class="legend-dot present"></span> 出席</span>
+      <span class="legend-item"><span class="legend-dot absent"></span> 缺席</span>
+      <span class="legend-item"><span class="legend-dot leave"></span> 請假</span>
+    </div>
+
+    <div class="grid-container" id="rollGrid"></div>
+
+    <div class="actions">
+      <button class="btn btn-primary" onclick="markAllPresent()">✅ 全部出席</button>
+      <button class="btn btn-outline" onclick="showResetModal()">⟳ 重置</button>
+      <button class="btn btn-success" onclick="exportResult()">📋 匯出結果</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="resetModal">
+  <div class="modal">
+    <h3>確認重置</h3>
+    <p>確定要清除所有點名記錄嗎？<br>此操作無法復原。</p>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeResetModal()">取消</button>
+      <button class="btn btn-danger" onclick="resetAll()" style="background:var(--absent);color:#fff;border:none">確認重置</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  const TOTAL = 34
+  const states = ['unmarked', 'present', 'absent', 'leave']
+  const rollData = {}
+  let currentIndex = 0
+
+  function init() {
+    document.getElementById('dateDisplay').textContent = new Date().toLocaleDateString('zh-TW', {
+      year: 'numeric', month: 'long', day: 'numeric', weekday: 'long'
+    })
+    for (let i = 1; i <= TOTAL; i++) rollData[i] = 'unmarked'
+    render()
+  }
+
+  function nextState(current) {
+    const idx = states.indexOf(current)
+    return states[(idx + 1) % states.length]
+  }
+
+  const stateLabels = { present: '出席', absent: '缺席', leave: '請假', unmarked: '未點名' }
+  const stateIcons = { present: '✓', absent: '✗', leave: '休', unmarked: '' }
+
+  function cycleState(num) {
+    rollData[num] = nextState(rollData[num])
+    render()
+    showToast(`第 ${num} 號 → ${stateLabels[rollData[num]]}`)
+  }
+
+  function render() {
+    const grid = document.getElementById('rollGrid')
+    grid.innerHTML = ''
+    let present = 0, absent = 0, leave = 0
+    for (let i = 1; i <= TOTAL; i++) {
+      const s = rollData[i]
+      if (s === 'present') present++
+      else if (s === 'absent') absent++
+      else if (s === 'leave') leave++
+      const btn = document.createElement('button')
+      btn.className = `roll-btn ${s !== 'unmarked' ? s : ''}`
+      const icon = stateIcons[s] || i
+      btn.innerHTML = `${icon}${s !== 'unmarked' ? '<span class="badge">' + stateIcons[s] + '</span>' : ''}`
+      btn.title = `第 ${i} 號 - ${stateLabels[s]}（點擊切換狀態）`
+      btn.onclick = () => cycleState(i)
+      grid.appendChild(btn)
+    }
+    document.getElementById('presentCount').textContent = present
+    document.getElementById('absentCount').textContent = absent
+    document.getElementById('leaveCount').textContent = leave
+  }
+
+  function markAllPresent() {
+    for (let i = 1; i <= TOTAL; i++) rollData[i] = 'present'
+    render()
+    showToast('✅ 已將全部標記為出席')
+  }
+
+  function resetAll() {
+    for (let i = 1; i <= TOTAL; i++) rollData[i] = 'unmarked'
+    closeResetModal()
+    render()
+    showToast('已清除所有點名記錄')
+  }
+
+  function showResetModal() {
+    document.getElementById('resetModal').classList.add('show')
+  }
+
+  function closeResetModal() {
+    document.getElementById('resetModal').classList.remove('show')
+  }
+
+  function exportResult() {
+    const date = new Date().toLocaleDateString('zh-TW')
+    const present = [], absent = [], leave = []
+    for (let i = 1; i <= TOTAL; i++) {
+      if (rollData[i] === 'present') present.push(i)
+      else if (rollData[i] === 'absent') absent.push(i)
+      else if (rollData[i] === 'leave') leave.push(i)
+    }
+    const lines = [
+      `📋 點名結果 - ${date}`,
+      `━━━━━━━━━━━━━━━━`,
+      `總人數：${TOTAL} 人`,
+      `✅ 出席：${present.length} 人${present.length ? '（' + present.join('、') + ' 號）' : ''}`,
+      `❌ 缺席：${absent.length} 人${absent.length ? '（' + absent.join('、') + ' 號）' : ''}`,
+      `📝 請假：${leave.length} 人${leave.length ? '（' + leave.join('、') + ' 號）' : ''}`,
+      `未點名：${TOTAL - present.length - absent.length - leave.length} 人`,
+      `━━━━━━━━━━━━━━━━`,
+    ]
+    navigator.clipboard.writeText(lines.join('\n')).then(() => {
+      showToast('📋 已複製到剪貼簿！')
+    }).catch(() => {
+      prompt('請手動複製：', lines.join('\n'))
+    })
+  }
+
+  let toastTimer = null
+  function showToast(msg) {
+    const el = document.getElementById('toast')
+    el.textContent = msg
+    el.classList.add('show')
+    clearTimeout(toastTimer)
+    toastTimer = setTimeout(() => el.classList.remove('show'), 2000)
+  }
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') closeResetModal()
+  })
+
+  init()
+</script>
+</body>
+</html>
