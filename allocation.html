@@ -1789,7 +1789,13 @@
       '━━━ 本報告由配課系統自動產生 ━━━',
     ]
     const text = lines.join('\n')
-    navigator.clipboard.writeText(text).then(() => showToast('📋 分析報告已複製到剪貼簿！'))
+    const blob = new Blob([text], { type: 'text/plain;charset=utf-8' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url; a.download = `人力分析報告_${new Date().toISOString().slice(0,10)}.txt`
+    document.body.appendChild(a); a.click(); document.body.removeChild(a)
+    URL.revokeObjectURL(url)
+    showToast('✅ 分析報告已下載！')
   }
 
   function autoAllocate() {
