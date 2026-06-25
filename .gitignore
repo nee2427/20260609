@@ -8,3 +8,4 @@ Thumbs.db
 __pycache__/
 .env
 parsed_data.json
+course-allocation/parsed_data.json
